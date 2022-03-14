@@ -1,0 +1,52 @@
+server.port=8080
+management.endpoints.web.exposure.include=*
+management.endpoint.shutdown.enabled=true
+spring.datasource.url=jdbc:h2:file:../quizdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=INPUT YOUR USERNAME
+spring.datasource.password=INPUT YOUR PASSWORD
+
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.generate-ddl=false
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+
+spring.h2.console.enabled=true
+spring.h2.console.settings.trace=true
+spring.h2.console.settings.web-allow-others=true
+
+spring.freemarker.expose-request-attributes=true
+
+spring.mail.host = smtp.yandex.ru
+spring.mail.username =INPUT YOUR
+spring.mail.password =INPUT YOUR
+spring.mail.port = 465
+spring.mail.protocol = smtps
+mail.debug = false
+
+#spring.session.jdbc.initialize-schema=always
+#spring.session.store-type=redis
+spring.session.store-type=jdbc
+#spring.session.jdbc.initialize-schema=always
+#spring.session.jdbc.table-name=SPRING_SESSION
+#spring.session.redis.namespace=spring:session
+#spring.session.timeout.seconds=120
+#spring.redis.ssl = true
+spring.session.timeout = 72h
+
+
+
+
+spring.security.oauth2.client.registration.google.client-id=INPUT
+spring.security.oauth2.client.registration.google.client-secret=INPUT
+
+spring.security.oauth2.client.registration.github.client-id=INPUT
+spring.security.oauth2.client.registration.github.client-secret=INPUT
+
+hostname=localhost
+server.port=443
+
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store=
+server.ssl.key-store-password=
+server.ssl.key-alias=

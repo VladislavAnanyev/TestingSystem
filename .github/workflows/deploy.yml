@@ -1,0 +1,32 @@
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: digitalocean  
+      uses: appleboy/ssh-action@v0.1.2
+      with: 
+        host: ${{secrets.SSH_HOST}}
+        key: ${{secrets.SSH_KEY}}
+        username: ${{secrets.SSH_USERNAME}}
+        script: |
+          cd api/WebQuiz
+          git fetch
+          git merge
+          ./gradlew build -x test
+          pkill -9 java
+          nohup java -jar build/libs/mywebquizengine-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+  
+      
+  
+  

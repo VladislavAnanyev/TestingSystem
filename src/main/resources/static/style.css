@@ -1,0 +1,135 @@
+
+/*@media (max-width: 768px) {
+	.body {
+		background: black;
+	}
+}*/
+
+body{
+	/*background-color: #fff;*/
+	/*color: #555;*/
+	font-size: 14px;
+	font-family: 'Bad Script', Monaco, cursive ;
+	/*margin: 0;
+	padding: 0;*/
+	/*min-width: 480px;*/
+}
+
+/*html, body{
+	height: 100%; 
+}*/
+
+h2{
+	font-size: 80px;
+	text-align: center;
+	font-family: 'Lobster', Monaco, cursive;
+	font-weight: 700;
+	font-style: italic;
+	color: #444;
+}
+
+hr{
+	height: 0;
+	border: none;
+	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
+	margin-bottom: 50px;
+	clear: both;
+}
+
+.cont{
+	font-size: 30px;
+	margin: 0 auto;
+	padding-top: 20px;
+	width: 50%;
+	max-width: 50%;
+	}
+
+.text{
+	padding-top: 15px;
+	padding-bottom: 20px
+	}
+
+.box{
+	border: 0px solid #000;
+	font-size: 30px;
+	margin: 0 auto;
+	padding-top: 20px;
+	width: 100%;
+	max-width: 100%;
+	}
+
+.box a{
+	margin-right: 20px;
+	margin-bottom: 20px;
+	float: left;
+	border-radius: 4px;
+	padding: 8px 35px 8px 35px;
+	background-color: #eee;
+	color: #555;
+	font-size: 25px;
+	}
+
+.box a:hover{
+	background-color: #333;
+	color: #fff;
+	}
+
+
+:root {
+	--scrollbarBg: rgb(255, 255, 255);
+	--scrollbarBgInbox: rgb(245, 245, 245);
+	--scrollbarThumb: rgba(203, 199, 199, 0.8);
+	--scrollbarWidth: 12px;
+	--scrollbarBorder: 3px solid var(--scrollbarBg);
+	--scrollbarBorderRadius: calc(var(--scrollbarWidth) / 2);
+}
+.msg_history {
+	scrollbar-width: var(--scrollbarWidth);
+	scrollbar-color: var(--scrollbarThumb) var(--scrollbarBg);
+}
+.msg_history::-webkit-scrollbar {
+	width: var(--scrollbarWidth);
+}
+.msg_history::-webkit-scrollbar-track {
+	background: var(--scrollbarBg);
+	border-radius: var(--scrollbarBorderRadius);
+}
+.msg_history::-webkit-scrollbar-thumb {
+	background-color: var(--scrollbarThumb);
+	border-radius: var(--scrollbarBorderRadius);
+	border: var(--scrollbarBorder);
+}
+
+.inbox_chat {
+	scrollbar-width: var(--scrollbarWidth);
+	scrollbar-color: var(--scrollbarThumb) var(--scrollbarBgInbox);
+}
+.inbox_chat::-webkit-scrollbar {
+	width: var(--scrollbarWidth);
+}
+.inbox_chat::-webkit-scrollbar-track {
+	background: var(--scrollbarBgInbox);
+	border-radius: var(--scrollbarBorderRadius);
+}
+.inbox_chat::-webkit-scrollbar-thumb {
+	background-color: var(--scrollbarThumb);
+	border-radius: var(--scrollbarBorderRadius);
+	border: var(--scrollbarBorder);
+}
+
+/* this stuff below doesn't
+   affect scrollbar styling */
+/*
+body {
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+}
+.container {
+	width: clamp(200px, 50%, 300px);
+	height: 200px;
+	overflow: auto;
+}*/
