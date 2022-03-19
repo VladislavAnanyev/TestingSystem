@@ -94,37 +94,19 @@ public class UserAnswerService  {
     }
 
     public void saveTempAnswer(UserTestAnswer userTestAnswer) {
-        UserTestAnswer lastUserAnswer = userTestAnswerRepository
-                .findLastUserAnswer(userTestAnswer.getUser().getUsername()).get();
-
-        //testService.findTest(Integer.parseInt(id))
-
-        //int id = lastUserAnswer.getUserAnswerId();
-
-        //userTestAnswerRepository.delete(lastUserAnswer);
-
+        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(userTestAnswer.getUser().getUsername()).get();
 
         for (int i = 0; i < lastUserAnswer.getUserQuizAnswers().size(); i++) {
             userQuizAnswerRepository.delete(lastUserAnswer.getUserQuizAnswers().get(i));
         }
-
-
 
         for (int i = 0; i < lastUserAnswer.getTest().getQuizzes().size(); i++) {
             userTestAnswer.getUserQuizAnswers().get(i).setQuiz(userTestAnswer.getTest().getQuizzes().get(i));
             userTestAnswer.getUserQuizAnswers().get(i).setUserAnswer(lastUserAnswer);
         }
 
-
-
         lastUserAnswer.setUserQuizAnswers(userTestAnswer.getUserQuizAnswers());
-        //lastUserAnswer.setUserAnswerId(id);
-
-        //userTestAnswer.setUserAnswerId(lastUserAnswer.getUserAnswerId());
-        //userTestAnswer.setCompletedAt(lastUserAnswer.getCompletedAt());
-
         userTestAnswerRepository.save(lastUserAnswer);
-
     }
 
     /*public Page<UserQuizAnswer> getCompleted (String name, Integer page,
@@ -149,12 +131,12 @@ public class UserAnswerService  {
 
         Test test = testService.findTest(id);
 
-        ArrayList<Integer> list = new ArrayList<>();
+        ArrayList<Long> list = new ArrayList<>();
 
         //Hibernate.initialize(test.getQuizzes());
 
         for (Quiz quiz: test.getQuizzes()) {
-            list.add(quiz.getId());
+            list.add(quiz.getQuizId());
         }
 
 

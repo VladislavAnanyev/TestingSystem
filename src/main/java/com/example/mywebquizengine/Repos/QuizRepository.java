@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 
 @Repository
-public interface QuizRepository extends CrudRepository<Quiz, Integer>, PagingAndSortingRepository<Quiz, Integer> {
+public interface QuizRepository extends CrudRepository<Quiz, Long>, PagingAndSortingRepository<Quiz, Long> {
 
     @Query(value = "SELECT * FROM QUIZZES u WHERE USER_USERNAME = :name", nativeQuery = true)
     Page<Quiz> getQuizForThis(String name, Pageable paging);

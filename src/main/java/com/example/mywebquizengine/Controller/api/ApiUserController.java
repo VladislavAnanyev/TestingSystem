@@ -1,6 +1,5 @@
 package com.example.mywebquizengine.Controller.api;
 
-import com.example.mywebquizengine.Model.Photo;
 import com.example.mywebquizengine.Model.Projection.ProfileView;
 import com.example.mywebquizengine.Model.Projection.UserCommonView;
 import com.example.mywebquizengine.Model.Projection.UserView;
@@ -46,17 +45,17 @@ public class ApiUserController {
     }
 
 
-    @PostMapping(path = "/signup")
+    /*@PostMapping(path = "/signup")
     public AuthResponse signup(@Valid @RequestBody User user) {
-        userService.processCheckIn(user, "BASIC");
+        userService.processCheckIn(user);
         return userService.getJwtToken(user);
     }
+*/
 
-
-    @PostMapping(path = "/googleauth")
+   /* @PostMapping(path = "/googleauth")
     public AuthResponse googleJwt(@RequestBody GoogleToken token) throws GeneralSecurityException, IOException {
         return userService.signinViaGoogleToken(token);
-    }
+    }*/
 
 
     @GetMapping(path = "/authuser")
@@ -107,8 +106,4 @@ public class ApiUserController {
         return userService.checkForExistUser(username);
     }
 
-    @PostMapping(path = "/user/swap-photo")
-    public void swapPhoto(@AuthenticationPrincipal Principal principal, @RequestBody Photo photo) {
-        userService.swapPhoto(photo, principal.getName());
-    }
 }

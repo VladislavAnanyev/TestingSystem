@@ -76,11 +76,11 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
 
 
 
-        if (authentication instanceof OAuth2AuthenticationToken) {
+        /*if (authentication instanceof OAuth2AuthenticationToken) {
             User user = userService.castToUserFromOauth((OAuth2AuthenticationToken) authentication);
 
-            userService.processCheckIn(user, "OAUTH2"); // save if not exist (registration)
-        }
+            userService.processCheckIn(user); // save if not exist (registration)
+        }*/
 
 
 

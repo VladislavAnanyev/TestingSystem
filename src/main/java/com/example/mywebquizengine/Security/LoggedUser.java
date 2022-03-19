@@ -40,7 +40,7 @@ public class LoggedUser implements HttpSessionBindingListener {
 
             if (MywebquizengineApplication.ctx.getBean(UserRepository.class).findById(user.getUsername()).isPresent()) {
                 User authUser = MywebquizengineApplication.ctx.getBean(UserRepository.class).findById(user.getUsername()).get();
-                authUser.setOnline("true");
+                authUser.setOnline(true);
                 MywebquizengineApplication.ctx.getBean(UserRepository.class).save(authUser);
             }
 
@@ -60,7 +60,7 @@ public class LoggedUser implements HttpSessionBindingListener {
         System.out.println("Конец");
         if (MywebquizengineApplication.ctx.getBean(UserRepository.class).findById(user.getUsername()).isPresent()) {
             User authUser = MywebquizengineApplication.ctx.getBean(UserRepository.class).findById(user.getUsername()).get();
-            authUser.setOnline("false");
+            authUser.setOnline(false);
             MywebquizengineApplication.ctx.getBean(UserRepository.class).save(authUser);
         }
 

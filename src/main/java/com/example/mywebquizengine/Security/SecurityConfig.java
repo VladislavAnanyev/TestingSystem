@@ -68,33 +68,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
     @Autowired
     protected UserDetailsService userDetailsService;
 
-
-
-
-
-    /*@Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/ws/**").allowedMethods("*").allowedOriginPatterns("https://localhost/ws/**");
-            }
-        };
-    }*/
-
-
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider()  {
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(userDetailsService);
@@ -206,11 +191,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
             http
 
                     .authorizeRequests()
-                    .antMatchers("/googlee45a32e3d6f7edf4.html", "/register", "/activate/*",
+                    .antMatchers("/googlee45a32e3d6f7edf4.html", "/signup", "/activate/*",
                             "/quizzes", "/reg",  "/androidSign", "/ws/**", "/add", "/about/**",
                             "/", "/signin", "/checkyandex", "/h2-console/**", "/.well-known/pki-validation/**",
-                            /*"/static/forgotPassword.js", "/static/changePassword.js", */"/update/userinfo/pswrdwithoutauth",
-                            "/updatepass/**", "/testm", "/pass/**", "/updatepassword/{activationCode}", "/yandex_135f209071de02b1.html").permitAll()
+                            "/update/userinfo/pswrdwithoutauth", "/updatepass/**", "/testm", "/pass/**",
+                            "/updatepassword/{activationCode}", "/yandex_135f209071de02b1.html",
+                            "/start/{activationCode}").permitAll()
                     .antMatchers("/swagger-ui/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
 

@@ -35,7 +35,7 @@ public class QuizService   {
     }
 
 
-    public void deleteQuiz(int id) {
+    public void deleteQuiz(Long id) {
         if (quizRepository.findById(id).isPresent()) {
             quizRepository.deleteById(id);
             throw new ResponseStatusException(HttpStatus.NO_CONTENT);
@@ -53,7 +53,7 @@ public class QuizService   {
         answers.forEach(answer -> quizRepository.insertAnswers(id, answer));
     }
 
-    public Quiz findQuiz(int id) {
+    public Quiz findQuiz(Long id) {
         if (quizRepository.findById(id).isPresent()){
             return quizRepository.findById(id).get();
         } else {

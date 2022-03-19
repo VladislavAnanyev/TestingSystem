@@ -1,22 +1,17 @@
 package com.example.mywebquizengine;
 
-import com.example.mywebquizengine.Model.Photo;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Repos.UserRepository;
-import com.example.mywebquizengine.Service.UserAnswerService;
 import com.example.mywebquizengine.Service.UserService;
-import org.quartz.*;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
@@ -31,10 +26,17 @@ public class Demo implements CommandLineRunner {
     @Autowired
     private RabbitAdmin rabbitAdmin;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @Transactional
     @Override
     public void run(String... args) {
 
+        System.out.println(passwordEncoder.encode("12345"));
         /*List<User> users2 = userRepository.findAll();
 
         for (User user : users2) {
@@ -42,7 +44,7 @@ public class Demo implements CommandLineRunner {
 
         }*/
 
-        if (rabbitAdmin.getQueueProperties("application") == null) {
+        /*if (rabbitAdmin.getQueueProperties("application") == null) {
             List<User> users = userRepository.findAll();
 
             for (User user : users) {
@@ -56,7 +58,7 @@ public class Demo implements CommandLineRunner {
 
 
             }
-        }
+        }*/
 
 
 

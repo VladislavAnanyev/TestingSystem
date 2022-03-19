@@ -69,7 +69,7 @@
 
 
 <#--        <form method="get" action="/myquiz" >-->
-        <button  onclick="updateQuiz(${oldTest.id?c})" type="submit" class="btn btn-primary mt-2">Изменить</button>
+        <button onclick="updateQuiz(${oldTest.testId?c})" type="submit" class="btn btn-primary mt-2">Изменить</button>
 <#--        </form>-->
 
 

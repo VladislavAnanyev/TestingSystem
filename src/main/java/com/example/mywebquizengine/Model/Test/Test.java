@@ -1,10 +1,12 @@
 package com.example.mywebquizengine.Model.Test;
 
+import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -13,7 +15,7 @@ public class Test {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    private int testId;
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     //@Fetch(FetchMode.SUBSELECT)
@@ -27,8 +29,12 @@ public class Test {
 
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     //@Fetch(FetchMode.SUBSELECT)
-    private List<UserTestAnswer> answers;
+    private List<UserTestAnswer> userTestAnswers;
 
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "COURSE_ID")
+    private Course course;
 
     private String description;
 
@@ -37,7 +43,6 @@ public class Test {
     public Test() {}
 
     public List<Quiz> getQuizzes() {
-        //Hibernate.initialize(this);
         return quizzes;
     }
 
@@ -60,12 +65,12 @@ public class Test {
         //this.quizzes = quizzes;
     }
 
-    public int getId() {
-        return id;
+    public int getTestId() {
+        return testId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTestId(int id) {
+        this.testId = id;
     }
 
     public User getUser() {
@@ -76,27 +81,27 @@ public class Test {
         this.user = user;
     }
 
-    public void setAnswers(List<UserTestAnswer> answers) {
+    public void setUserTestAnswers(List<UserTestAnswer> answers) {
         //this.answers = answers;
         /*
         Для корректной работы с orphanRemoval и обновлением строк в БД
         (Обработка ошибки: A collection with cascade=”all-delete-orphan”
          was no longer referenced by the owning entity instance)
          */
-        if (this.answers == null) {
-            this.answers = answers;
+        if (this.userTestAnswers == null) {
+            this.userTestAnswers = answers;
             return;
         } else {
-            this.answers.clear();
+            this.userTestAnswers.clear();
         }
         if (answers != null) {
-            this.answers.addAll(answers);
+            this.userTestAnswers.addAll(answers);
             //this.answers.forEach((userQuizAnswer) -> userQuizAnswer.setUserAnswer(this));
         }
     }
 
-    public List<UserTestAnswer> getAnswers() {
-        return answers;
+    public List<UserTestAnswer> getUserTestAnswers() {
+        return userTestAnswers;
     }
 
     public String getDescription() {
@@ -113,5 +118,13 @@ public class Test {
 
     public LocalTime getDuration() {
         return duration;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }

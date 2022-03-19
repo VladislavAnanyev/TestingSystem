@@ -19,12 +19,13 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
     @Override
     Optional<User> findById(String s);
 
-
     UserCommonView findByUsername(String username);
 
     UserView findAllByUsername(String username);
 
-    ProfileView findUserByUsernameOrderByUsernameAscPhotosAsc(String username);
+    Optional<User> findUserByEmail(String email);
+
+    ProfileView findUserByUsernameOrderByUsernameAsc(String username);
 
     @Modifying
     @Transactional
@@ -43,7 +44,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
 
     @Query(value = "SELECT * FROM USERS WHERE ACTIVATION_CODE = :activationCode",nativeQuery = true )
-    User findByActivationCode(String activationCode);
+    Optional<User> findByActivationCode(String activationCode);
 
     @Modifying
     @Transactional
@@ -58,6 +59,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Query(value = "SELECT * FROM USERS WHERE CHANGE_PASSWORD_CODE = :changePasswordCode", nativeQuery = true )
     Optional<User> findByChangePasswordCode(String changePasswordCode);
+
 
     @Modifying
     @Transactional

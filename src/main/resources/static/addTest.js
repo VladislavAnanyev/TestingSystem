@@ -1,31 +1,20 @@
 
 
 function addTest() {
-
-
     let quizzes_mas = [];
     let name = document.getElementById("description validationDefault01");
-    /*if (!name.checkValidity()) {
-        //document.getElementById("demo").innerHTML = name.validationMessage;
-        alert(1)
-        return
-    }*/
-
-
+    let courseId = document.getElementById("courseId");
     console.log(document.getElementsByClassName("checkFormCl").length)
     let isValidForm = true
 
     // Цикл с конца так как только в таком случае валидация работает сверху вниз, а не внизу вверх
-    for (let i = document.getElementsByClassName("checkFormCl").length-1; i >= 0 ; i--) {
+    /*for (let i = document.getElementsByClassName("checkFormCl").length-1; i >= 0 ; i--) {
         document.forms['checkForm' + i].reportValidity()
         isValidForm = isValidForm && document.forms['checkForm' + i].checkValidity()
-    }
+    }*/
 
-    if (isValidForm)
-    {
-        //let ftext = data.ftext.value;
-        //$.post('saveser.php',{ ftext:ftext},function(data){ },'json');
-        //window.alert('Спасибо! Ваше сообщение уже у нас в ящике!');
+    if (isValidForm) {
+
         let countOfQuiz = document.getElementsByClassName("quiz").length;
         let title = document.getElementsByName("title");
         let text = document.getElementsByName("text");
@@ -36,9 +25,7 @@ function addTest() {
             time = null
         }
 
-
-        //console.log(time)
-
+        let stringAnswer = document.getElementById('stringAnswer1')
 
         for (let i = 0; i < countOfQuiz; i++) {
             let options = document.getElementsByName(String(Number(i+1) + "options"));
@@ -62,37 +49,27 @@ function addTest() {
                 }
             }
 
-
-
-
-            let quiz = {
-                title: title[i].value,
-                text: text[i].value,
-                options:opt_values,
-                answer: answer_values
+            let quiz
+            if (document.getElementById('1optionstest').hidden === false) {
+                quiz = {
+                    type: "MULTIPLE",
+                    title: title[i].value,
+                    text: text[i].value,
+                    options:opt_values,
+                    answer: answer_values
+                }
+            } else {
+                quiz = {
+                    type: "STRING",
+                    title: title[i].value,
+                    text: text[i].value,
+                    answer: stringAnswer.value
+                }
             }
+
+
             quizzes_mas.push(quiz)
         }
-
-        //let title = $('input[name=title]').val();
-        //let text = $('input[name=text]').val();
-
-        /*let opt = $('input[name=options]');
-
-        for (i = 0; i < arr.length; i++) {
-            arr2.push(arr[i].value)
-        }*/
-
-
-
-        // let quizzes = {
-        //         title: title,
-        //         text: text,
-        //         options: options,
-        //         answer: arr2
-        //     }
-
-        // quizzes_mas.push(quiz)
 
         let json;
 
@@ -102,16 +79,18 @@ function addTest() {
             json = {
                 description: name.value,
                 quizzes: quizzes_mas,
-                duration: time.value
+                duration: time.value,
+                courseId: courseId.value
             }
         } else {
             json = {
                 description: name.value,
                 quizzes: quizzes_mas,
+                courseId: courseId.value
             }
         }
         //console.log("abcde")
-
+        console.log(json)
         let xhr = new XMLHttpRequest();
         xhr.open('POST', '/quizzes/',true);
         xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
@@ -159,18 +138,6 @@ function addTest() {
         };
         xhr.send(JSON.stringify(json))
 
-
-        /*let xhr_2 = new XMLHttpRequest();
-        xhr_2.open('GET', '/api/quizzes/',true);
-        xhr_2.setRequestHeader('Content-type','application/json; charset=utf-8');
-        xhr_2.send();*/
     }
-    /*else
-    {
-        window.alert('Вы заполнили не все поля!');
-    }*/
-
-
-
 
 }

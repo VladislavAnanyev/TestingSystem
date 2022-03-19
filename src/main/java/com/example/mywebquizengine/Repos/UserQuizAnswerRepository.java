@@ -7,7 +7,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -28,7 +27,7 @@ public interface UserQuizAnswerRepository extends CrudRepository<UserQuizAnswer,
             where B.QUIZ_ID = C.QUIZ_ID and UTA.COMPLETED_AT is not null)) * 100, 1)
             FROM USER_QUIZ_ANSWERS AS C WHERE QUIZ_ID IN (:quizzes)  GROUP BY QUIZ_ID
             """, nativeQuery = true)
-    List<Object[]> getAnswerStat(ArrayList<Integer> quizzes);
+    List<Object[]> getAnswerStat(ArrayList<Long> quizzes);
 
 
     String query = """

@@ -1,7 +1,5 @@
 package com.example.mywebquizengine.Service;
 
-import com.example.mywebquizengine.Model.Order;
-import com.example.mywebquizengine.Model.Photo;
 import com.example.mywebquizengine.Model.Projection.ProfileView;
 import com.example.mywebquizengine.Model.Projection.UserCommonView;
 import com.example.mywebquizengine.Model.Projection.UserView;
@@ -9,11 +7,7 @@ import com.example.mywebquizengine.Model.Role;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.UserInfo.AuthRequest;
 import com.example.mywebquizengine.Model.UserInfo.AuthResponse;
-import com.example.mywebquizengine.Model.UserInfo.GoogleToken;
-import com.example.mywebquizengine.Repos.PhotoRepository;
 import com.example.mywebquizengine.Repos.UserRepository;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -28,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -43,9 +36,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.*;
 
@@ -55,8 +45,7 @@ public class UserService implements UserDetailsService {
 
     private static final HttpTransport transport = new NetHttpTransport();
     private static final JsonFactory jsonFactory = new JacksonFactory();
-    @Value("${notification-secret}")
-    String notification_secret;
+
     @Value("${androidGoogleClientId}")
     private String CLIENT_ID;
     @Autowired
@@ -73,10 +62,6 @@ public class UserService implements UserDetailsService {
     private MailSender mailSender;
     @Value("${hostname}")
     private String hostname;
-    @Autowired
-    private PaymentServices paymentServices;
-    @Autowired
-    private PhotoRepository photoRepository;
 
     @Override
     public User loadUserByUsername(String username) throws ResponseStatusException {
@@ -87,25 +72,8 @@ public class UserService implements UserDetailsService {
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-
-
     public User loadUserByUsernameProxy(String username) throws UsernameNotFoundException {
         return userRepository.getOne(username);
-    }
-
-    private void saveUser(User user, String type) {
-
-        Optional<User> optionalUser = userRepository.findById(user.getUsername());
-        if (type.equals("OAUTH2")) {
-            if (optionalUser.isEmpty()) {
-                userRepository.save(user);
-            }
-        } else if (type.equals("BASIC")) {
-            if (optionalUser.isEmpty()) {
-                userRepository.save(user);
-            } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
     }
 
     public void updateUser(String lastName, String firstName, String username) {
@@ -123,9 +91,9 @@ public class UserService implements UserDetailsService {
         userRepository.setChangePasswordCode(user.getUsername(), String.valueOf(code));
 
         try {
-            mailSender.send(user.getEmail(), "Смена пароля в WebQuizzes",
+            mailSender.send(user.getEmail(), "Смена пароля в системе дистанционного обучения",
                     """
-                            Для смены пароля в WebQuizzes
+                            Для смены пароля в системе дистанционного обучения
                             введите в приложении код: """ + code +
                             """
                                     . 
@@ -166,13 +134,11 @@ public class UserService implements UserDetailsService {
         savedUser.setChangePasswordCode(UUID.randomUUID().toString());
     }
 
-    public void activateAccount(String activationCode) {
-        User user = userRepository.findByActivationCode(activationCode);
-        if (user != null) {
-            user.setStatus(true);
-            userRepository.activateAccount(user.getUsername());
-        }
-
+    public User findUserByActivationCode(String activationCode) {
+        Optional<User> optionalUser = userRepository.findByActivationCode(activationCode);
+        if (optionalUser.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Вы не были приглашены");
+        } else return optionalUser.get();
     }
 
     public User getUserViaChangePasswordCode(String changePasswordCode) {
@@ -201,7 +167,7 @@ public class UserService implements UserDetailsService {
                 user.setEmail((String) authentication.getPrincipal().getAttributes().get("email"));
                 user.setFirstName((String) authentication.getPrincipal().getAttributes().get("given_name"));
                 user.setLastName((String) authentication.getPrincipal().getAttributes().get("family_name"));
-                user.setPhotos(Collections.singletonList((String) authentication.getPrincipal().getAttributes().get("picture")));
+                user.setAvatar((String) authentication.getPrincipal().getAttributes().get("picture"));
 
                 user.setUsername(((String) authentication.getPrincipal().getAttributes()
                         .get("email")).replace("@gmail.com", ""));
@@ -213,7 +179,7 @@ public class UserService implements UserDetailsService {
             user.setUsername(authentication.getPrincipal().getAttributes().get("login").toString());
             user.setFirstName(authentication.getPrincipal().getAttributes().get("name").toString());
             user.setLastName(authentication.getPrincipal().getAttributes().get("name").toString());
-            user.setPhotos(Collections.singletonList(authentication.getPrincipal().getAttributes().get("avatar_url").toString()));
+            user.setAvatar(authentication.getPrincipal().getAttributes().get("avatar_url").toString());
 
             if (authentication.getPrincipal().getAttributes().get("email") != null) {
                 user.setEmail(authentication.getPrincipal().getAttributes().get("email").toString());
@@ -227,67 +193,16 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public void doBasicUserInitializationBeforeSave(User user) {
+    private void rabbitInitialize(String username) {
 
-        Queue queue = new Queue(user.getUsername(), true, false, false);
+        Queue queue = new Queue(username, true, false, false);
 
-        Binding binding = new Binding(user.getUsername(), Binding.DestinationType.QUEUE,
-                "message-exchange", user.getUsername(), null);
+        Binding binding = new Binding(username, Binding.DestinationType.QUEUE,
+                "message-exchange", username, null);
 
         rabbitAdmin.declareQueue(queue);
         rabbitAdmin.declareBinding(binding);
 
-        //if (user.getPhotos() == null) {
-
-        user.setPhotos(Collections.singletonList("https://" + hostname + "/img/default.jpg"));
-        //}
-
-        user.setEnabled(true);
-        user.setBalance(0);
-        user.grantAuthority(Role.ROLE_USER);
-
-    }
-
-    public void updateBalance(Integer coins, String username) {
-        User user = userRepository.findById(username).get();
-        user.setBalance(user.getBalance() + coins);
-    }
-
-    public void processPayment(String notification_type, String operation_id, Number amount, Number withdraw_amount, String currency, String datetime, String sender, Boolean codepro, String label, String sha1_hash, Boolean test_notification, Boolean unaccepted, String lastname, String firstname, String fathersname, String email, String phone, String city, String street, String building, String suite, String flat, String zip) throws NoSuchAlgorithmException {
-        String mySha = notification_type + "&" + operation_id + "&" + amount + "&" + currency + "&" +
-                datetime + "&" + sender + "&" + codepro + "&" + notification_secret + "&" + label;
-
-        //System.out.println(mySha);
-
-        MessageDigest mDigest = MessageDigest.getInstance("SHA1");
-        byte[] result = mDigest.digest(mySha.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < result.length; i++) {
-            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
-        }
-
-
-        if (sb.toString().equals(sha1_hash)) {
-            System.out.println("Пришло уведомление");
-            System.out.println("notification_type = " + notification_type + ", operation_id = " + operation_id +
-                    ", amount = " + amount + ", withdraw_amount = " + withdraw_amount + ", currency = " + currency +
-                    ", datetime = " + datetime + ", sender = " + sender + ", codepro = " + codepro + ", label = " + label +
-                    ", sha1_hash = " + sha1_hash + ", test_notification = " + test_notification + ", unaccepted = " + unaccepted + ", lastname = " + lastname + ", firstname = " + firstname + ", fathersname = " + fathersname + ", email = " + email + ", phone = " + phone + ", city = " + city + ", street = " + street + ", building = " + building + ", suite = " + suite + ", flat = " + flat + ", zip = " + zip);
-            System.out.println();
-
-            Order order = new Order();
-
-            order.setAmount(String.valueOf(amount));
-            order.setCoins((int) (Double.parseDouble(String.valueOf(withdraw_amount)) * 100.0));
-            order.setOperation_id(operation_id);
-            order.setOrder_id(Integer.valueOf(label));
-
-            order = paymentServices.saveFinalOrder(order);
-            updateBalance(order.getCoins(), order.getUser().getUsername());
-
-        } else {
-            System.out.println("Неправильный хэш");
-        }
     }
 
     public ArrayList<User> getUserList() {
@@ -321,7 +236,7 @@ public class UserService implements UserDetailsService {
         return new AuthResponse(jwt);
     }
 
-    public AuthResponse signinViaGoogleToken(GoogleToken token) throws GeneralSecurityException, IOException {
+    /*public AuthResponse signinViaGoogleToken(GoogleToken token) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 // Specify the CLIENT_ID of the app that accesses the backend:
                 .setAudience(Collections.singletonList(CLIENT_ID))
@@ -341,7 +256,7 @@ public class UserService implements UserDetailsService {
             String email = payload.getEmail();
             boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
             String name = (String) payload.get("name");
-            List<String> pictureUrl = Collections.singletonList((String) payload.get("picture"));
+            String pictureUrl = (String) payload.get("picture");
             String locale = (String) payload.get("locale");
             String familyName = (String) payload.get("family_name");
             String givenName = (String) payload.get("given_name");
@@ -354,7 +269,7 @@ public class UserService implements UserDetailsService {
             user.setEmail(email);
             user.setFirstName(givenName);
             user.setLastName(familyName);
-            user.setPhotos(pictureUrl);
+            user.setAvatar(pictureUrl);
 
             processCheckIn(user, "OAUTH2");
 
@@ -374,7 +289,7 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
         }
-    }
+    }*/
 
     public UserView getAuthUser(String username) {
         if (userRepository.findAllByUsername(username) == null) {
@@ -389,53 +304,22 @@ public class UserService implements UserDetailsService {
         if (!file.isEmpty()) {
             try {
                 String uuid = UUID.randomUUID().toString();
-                uuid = uuid.substring(0, 8);
                 byte[] bytes = file.getBytes();
 
                 BufferedOutputStream stream =
-                        new BufferedOutputStream(new FileOutputStream(new File("img/" +
-                                uuid + ".jpg")));
+                        new BufferedOutputStream(new FileOutputStream(new File("img/" + uuid + ".jpg")));
                 stream.write(bytes);
                 stream.close();
 
-
-                String photoUrl = "https://" + hostname + "/img/" + uuid + ".jpg";
-
+                String photoUrl = hostname + "/img/" + uuid + ".jpg";
 
                 User user = loadUserByUsername(username);
-
-                Photo photo = new Photo();
-                photo.setUrl(photoUrl);
-                photo.setPosition(user.getPhotos().size());
-                user.addPhoto(photo);
-
+                user.setAvatar(photoUrl);
 
             } catch (IOException e) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
         }
-    }
-
-    public void processCheckIn(User user, String type) {
-        if (type.equals("BASIC")) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setStatus(false);
-            user.setActivationCode(UUID.randomUUID().toString());
-            String mes = user.getFirstName() + " " + user.getLastName() + ", Добро пожаловать в WebQuizzes! "
-                    + "Для активации аккаунта перейдите по ссылке: https://" + hostname + "/activate/" + user.getActivationCode()
-                    + " Если вы не регистрировались на данном ресурсе, то проигнорируйте это сообщение";
-
-            try {
-                mailSender.send(user.getEmail(), "Активация аккаунта в WebQuizzes", mes);
-            } catch (Exception e) {
-                System.out.println("Отключено");
-            }
-
-        } else if (type.equals("OAUTH2")) {
-            user.setStatus(true);
-        }
-        doBasicUserInitializationBeforeSave(user);
-        saveUser(user, type);
     }
 
     public Boolean checkForExistUser(String username) {
@@ -444,35 +328,62 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public ProfileView getUserProfileById(String username) {
-        ProfileView profileView = userRepository.findUserByUsernameOrderByUsernameAscPhotosAsc(username);
-        Collections.sort(profileView.getPhotos());
-        return profileView;
-    }
-
-    @Transactional
-    public void swapPhoto(Photo photo, String name) {
-
-        Photo savedPhoto = photoRepository.findById(photo.getId()).get();
-        List<Photo> photos = photoRepository.findByUser_Username(name);
-
-        photos.remove(((int) savedPhoto.getPosition()));
-        photos.add(photo.getPosition(), savedPhoto);
-
-        for (int i = 0; i < photos.size(); i++) {
-            photos.get(i).setPosition(i);
-        }
-
-
+        return userRepository.findUserByUsernameOrderByUsernameAsc(username);
     }
 
     public void getUserViaChangePasswordCodePhoneApi(String username, String code) {
-
         Optional<User> user = userRepository.findByChangePasswordCode(code);
-
         if (user.isPresent() && user.get().getUsername().equals(username)) {
             return;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
+
+    public User loadUserByEmail(String email) {
+        Optional<User> user = userRepository.findUserByEmail(email);
+        if (user.isPresent()) {
+            return user.get();
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    public void sendRegistrationLink(String email) {
+        User user = loadUserByEmail(email);
+
+        mailSender.send(
+                email,
+                "Приглашение в ",
+                "Для регистрации перейдите по ссылке: " + hostname + "/start/" + user.getActivationCode()
+        );
+    }
+
+    public void processCheckIn(String activationCode, String firstName, String lastName, String password) {
+        User user = findUserByActivationCode(activationCode);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setStatus(true);
+        user.setActivationCode(UUID.randomUUID().toString());
+        String mes = user.getFirstName() + " " + user.getLastName() + ", Добро пожаловать в WebQuizzes! "
+                + "Для активации аккаунта перейдите по ссылке: " + hostname + "/activate/" + user.getActivationCode()
+                + " Если вы не регистрировались на данном ресурсе, то проигнорируйте это сообщение";
+
+        /*try {
+            mailSender.send(user.getEmail(), "Активация аккаунта в WebQuizzes", mes);
+        } catch (Exception e) {
+            System.out.println("Отключено");
+        }*/
+
+        user.setAvatar(hostname + "/img/default.jpg");
+        user.setOnline(false);
+        user.setEnabled(true);
+        user.grantAuthority(Role.ROLE_USER);
+        rabbitInitialize(user.getUsername());
+        saveUser(user);
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
 }

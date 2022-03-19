@@ -6,8 +6,6 @@ public interface UserCommonView {
     String getUsername();
     String getFirstName();
     String getLastName();
-
-    @Value("#{target.photos.get(0).url}")
     String getAvatar();
 }
 

@@ -9,63 +9,40 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.util.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Entity(name = "USERS")
-public class User implements UserDetails, OAuth2User  {
+public class User implements UserDetails, OAuth2User {
 
+    private static final long serialVersionUID = -7422293274841574951L;
     @Id
     @NotBlank
     /*@Pattern(regexp = """
             [\S]{0,}
             """) // без пробелов*/
     private String username;
-
     @NotBlank
     @NotNull
     @Email
     private String email;
-
     private String activationCode;
-
     private String changePasswordCode;
-
     @NotBlank
     @NotNull
     private String firstName;
-
     @NotBlank
     @NotNull
     private String lastName;
 
     @Size(min = 5)
     private String password;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_username")
-    @OrderBy("position ASC")
-    private List<Photo> photos;
-
     private String avatar;
-
-    private String description;
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "users_dialogs",
@@ -73,36 +50,23 @@ public class User implements UserDetails, OAuth2User  {
             inverseJoinColumns = @JoinColumn(name = "dialog_id")
     )
     private List<Dialog> dialogs = new ArrayList<>();
-
-
-    public List<Dialog> getDialogs() {
-        return dialogs;
-    }
-
-    public void setDialogs(List<Dialog> dialogs) {
-        this.dialogs = dialogs;
-    }
-
     @Transient
     private boolean accountNonExpired;
-
     @Transient
     private boolean accountNonLocked;
-
     @Transient
     private boolean credentialsNonExpired;
-
     @Transient
     private boolean enabled;
-
     private boolean status;
+    @ManyToMany
+    private List<User> friends;
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Role> roles;
+    private boolean online;
 
-    private Integer balance;
-
-    private static final long serialVersionUID = -7422293274841574951L;
-
-    public User(){
-
+    public User() {
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
@@ -118,45 +82,39 @@ public class User implements UserDetails, OAuth2User  {
         this.status = false;
     }
 
-    public User(String username, String firstName, String lastName, List<Photo> photos) {
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.photos = photos;
-    }
-
     public User(String username, String firstName, String lastName, String avatar) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        Photo photo = new Photo();
-        photo.setUrl(avatar);
-        List<Photo> photos = new ArrayList<>();
-        photos.add(photo);
-        this.photos = photos;
+        this.avatar = avatar;
     }
 
-
-    private String online;
-
-
-    public void setOnline(String online) {
-        this.online = online;
+    public List<Dialog> getDialogs() {
+        return dialogs;
     }
 
-    public String getOnline() {
+    public void setDialogs(List<Dialog> dialogs) {
+        this.dialogs = dialogs;
+    }
+
+    public boolean getOnline() {
         return online;
     }
 
-    @ManyToMany
-    private List<User> friends;
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
     @Override
-    public List<GrantedAuthority> getAuthorities(){
+    public List<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.toString())));
         return authorities;
@@ -190,19 +148,18 @@ public class User implements UserDetails, OAuth2User  {
         return true;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public boolean isAdmin(String name) {
         return MywebquizengineApplication.ctx.getBean(UserService.class)
                 .loadUserByUsername(name).getRoles().contains(Role.ROLE_ADMIN);
     }
 
     public void grantAuthority(Role authority) {
-        if ( roles == null ) roles = new ArrayList<>();
+        if (roles == null) roles = new ArrayList<>();
         this.roles.add(authority);
-    }
-
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     @Override
@@ -247,29 +204,17 @@ public class User implements UserDetails, OAuth2User  {
         this.lastName = lastName;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
     public boolean isStatus() {
         return status;
     }
 
-    public List<Photo> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<String> avatarName) {
-        Photo photo = new Photo();
-        photo.setUrl(avatarName.get(0));
-        photo.setPosition(0);
-        this.photos = Collections.singletonList(photo);
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
     public List<Role> getRoles() {
         return roles;
     }
-
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
@@ -282,14 +227,6 @@ public class User implements UserDetails, OAuth2User  {
     public void setChangePasswordCode(String changePasswordCode) {
         this.changePasswordCode = changePasswordCode;
     }
-    public void setBalance(Integer balance) {
-        this.balance = balance;
-    }
-
-    public Integer getBalance() {
-        return balance;
-    }
-
 
     public List<User> getFriends() {
         return friends;
@@ -313,11 +250,5 @@ public class User implements UserDetails, OAuth2User  {
     @Override
     public Map<String, Object> getAttributes() {
         return null;
-    }
-
-    public void addPhoto(Photo photo) {
-        this.photos.add(photo);
-        //photo.setUser(this);
-        //photo.getUser().setPhotos(this.photos);
     }
 }

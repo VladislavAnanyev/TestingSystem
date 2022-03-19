@@ -10,7 +10,7 @@ public class WorkSchedule {
     @Autowired
     private MailSender sender;
 
-    @Scheduled(cron = "0 0 12 * * ?", zone = "Europe/Moscow")
+    /*@Scheduled(cron = "0 0 12 * * ?", zone = "Europe/Moscow")
     public void send() {
         try {
             sender.send("a.vlad.v@ya.ru","Подписка на WebQuizzes", "Вы подписаны на рассылку сообщений" +
@@ -19,6 +19,6 @@ public class WorkSchedule {
             System.out.println("Не отправлено");
         }
 
-    }
+    }*/
 
 }

@@ -1,6 +1,5 @@
 package com.example.mywebquizengine.Model.Chat;
 
-import com.example.mywebquizengine.Model.Photo;
 import com.example.mywebquizengine.Model.User;
 
 import javax.persistence.*;
