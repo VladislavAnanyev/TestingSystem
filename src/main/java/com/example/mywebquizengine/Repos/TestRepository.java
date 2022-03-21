@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TestRepository extends CrudRepository<Test, Integer>,
-        PagingAndSortingRepository<Test, Integer>, JpaRepository<Test, Integer> {
+public interface TestRepository extends CrudRepository<Test, Long>,
+        PagingAndSortingRepository<Test, Long>, JpaRepository<Test, Long> {
 
     @Query(value = "SELECT TEST_ID as testId, DESCRIPTION, DURATION, COURSE_ID as courseId, USERNAME FROM TESTS u WHERE USERNAME = :name AND COURSE_ID = :courseId", nativeQuery = true)
     List<TestView> findMyTestsInCourse(String name, Long courseId);
@@ -37,5 +37,5 @@ public interface TestRepository extends CrudRepository<Test, Integer>,
     @Transactional
     @Query(nativeQuery = true, value = "DELETE FROM TESTS WHERE TEST_ID =:id")
     @Modifying
-    void nativeDeleteTestById(int id);
+    void nativeDeleteTestById(Long id);
 }

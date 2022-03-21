@@ -35,10 +35,10 @@
                             </button>
 
                         <#else>
-                            <form method="get" action="/quizzes/${test.testId?c}/solve/" class="form-inline">
-                                <button type="submit" class="btn btn-primary ml-3 mb-3">Приступить к выполнению
-                                </button>
-                            </form>
+<#--                            <form method="get" action="/quizzes/${test.testId?c}/solve/" class="form-inline">-->
+                                <a href="/quizzes/${test.testId?c}/solve/" role="button" class="btn btn-primary ml-3 mb-3">Приступить к выполнению
+                                </a>
+<#--                            </form>-->
                         </#if>
 
 

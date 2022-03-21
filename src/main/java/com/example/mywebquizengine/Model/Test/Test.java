@@ -3,8 +3,6 @@ package com.example.mywebquizengine.Model.Test;
 import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -17,7 +15,7 @@ public class Test {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int testId;
+    private Long testId;
 
     //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,11 +64,11 @@ public class Test {
         //this.quizzes = quizzes;
     }
 
-    public int getTestId() {
+    public Long getTestId() {
         return testId;
     }
 
-    public void setTestId(int id) {
+    public void setTestId(Long id) {
         this.testId = id;
     }
 

@@ -15,15 +15,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer, Integer>,
-        PagingAndSortingRepository<UserTestAnswer,Integer>, JpaRepository<UserTestAnswer, Integer> {
+public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer, Long>,
+        PagingAndSortingRepository<UserTestAnswer, Long>, JpaRepository<UserTestAnswer, Long> {
 
 
     @Query(value = "SELECT * FROM USER_TEST_ANSWERS u WHERE TEST_ID = :id", nativeQuery = true)
-    Page<UserTestAnswer> getAnswersOnMyQuiz(int id, Pageable paging);
+    Page<UserTestAnswer> getAnswersOnMyQuiz(Long id, Pageable paging);
 
     @Query(value = "SELECT USER_ANSWER_ID FROM USER_TEST_ANSWERS u WHERE TEST_ID = :id", nativeQuery = true)
-    List<Integer> getUserAnswersById(int id);
+    List<Long> getUserAnswersById(Long id);
 
     @Query(value = "SELECT TOP 1 * FROM USER_TEST_ANSWERS WHERE USERNAME = :username ORDER BY START_AT DESC", nativeQuery = true)
     Optional<UserTestAnswer> findLastUserAnswer(String username);
@@ -32,9 +32,9 @@ public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer,
     Optional<UserTestAnswer> findLastUserAnswerEager(String username);
 
     @Query(value = "SELECT TOP 1 * FROM USER_TEST_ANSWERS WHERE USERNAME = :username AND TEST_ID = :test_id ORDER BY START_AT DESC", nativeQuery = true)
-    Optional<UserTestAnswer> findLastUserTestAnswer(String username, Integer test_id);
+    Optional<UserTestAnswer> findLastUserTestAnswer(String username, Long test_id);
 
-    Optional<UserTestAnswer> findByUserAnswerId(int userAnswerId);
+    Optional<UserTestAnswer> findByUserAnswerId(Long userAnswerId);
 
 
 

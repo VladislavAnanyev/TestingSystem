@@ -58,19 +58,19 @@ public class TestService {
         testRepository.save(test);
     }
 
-    public Test findTest(Integer id) {
+    public Test findTest(Long id) {
         if (testRepository.findById(id).isPresent()){
             return testRepository.findById(id).get();
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
-
+/*
     public Test findTestProxy(Integer id) {
         return testRepository.getOne(id);
-    }
+    }*/
 
-    public void deleteTest(int id) {
+    public void deleteTest(Long id) {
         if (testRepository.findById(id).isPresent()) {
             testRepository.nativeDeleteTestById(id);
         } else {
@@ -78,7 +78,7 @@ public class TestService {
         }
     }
 
-    public void updateTest(Integer id, Test test) {
+    public void updateTest(Long id, Test test) {
         Test oldTest = testRepository.findById(id).get();
         oldTest.setDescription(test.getDescription());
         oldTest.setQuizzes(test.getQuizzes());

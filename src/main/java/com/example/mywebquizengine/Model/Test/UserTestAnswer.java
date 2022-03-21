@@ -1,10 +1,6 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.example.mywebquizengine.Model.User;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Calendar;
@@ -15,7 +11,7 @@ public class UserTestAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int userAnswerId;
+    private Long userAnswerId;
 
     @ManyToOne
     @JoinColumn(name = "username")
@@ -59,11 +55,11 @@ public class UserTestAnswer {
         this.user = user;
     }
 
-    public int getUserAnswerId() {
+    public Long getUserAnswerId() {
         return userAnswerId;
     }
 
-    public void setUserAnswerId(int userAnswerId) {
+    public void setUserAnswerId(Long userAnswerId) {
         this.userAnswerId = userAnswerId;
     }
 

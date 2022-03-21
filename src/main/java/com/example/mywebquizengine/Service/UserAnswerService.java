@@ -41,17 +41,13 @@ public class UserAnswerService  {
         return userTestAnswerRepository.findLastUserAnswerEager(jobDataMap.getString("username")).get();
     }
 
-    public UserTestAnswer findByUserAnswerId(Integer userAnswerId) {
+    public UserTestAnswer findByUserAnswerId(Long userAnswerId) {
 
         Optional<UserTestAnswer> userTestAnswer = userTestAnswerRepository.findByUserAnswerId(userAnswerId);
         if (userTestAnswer.isPresent()) {
             return userTestAnswer.get();
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
-    }
-
-    public UserTestAnswer findByUserAnswerIdProxy(Integer userAnswerId) {
-        return userTestAnswerRepository.getOne(userAnswerId);
     }
 
     public void saveAnswer(UserTestAnswer userTestAnswer) {
@@ -82,19 +78,19 @@ public class UserAnswerService  {
         return userQuizAnswerRepository.getCompleteAnswersForUser(name, paging);
     }*/
 
-    public Page<UserTestAnswer> getPageAnswersById(int id, Integer page, Integer pageSize, String sortBy) {
+    public Page<UserTestAnswer> getPageAnswersById(Long id, Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
         return userTestAnswerRepository.getAnswersOnMyQuiz(id, paging);
     }
 
     @Transactional
-    public UserTestAnswer getUserTestAnswerById(int id) {
+    public UserTestAnswer getUserTestAnswerById(Long id) {
 
         return userTestAnswerRepository.findById(id).get();
     }
 
     @Transactional
-    public Map<BigInteger, Double> getAnswerStats(Integer id) {
+    public Map<BigInteger, Double> getAnswerStats(Long id) {
 
         Test test = testService.findTest(id);
         ArrayList<Long> list = new ArrayList<>();
@@ -119,18 +115,18 @@ public class UserAnswerService  {
         return ((double) userQuizAnswerRepository.getTrueAnswers(id, answer)/(double) userQuizAnswerRepository.getCountById(id, answer)) * 100;
     }
 
-    public ArrayList<Integer> getAnswersByTestId(Integer id) {
-        return (ArrayList<Integer>) userTestAnswerRepository.getUserAnswersById(id);
+    public ArrayList<Long> getAnswersByTestId(Long id) {
+        return (ArrayList<Long>) userTestAnswerRepository.getUserAnswersById(id);
     }
 
     public void saveStartAnswer(UserTestAnswer userTestAnswer) {
         userTestAnswerRepository.save(userTestAnswer);
     }
 
-    public UserTestAnswer checkLastComplete(User user, String id) {
+    public UserTestAnswer checkLastComplete(User user, Long id) {
 
-        if (userTestAnswerRepository.findLastUserTestAnswer(user.getUsername(), Integer.valueOf(id)).isPresent()) {
-            return userTestAnswerRepository.findLastUserTestAnswer(user.getUsername(), Integer.valueOf(id)).get();
+        if (userTestAnswerRepository.findLastUserTestAnswer(user.getUsername(), id).isPresent()) {
+            return userTestAnswerRepository.findLastUserTestAnswer(user.getUsername(), id).get();
         } else return null;
 
     }

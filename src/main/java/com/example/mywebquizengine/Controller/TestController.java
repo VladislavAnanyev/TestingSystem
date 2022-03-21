@@ -65,7 +65,7 @@ public class TestController {
 
     @DeleteMapping(path = "/quizzes/{id}")
     @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public void deleteTest(@PathVariable Integer id, @AuthenticationPrincipal Principal principal) {
+    public void deleteTest(@PathVariable Long id, @AuthenticationPrincipal Principal principal) {
         testService.deleteTest(id);
         throw new ResponseStatusException(HttpStatus.OK);
     }
@@ -74,14 +74,14 @@ public class TestController {
     @PutMapping(path = "/update/{id}", consumes = {"application/json"})
     @ResponseBody
     @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public void changeTest(@PathVariable Integer id, @Valid @RequestBody Test test,
+    public void changeTest(@PathVariable Long id, @Valid @RequestBody Test test,
                            @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
         testService.updateTest(id, test);
     }
 
     @GetMapping(path = "/update/{id}")
     @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public String update(@PathVariable Integer id, Model model, @AuthenticationPrincipal Principal principal) {
+    public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal Principal principal) {
         Test tempTest = testService.findTest(id);
         model.addAttribute("oldTest", tempTest);
         return "updateQuiz";
@@ -89,7 +89,7 @@ public class TestController {
 
     @GetMapping(path = "/quizzes/{id}/info/")
     @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public String getInfo(@PathVariable Integer id, Model model,
+    public String getInfo(@PathVariable Long id, Model model,
                           @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                           @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
                           @RequestParam(defaultValue = "completed_at") String sortBy, @AuthenticationPrincipal Principal principal) {

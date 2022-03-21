@@ -51,10 +51,16 @@ public class UserAnswerController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserTestAnswerRepository userTestAnswerRepository;
+
+    @Autowired
+    private UserQuizAnswerRepository userQuizAnswerRepository;
+
     // Проверка наличия неотправленных ответов
     @GetMapping(path = "/checklastanswer/{id}")
     @ResponseBody
-    public Boolean checkLastAnswer(@PathVariable String id, @AuthenticationPrincipal Principal principal) {
+    public Boolean checkLastAnswer(@PathVariable Long id, @AuthenticationPrincipal Principal principal) {
         if (userAnswerService.checkLastComplete(userService.loadUserByUsernameProxy(principal.getName()), id) != null) {
             return userAnswerService.checkLastComplete(userService.loadUserByUsernameProxy(principal.getName()), id).getCompletedAt() == null;
         } else {
@@ -68,9 +74,8 @@ public class UserAnswerController {
     public void getAnswerOnTest(@PathVariable String id,
                                 @RequestBody UserTestAnswer userAnswerId) {
 
-        //UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userAnswerId.getUserAnswerId());
-        //String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserTestAnswer userTestAnswer = userTestAnswerRepository.findLastUserAnswer("application").get();
+        UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userAnswerId.getUserAnswerId());
+        //UserTestAnswer userTestAnswer = userTestAnswerRepository.findLastUserAnswer("application").get();
         StringBuilder result = new StringBuilder();
         List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
         int trueAnswers = 0;
@@ -89,8 +94,15 @@ public class UserAnswerController {
                 ((MultipleUserAnswerQuiz) quizAnswer).setAnswer(((MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
             } else if (quiz.getType().equals("STRING")) {
                 quizAnswer = new StringUserAnswerQuiz();
-                answerChecker.checkAnswer(userTestAnswer.getUserQuizAnswers().get(i));
-                ((StringUserAnswerQuiz) quizAnswer).setAnswer(((StringUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
+                List<UserQuizAnswer> answers = userTestAnswer.getUserQuizAnswers();
+                if (answers == null) {
+                    StringUserAnswerQuiz answerQuiz = new StringUserAnswerQuiz();
+                    answerQuiz.setAnswer("");
+                    answerChecker.checkAnswer(answerQuiz);
+                } else {
+                    answerChecker.checkAnswer(answers.get(i));
+                }
+                ((StringUserAnswerQuiz) quizAnswer).setAnswer(((StringUserAnswerQuiz) answers.get(i)).getAnswer());
             }
 
             quizAnswer.setQuiz(quiz);
@@ -125,40 +137,23 @@ public class UserAnswerController {
     }
 
     @GetMapping(path = "/quizzes/{id}/solve")
-    public String passTest(Model model, @PathVariable String id,
+    public String passTest(@PathVariable Long id,
                            @RequestParam(required = false, defaultValue = "false") String restore,
                            @AuthenticationPrincipal Principal principal) throws SchedulerException {
 
-        Test test = testService.findTest(Integer.parseInt(id));
+        Test test = testService.findTest(id);
         UserTestAnswer userTestAnswer;
-
         UserTestAnswer lastUserTestAnswer = userAnswerService.checkLastComplete(userService.loadUserByUsernameProxy(principal.getName()), id);
 
         if (Boolean.parseBoolean(restore) && lastUserTestAnswer != null && lastUserTestAnswer.getCompletedAt() == null) {
-
-            model.addAttribute("lastAnswer", lastUserTestAnswer);
-
-            if (test.getDuration() != null) {
-                Calendar calendar2 = lastUserTestAnswer.getStartAt();
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(calendar2.getTime());
-                calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) + test.getDuration().getSecond());
-                calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
-                calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + test.getDuration().getHour());
-
-                model.addAttribute("timeout", calendar.getTime());
-            }
-
+            userTestAnswer = lastUserTestAnswer;
         } else {
             userTestAnswer = new UserTestAnswer();
             Calendar calendar = new GregorianCalendar();
             userTestAnswer.setStartAt(calendar);
-            userTestAnswer.setTest(testService.findTest(Integer.parseInt(id)));
+            userTestAnswer.setTest(testService.findTest(id));
             userTestAnswer.setUser(userService.loadUserByUsernameProxy(principal.getName()));
             userAnswerService.saveStartAnswer(userTestAnswer);
-
-            model.addAttribute("lastAnswer", userTestAnswer);
-
 
             if (test.getDuration() != null) {
                 Calendar jobCalendar = new GregorianCalendar();
@@ -192,22 +187,39 @@ public class UserAnswerController {
 
                 System.out.println("Задание выполнится в: " + jobCalendar.getTime());
 
-                model.addAttribute("timeout", jobCalendar.getTime());
-
                 scheduler.start();
-
             }
         }
 
-        model.addAttribute("test_id", test);
-        return "answer";
+        return "redirect:/test/" + test.getTestId() + "/" + userTestAnswer.getUserAnswerId() + "/solve/";
     }
 
-    @Autowired
-    private UserTestAnswerRepository userTestAnswerRepository;
 
-    @Autowired
-    private UserQuizAnswerRepository userQuizAnswerRepository;
+    @GetMapping(value = "/test/{testId}/{userTestAnswerId}/solve/")
+    public String startAnswer(@PathVariable Long testId, @PathVariable Long userTestAnswerId, Model model) {
+        UserTestAnswer userTestAnswer = userTestAnswerRepository.findByUserAnswerId(userTestAnswerId).get();
+
+        if (userTestAnswer.getCompletedAt() != null) {
+            return "redirect:/courses";
+        } else {
+            model.addAttribute("lastAnswer", userTestAnswer);
+            Test test = testService.findTest(testId);
+            model.addAttribute("test_id", test);
+
+            if (test.getDuration() != null) {
+                Calendar userTestAnswerStartAt = userTestAnswer.getStartAt();
+                Calendar userTestAnswerFinishAt = new GregorianCalendar();
+                userTestAnswerFinishAt.setTime(userTestAnswerStartAt.getTime());
+                userTestAnswerFinishAt.set(Calendar.SECOND, userTestAnswerFinishAt.get(Calendar.SECOND) + test.getDuration().getSecond());
+                userTestAnswerFinishAt.set(Calendar.MINUTE, userTestAnswerFinishAt.get(Calendar.MINUTE) + test.getDuration().getMinute());
+                userTestAnswerFinishAt.set(Calendar.HOUR, userTestAnswerFinishAt.get(Calendar.HOUR) + test.getDuration().getHour());
+                model.addAttribute("timeout", userTestAnswerFinishAt.getTime());
+            }
+
+            return "answer";
+        }
+    }
+
 
     @PostMapping(value = "/answersession/{id}")
     public void getAnswerSession(@AuthenticationPrincipal Principal principal, @Valid @RequestBody UserTestAnswerRequest request, @PathVariable String id) {

@@ -12,41 +12,23 @@ import org.springframework.stereotype.Component;
 
 import java.util.GregorianCalendar;
 
-
 @Component
 public class SimpleJob extends QuartzJobBean {
 
-    //@Transactional
     @Override
     public void executeInternal(JobExecutionContext context) {
 
-        SimpMessagingTemplate simpMessagingTemplate = MywebquizengineApplication.ctx.getBean(SimpMessagingTemplate.class);
         UserAnswerController userAnswerController = MywebquizengineApplication.ctx.getBean(UserAnswerController.class);
-
         UserAnswerService userAnswerService = MywebquizengineApplication.ctx.getBean(UserAnswerService.class);
-
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-
         UserTestAnswer userTestAnswer = new UserTestAnswer();
-
-        userTestAnswer.setUserAnswerId(dataMap.getInt("answer"));
-
-        UserTestAnswer userTestAnswer2 = userAnswerService.findByUserAnswerId(dataMap.getInt("answer"));
-
+        userTestAnswer.setUserAnswerId(dataMap.getLong("answer"));
+        UserTestAnswer userTestAnswer2 = userAnswerService.findByUserAnswerId(dataMap.getLong("answer"));
 
         if (userTestAnswer2.getCompletedAt() == null) {
-
             userAnswerController.getAnswerOnTest(String.valueOf(dataMap.get("test")), userTestAnswer);
-
-
-            /*simpMessagingTemplate.convertAndSend("/topic/" +
-                    dataMap.getString("username") + dataMap.get("test"), "OK");*/
-
-
         }
 
         System.out.println("Задание выполнено в: " + new GregorianCalendar().getTime());
-
     }
-
 }

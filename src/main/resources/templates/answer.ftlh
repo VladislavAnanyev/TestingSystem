@@ -191,22 +191,25 @@
 
             let text = document.getElementById('stringAnswer1')
 
-            let json = {
-                answer: text.value,
-                quizId: Number(${test_id.quizzes[0].quizId?c})
+            if (text.value !== "") {
+                let json = {
+                    answer: text.value,
+                    quizId: Number(${test_id.quizzes[0].quizId?c})
+                }
+
+                console.log(json)
+                let xhrTyping = new XMLHttpRequest();
+
+                xhrTyping.open('POST', '/answersession/' + ${test_id.testId?c}, true);
+                xhrTyping.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                xhrTyping.onreadystatechange = function () {
+                    if (xhrTyping.readyState === XMLHttpRequest.DONE && xhrTyping.status === 200) {
+                        console.log("Успех")
+                    }
+                };
+                xhrTyping.send(JSON.stringify(json));
             }
 
-            console.log(json)
-            let xhrTyping = new XMLHttpRequest();
-
-            xhrTyping.open('POST', '/answersession/' + ${test_id.testId?c}, true);
-            xhrTyping.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhrTyping.onreadystatechange = function () {
-                if (xhrTyping.readyState === XMLHttpRequest.DONE && xhrTyping.status === 200) {
-                    console.log("Успех")
-                }
-            };
-            xhrTyping.send(JSON.stringify(json));
 
         };
     </script>
