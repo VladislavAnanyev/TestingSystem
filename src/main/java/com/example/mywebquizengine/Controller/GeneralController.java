@@ -40,4 +40,10 @@ public class GeneralController {
         return "home";
     }
 
+
+    @GetMapping(path = "/test")
+    public String test() {
+        return "saved_resource";
+    }
+
 }

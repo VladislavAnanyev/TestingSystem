@@ -32,24 +32,17 @@ function onConnectedNotif() {
 
     stompClient.subscribe('/topic/' + username, onMessageReceived);
 
-
-    //geo()
-
-   /* stompClient.disconnect(function(frame) {
-        //debug("STOMP Client disconnecting ...");
-        console.log("STOMP client succesfully disconnected.");
-    })*/
 }
 
 
 function onErrorNotif(error) {
     console.log("fail")
-    notificationConnect()
+    console.log('STOMP: ' + error);
+    stompClient.disconnect()
+    setTimeout( () => {notificationConnect()}, 5000);
+    console.log('STOMP: Reconecting in 5 seconds');
     console.log("try")
 }
-
-
-
 
 
 function onMessageReceived(payload) {

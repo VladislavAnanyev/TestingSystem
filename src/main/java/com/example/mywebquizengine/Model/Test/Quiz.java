@@ -10,10 +10,11 @@ import java.util.List;
 @Inheritance(
         strategy = InheritanceType.JOINED
 )
-public abstract class Quiz {
+public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "QUIZ_ID")
     private Long quizId;
 
     @NotBlank
@@ -28,7 +29,7 @@ public abstract class Quiz {
     @JoinColumn(name = "test_id")
     private Test test;
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<UserQuizAnswer> userQuizAnswers;
 
     private String type;

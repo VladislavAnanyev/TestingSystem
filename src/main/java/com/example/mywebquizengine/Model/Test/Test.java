@@ -3,6 +3,8 @@ package com.example.mywebquizengine.Model.Test;
 import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -17,9 +19,8 @@ public class Test {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int testId;
 
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(FetchMode.SUBSELECT)
-    //@Fetch(value = FetchMode)
     private List<@Valid Quiz> quizzes;
 
     @ManyToOne/*(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)*/
@@ -27,8 +28,8 @@ public class Test {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
 
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(FetchMode.SUBSELECT)
     private List<UserTestAnswer> userTestAnswers;
 
     @ManyToOne

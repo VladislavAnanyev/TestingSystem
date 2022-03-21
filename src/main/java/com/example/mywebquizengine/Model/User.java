@@ -3,6 +3,8 @@ package com.example.mywebquizengine.Model;
 import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.MywebquizengineApplication;
 import com.example.mywebquizengine.Service.UserService;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,8 +61,7 @@ public class User implements UserDetails, OAuth2User {
     @Transient
     private boolean enabled;
     private boolean status;
-    @ManyToMany
-    private List<User> friends;
+
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles;
@@ -226,20 +227,6 @@ public class User implements UserDetails, OAuth2User {
 
     public void setChangePasswordCode(String changePasswordCode) {
         this.changePasswordCode = changePasswordCode;
-    }
-
-    public List<User> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<User> friends) {
-        this.friends = new ArrayList<>();
-        this.friends.addAll(friends);
-    }
-
-    public void addFriend(User user) {
-        this.friends.add(user);
-        user.getFriends().add(this);
     }
 
     @Override

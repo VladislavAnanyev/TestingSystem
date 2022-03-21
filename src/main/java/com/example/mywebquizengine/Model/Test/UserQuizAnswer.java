@@ -1,5 +1,8 @@
 package com.example.mywebquizengine.Model.Test;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity(name = "USER_QUIZ_ANSWERS")
@@ -9,23 +12,20 @@ import javax.persistence.*;
 public class UserQuizAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int quizAnswerId;
+    private Long quizAnswerId;
 
     private Boolean status;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "quiz_id")
-    //@Cascade(org.hibernate.annotations.CascadeType.DELETE)
     //@OnDelete(action = OnDeleteAction.CASCADE)
     private Quiz quiz;
-    //private Test test;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false, name = "user_answer_id")
     private UserTestAnswer userAnswer;
 
-    public UserQuizAnswer() {
-    }
+    public UserQuizAnswer() {}
 
     public Boolean getStatus() {
         return status;
@@ -39,11 +39,11 @@ public class UserQuizAnswer {
         this.quiz = id;
     }
 
-    public int getQuizAnswerId() {
+    public Long getQuizAnswerId() {
         return quizAnswerId;
     }
 
-    public void setQuizAnswerId(int id) {
+    public void setQuizAnswerId(Long id) {
         this.quizAnswerId = id;
     }
 

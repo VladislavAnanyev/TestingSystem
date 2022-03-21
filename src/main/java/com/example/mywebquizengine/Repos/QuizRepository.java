@@ -3,6 +3,7 @@ package com.example.mywebquizengine.Repos;
 import com.example.mywebquizengine.Model.Test.Quiz;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 
 @Repository
-public interface QuizRepository extends CrudRepository<Quiz, Long>, PagingAndSortingRepository<Quiz, Long> {
+public interface QuizRepository extends CrudRepository<Quiz, Long>, PagingAndSortingRepository<Quiz, Long>, JpaRepository<Quiz, Long> {
 
     @Query(value = "SELECT * FROM QUIZZES u WHERE USER_USERNAME = :name", nativeQuery = true)
     Page<Quiz> getQuizForThis(String name, Pageable paging);
@@ -60,5 +61,11 @@ public interface QuizRepository extends CrudRepository<Quiz, Long>, PagingAndSor
     @Transactional
     @Query(value = "CASCADE DELETE FROM QUIZZES WHERE QUIZZES_ID = :id", nativeQuery = true)
     void CustomDeleteById(int id);
+
+    @Query(nativeQuery = true, value = "SELECT *, 0 AS clazz_ FROM QUIZZES WHERE QUIZ_ID = :quizId")
+    Quiz find(Long quizId);
+
+    @Query(nativeQuery = true, value = "SELECT TYPE FROM QUIZZES WHERE QUIZ_ID = :quizId")
+    String findType(Long quizId);
 }
 

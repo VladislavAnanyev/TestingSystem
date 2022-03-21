@@ -27,6 +27,7 @@
                 <label for="exampleFormControlInput1 validationDefault01">Тема</label>
                 <input required type="text" class="form-control" id="titleID validationDefault01"
                        placeholder="Напишите здесь тему вопроса из викторины" name="title">
+                <input type="hidden">
             </div>
 
             <div class="form-group">

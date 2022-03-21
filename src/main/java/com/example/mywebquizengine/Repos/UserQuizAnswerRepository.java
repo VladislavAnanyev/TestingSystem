@@ -9,9 +9,10 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Repository
-public interface UserQuizAnswerRepository extends CrudRepository<UserQuizAnswer, Integer>,
-        PagingAndSortingRepository<UserQuizAnswer,Integer> {
+public interface UserQuizAnswerRepository extends CrudRepository<UserQuizAnswer, Long>,
+        PagingAndSortingRepository<UserQuizAnswer, Long> {
 
     /*@Query(value = "SELECT * FROM USER_ANSWERS u WHERE USER_USERNAME = :name AND STATUS = TRUE", nativeQuery = true)
     Page<UserQuizAnswer> getCompleteAnswersForUser(String name, Pageable paging);*/
@@ -41,6 +42,9 @@ public interface UserQuizAnswerRepository extends CrudRepository<UserQuizAnswer,
 
     @Query(value = "SELECT COUNT(*) FROM USER_QUIZ_ANSWERS Q LEFT OUTER JOIN USER_TEST_ANSWERS T ON Q.USER_ANSWER_ID = T.USER_ANSWER_ID WHERE TEST_ID = :id AND T.USER_ANSWER_ID = :answer", nativeQuery = true)
     Long getCountById(Integer id, Integer answer);
+
+    @Query(nativeQuery = true, value = "SELECT TOP 1 *, 0 as clazz_ FROM USER_QUIZ_ANSWERS JOIN USER_TEST_ANSWERS UTA on UTA.USER_ANSWER_ID = USER_QUIZ_ANSWERS.USER_ANSWER_ID WHERE USERNAME = :name AND QUIZ_ID = :quizId ORDER BY START_AT DESC")
+    UserQuizAnswer findLastUserQuizAnswer(String name, Long quizId);
 
     /*@Query(value = "SELECT ANSWER_ID FROM USER_ANSWERS WHERE QUIZ_ID = :id", nativeQuery = true)
     List<Integer> getAnswerIdForQuiz(Integer id);*/

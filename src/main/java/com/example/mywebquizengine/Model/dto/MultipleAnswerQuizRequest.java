@@ -3,7 +3,7 @@ package com.example.mywebquizengine.Model.dto;
 import java.util.List;
 
 public class MultipleAnswerQuizRequest extends AddQuizRequest {
-    private List<Long> answer;
+    private List<Integer> answer;
     private List<String> options;
 
     public List<String> getOptions() {
@@ -14,11 +14,11 @@ public class MultipleAnswerQuizRequest extends AddQuizRequest {
         this.options = options;
     }
 
-    public List<Long> getAnswer() {
+    public List<Integer> getAnswer() {
         return answer;
     }
 
-    public void setAnswer(List<Long> answer) {
+    public void setAnswer(List<Integer> answer) {
         this.answer = answer;
     }
 }

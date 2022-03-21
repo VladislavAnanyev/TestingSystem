@@ -16,21 +16,21 @@
                     </div>
 
                     <#if course.ownerUsername = name>
-                        <a href="/course/${course.courseId}/test/add">
+                        <a href="/course/${course.courseId?c}/test/add">
                             <button type="button" class="btn btn-primary ml-3 mb-3">
                                 Добавить тест
                             </button>
                         </a>
                     </#if>
 
-                    <a href="/course/${course.courseId}/tests">
+                    <a href="/course/${course.courseId?c}/tests">
                         <button type="button" class="btn btn-primary ml-3 mb-3">
                             Все тесты курса
                         </button>
                     </a>
 
                     <#if course.ownerUsername = name>
-                        <a href="/course/${course.courseId}/manage">
+                        <a href="/course/${course.courseId?c}/manage">
                             <button type="button" class="btn btn-primary ml-3 mb-3">
                                 Управление
                             </button>

@@ -66,8 +66,6 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
     @Query(value = "UPDATE USERS SET CHANGE_PASSWORD_CODE = :mes WHERE USERNAME = :username", nativeQuery = true)
     void setChangePasswordCode(String username, String mes);
 
-    //List<UserCommonView> findUsersByFriendsUsernameContains(String s);
-
     @Modifying
     @Transactional
     @Query(value = "UPDATE USERS SET ONLINE = :status WHERE USERNAME = :username", nativeQuery = true)
@@ -78,6 +76,4 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
     @Query(value = "select ONLINE from USERS WHERE USERNAME = :username", nativeQuery = true)
     String getOnline(String username);
 
-    //@Query(value = "SELECT * FROM ", nativeQuery = true)
-    List<UserCommonView> findUsersByFriendsUsername(String username);
 }

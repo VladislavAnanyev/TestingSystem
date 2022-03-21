@@ -1,10 +1,13 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Entity;
 
-@Entity
+@Entity(name = "QUIZZES_STRING_TRUE_ANSWERS")
+//@OnDelete(action = OnDeleteAction.CASCADE)
 public class StringAnswerQuiz extends Quiz {
 
     //@ElementCollection

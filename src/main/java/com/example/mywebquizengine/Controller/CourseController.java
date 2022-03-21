@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 public class CourseController {
@@ -79,9 +80,8 @@ public class CourseController {
                              @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                              @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(10) Integer pageSize,
                              @RequestParam(defaultValue = "test_id") String sortBy) {
-        User user = userService.loadUserByUsernameProxy(principal.getName());
-        Page<TestView> pageObject = testService.findTestsInCourseByName(user.getUsername(), id, page, pageSize, sortBy);
-        model.addAttribute("myquiz", pageObject.getContent());
+        List<TestView> pageObject = testService.findTestsInCourseByName(id, principal.getName());
+        model.addAttribute("myquiz", pageObject);
         model.addAttribute("courseId", id);
         return "myquiz";
     }

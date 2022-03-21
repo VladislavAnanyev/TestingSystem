@@ -9,7 +9,6 @@ import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.AddQuizRequest;
 import com.example.mywebquizengine.Model.dto.MultipleAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.StringAnswerQuizRequest;
-import com.example.mywebquizengine.Repos.QuizRepository;
 import com.example.mywebquizengine.Repos.TestRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +40,9 @@ public class TestService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public Page<TestView> findTestsInCourseByName(String name, Long courseId, Integer page, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return testRepository.findMyTestsInCourse(name, courseId, paging);
+    public List<TestView> findTestsInCourseByName(Long courseId, String name) {
+        //Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
+        return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_Username(courseId, name);
     }
 
     public List<Test> getMyQuizNoPaging (String name) {
@@ -73,8 +72,7 @@ public class TestService {
 
     public void deleteTest(int id) {
         if (testRepository.findById(id).isPresent()) {
-            testRepository.deleteById(id);
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+            testRepository.nativeDeleteTestById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

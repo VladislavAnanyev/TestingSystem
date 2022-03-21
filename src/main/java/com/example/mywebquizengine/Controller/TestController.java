@@ -6,6 +6,7 @@ import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -66,6 +67,7 @@ public class TestController {
     @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
     public void deleteTest(@PathVariable Integer id, @AuthenticationPrincipal Principal principal) {
         testService.deleteTest(id);
+        throw new ResponseStatusException(HttpStatus.OK);
     }
 
 
@@ -95,7 +97,6 @@ public class TestController {
         Test test = testService.findTest(id);
         model.addAttribute("quizzes", test.getQuizzes());
         model.addAttribute("chart", userAnswerService.getAnswerStats(id));
-        System.out.println(userAnswerService.getAnswerStats(id));
         model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, page, pageSize, sortBy).getContent());
         return "info";
     }

@@ -6,11 +6,13 @@ import com.example.mywebquizengine.Model.Test.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +20,8 @@ import java.util.Optional;
 public interface TestRepository extends CrudRepository<Test, Integer>,
         PagingAndSortingRepository<Test, Integer>, JpaRepository<Test, Integer> {
 
-    @Query(value = "SELECT * FROM TESTS u WHERE USERNAME = :name AND COURSE_ID = :courseId", nativeQuery = true)
-    Page<TestView> findMyTestsInCourse(String name, Long courseId, Pageable paging);
+    @Query(value = "SELECT TEST_ID as testId, DESCRIPTION, DURATION, COURSE_ID as courseId, USERNAME FROM TESTS u WHERE USERNAME = :name AND COURSE_ID = :courseId", nativeQuery = true)
+    List<TestView> findMyTestsInCourse(String name, Long courseId);
 
     @Query(value = "SELECT * FROM TESTS u WHERE USERNAME = :name", nativeQuery = true)
     List<Test> getQuizForThisNoPaging(String name);
@@ -29,4 +31,11 @@ public interface TestRepository extends CrudRepository<Test, Integer>,
     Optional<Test> getTestByIds(Integer id);
 
     List<TestView> findTestsByCourse_CourseId(Long courseId);
+
+    List<TestView> findTestsByCourse_CourseIdAndCourse_Owner_Username(Long courseId, String name);
+
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM TESTS WHERE TEST_ID =:id")
+    @Modifying
+    void nativeDeleteTestById(int id);
 }

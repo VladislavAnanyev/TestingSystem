@@ -1,8 +1,10 @@
 package com.example.mywebquizengine.Controller;
 
 import com.example.mywebquizengine.Model.Test.*;
-import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.UserTestAnswerRequest;
+import com.example.mywebquizengine.Repos.QuizRepository;
+import com.example.mywebquizengine.Repos.UserQuizAnswerRepository;
+import com.example.mywebquizengine.Repos.UserTestAnswerRepository;
 import com.example.mywebquizengine.Service.QuizService;
 import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserAnswerService;
@@ -10,13 +12,18 @@ import com.example.mywebquizengine.Service.UserService;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.*;
@@ -26,6 +33,7 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @Controller
+@Validated
 public class UserAnswerController {
 
     @Autowired
@@ -60,7 +68,9 @@ public class UserAnswerController {
     public void getAnswerOnTest(@PathVariable String id,
                                 @RequestBody UserTestAnswer userAnswerId) {
 
-        UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userAnswerId.getUserAnswerId());
+        //UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userAnswerId.getUserAnswerId());
+        //String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserTestAnswer userTestAnswer = userTestAnswerRepository.findLastUserAnswer("application").get();
         StringBuilder result = new StringBuilder();
         List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
         int trueAnswers = 0;
@@ -82,6 +92,7 @@ public class UserAnswerController {
                 answerChecker.checkAnswer(userTestAnswer.getUserQuizAnswers().get(i));
                 ((StringUserAnswerQuiz) quizAnswer).setAnswer(((StringUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
             }
+
             quizAnswer.setQuiz(quiz);
             quizAnswer.setStatus(answerChecker.isSuccess());
             userQuizAnswers.add(quizAnswer);
@@ -106,8 +117,11 @@ public class UserAnswerController {
 
         userAnswerService.saveAnswer(userTestAnswer);
 
-        simpMessagingTemplate.convertAndSend("/topic/" +
-                userTestAnswer.getUser().getUsername() + userTestAnswer.getUserAnswerId(), result.toString().toCharArray());
+        String destination =  "/topic/" + userTestAnswer.getUser().getUsername() + userTestAnswer.getUserAnswerId();
+        System.out.println("AAA");
+        System.out.println(destination);
+
+        simpMessagingTemplate.convertAndSend(destination, result.toString().toCharArray());
     }
 
     @GetMapping(path = "/quizzes/{id}/solve")
@@ -189,26 +203,52 @@ public class UserAnswerController {
         return "answer";
     }
 
-    @PostMapping(value = "/answersession/{id}")
-    public void getAnswerSession(@AuthenticationPrincipal Principal principal, @RequestBody UserTestAnswerRequest request, @PathVariable String id) {
-        User user = userService.loadUserByUsernameProxy(principal.getName());
-        UserTestAnswer userTestAnswer = new UserTestAnswer();
+    @Autowired
+    private UserTestAnswerRepository userTestAnswerRepository;
 
+    @Autowired
+    private UserQuizAnswerRepository userQuizAnswerRepository;
+
+    @PostMapping(value = "/answersession/{id}")
+    public void getAnswerSession(@AuthenticationPrincipal Principal principal, @Valid @RequestBody UserTestAnswerRequest request, @PathVariable String id) {
         Quiz quiz = quizService.findQuiz(request.getQuizId());
-        if (quiz.getType().equals("MULTIPLE")) {
-            MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
-            multipleUserAnswerQuiz.setQuiz(quiz);
-            multipleUserAnswerQuiz.setAnswer((List<Integer>) request.getAnswer());
-            userTestAnswer.setUserQuizAnswers(Collections.singletonList(multipleUserAnswerQuiz));
-        } else if (quiz.getType().equals("STRING")) {
-            StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
-            stringUserAnswerQuiz.setAnswer((String) request.getAnswer());
-            stringUserAnswerQuiz.setQuiz(quiz);
-            userTestAnswer.setUserQuizAnswers(Collections.singletonList(stringUserAnswerQuiz));
+        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(principal.getName()).get();
+
+        Long userQuizAnswerId = null;
+        for (UserQuizAnswer quizAnswer : lastUserAnswer.getUserQuizAnswers()) {
+            if (quizAnswer.getQuiz().getQuizId().equals(request.getQuizId())) {
+                userQuizAnswerId = quizAnswer.getQuizAnswerId();
+            }
         }
-        userTestAnswer.setUser(user);
-        userTestAnswer.setTest(testService.findTest(Integer.parseInt(id)));
-        userAnswerService.saveTempAnswer(userTestAnswer);
+
+        UserQuizAnswer userQuizAnswer;
+        if (userQuizAnswerId != null) {
+            userQuizAnswer = userQuizAnswerRepository.findById(userQuizAnswerId).get();
+            if (quiz.getType().equals("MULTIPLE")) {
+                ((MultipleUserAnswerQuiz) userQuizAnswer).setAnswer((List<Integer>) request.getAnswer());
+            } else if (quiz.getType().equals("STRING")) {
+                ((StringUserAnswerQuiz) userQuizAnswer).setAnswer((String) request.getAnswer());
+            }
+        } else {
+            if (quiz.getType().equals("MULTIPLE")) {
+                MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
+                multipleUserAnswerQuiz.setQuiz(quiz);
+                multipleUserAnswerQuiz.setAnswer((List<Integer>) request.getAnswer());
+
+                userQuizAnswer = multipleUserAnswerQuiz;
+                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
+            } else if (quiz.getType().equals("STRING")) {
+                StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
+                stringUserAnswerQuiz.setQuiz(quiz);
+                stringUserAnswerQuiz.setAnswer((String) request.getAnswer());
+
+                userQuizAnswer = stringUserAnswerQuiz;
+                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
+            }
+        }
+
+        userTestAnswerRepository.save(lastUserAnswer);
+        throw new ResponseStatusException(HttpStatus.OK);
     }
 
 }

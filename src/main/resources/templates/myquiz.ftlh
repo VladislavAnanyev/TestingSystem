@@ -13,12 +13,12 @@
 
                         <div class="col">
                             <h5 class="card-title">${test.description}</h5>
-                            <p class="card-text">Количество вопросов: ${test.quizzes?size}</p>
+                            <p class="card-text">Количество вопросов: ${test.numberOfQuestions}</p>
 <#--                            <p class="card-text">Количество ответов пользователей: ${test.answers?size}</p>-->
 
                             <p class="card-text"><small class="text-muted">Автор: <a
-                                            href="/about/${test.user.username}">
-                                        ${test.user.username}
+                                            href="/about/${test.author}">
+                                        ${test.author}
                                     </a></small></p>
                         </div>
 
@@ -58,6 +58,10 @@
                                         Удалить
                                     </button>
                                 </form>
+
+                                <form class="mt-2">
+                                <a type="button" class="btn btn-primary btn-block" href="/course/${courseId?c}/members/add" role="button">Добавить участника</a>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -65,7 +69,6 @@
             </div>
         </div>
 
-        <a class="btn btn-primary" href="/course/${courseId?c}/members/add" role="button">Добавить участника</a>
 
     <#else>
         Здесь пока ничего нет

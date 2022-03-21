@@ -50,7 +50,7 @@ function addTest() {
             }
 
             let quiz
-            if (document.getElementById('1optionstest').hidden === false) {
+            if (document.getElementById(String(Number(i+1) +'optionstest')).hidden === false) {
                 quiz = {
                     type: "MULTIPLE",
                     title: title[i].value,
@@ -67,6 +67,8 @@ function addTest() {
                 }
             }
 
+            console.log(String(Number(i+1) +'optionstest'))
+            console.log(document.getElementById(String(Number(i+1) +'optionstest')))
 
             quizzes_mas.push(quiz)
         }

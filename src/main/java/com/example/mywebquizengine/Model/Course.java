@@ -1,6 +1,8 @@
 package com.example.mywebquizengine.Model;
 
 import com.example.mywebquizengine.Model.Test.Test;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,6 +17,7 @@ public class Course {
     private User owner;
     @OneToMany
     private List<User> members;
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Test> tests;
 

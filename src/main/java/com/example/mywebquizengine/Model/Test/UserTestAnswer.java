@@ -3,6 +3,8 @@ package com.example.mywebquizengine.Model.Test;
 import com.example.mywebquizengine.Model.User;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Calendar;
@@ -19,8 +21,8 @@ public class UserTestAnswer {
     @JoinColumn(name = "username")
     private User user;
 
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    //@Fetch(FetchMode.SUBSELECT)
     private List<UserQuizAnswer> userQuizAnswers;
 
     @ManyToOne
@@ -86,6 +88,16 @@ public class UserTestAnswer {
             this.userQuizAnswers.forEach((userQuizAnswer) -> userQuizAnswer.setUserAnswer(this));
         }
 
+    }
+
+    public void addUserQuizAnswer(UserQuizAnswer userQuizAnswer) {
+        this.userQuizAnswers.add(userQuizAnswer);
+        userQuizAnswer.setUserAnswer(this);
+    }
+
+    public void removeUserQuizAnswer(UserQuizAnswer userQuizAnswer) {
+        this.userQuizAnswers.remove(userQuizAnswer);
+        userQuizAnswer.setUserAnswer(this);
     }
 
     public void setTest(Test test) {

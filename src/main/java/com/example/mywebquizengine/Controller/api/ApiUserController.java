@@ -26,18 +26,11 @@ public class ApiUserController {
     @Autowired
     private UserService userService;
 
-
-    @GetMapping(path = "/friends")
-    public List<UserCommonView> getFriends(@AuthenticationPrincipal Principal principal) {
-        return userService.findMyFriends(principal);
-    }
-
     @GetMapping(path = "/findbyid")
     public UserCommonView getUserById(@RequestParam String username) {
         return userService.getUserView(username);
 
     }
-
 
     @PostMapping(path = "/signin")
     public AuthResponse jwtSignIn(@RequestBody AuthRequest authRequest) {

@@ -209,10 +209,6 @@ public class UserService implements UserDetailsService {
         return (ArrayList<User>) userRepository.findAll();
     }
 
-    public List<UserCommonView> findMyFriends(Principal principal) {
-        return userRepository.findUsersByFriendsUsername(principal.getName());
-    }
-
     public UserCommonView getUserView(String username) {
         return userRepository.findByUsername(username);
     }

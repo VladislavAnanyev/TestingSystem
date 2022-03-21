@@ -1,9 +1,6 @@
 package com.example.mywebquizengine.Model.Test;
 
-import com.example.mywebquizengine.Model.dto.MultipleAnswerQuizRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
 
 public class AnswerChecker {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -15,11 +12,6 @@ public class AnswerChecker {
 
     public void checkAnswer(UserQuizAnswer answer){
 
-        /*List<Integer> list1 = new ArrayList<>();
-        list1 = answer;
-
-        List<Integer> list2 = new ArrayList<>();
-        list2 = quiz.getAnswer();*/
         if (quiz.getType().equals("MULTIPLE")) {
             MultipleUserAnswerQuiz multipleUserAnswerQuiz = (MultipleUserAnswerQuiz) answer;
             MultipleAnswerQuiz multipleAnswerQuiz = (MultipleAnswerQuiz) quiz;

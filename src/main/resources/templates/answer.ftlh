@@ -5,7 +5,7 @@
 <#--    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>-->
 
 <#--    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" type="text/css" rel="stylesheet">-->
-    <link type="text/html" rel="stylesheet" href="../static/chart.css">
+    <link type="text/html" rel="stylesheet" href="/static/chart.css">
     <link href="/static/timer.css" type="text/css" rel="stylesheet">
 
 <#--    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>-->
@@ -59,7 +59,7 @@
                                 <div class="custom-control custom-checkbox mt-2">
                                     <input type="checkbox" onclick="session(${test_id.testId?c}, ${quiz.quizId?c})"
                                            class="custom-control-input answers${options_index}"
-                                           id="${options_index}_${quiz.quizId}" name="check${quiz?index}"
+                                           id="${options_index}_${quiz.quizId}" name="check${quiz.quizId?c}"
                                            value="${options_index}"
                                             <#if lastAnswer??>
                                         <#if lastAnswer.userQuizAnswers??>

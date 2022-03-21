@@ -1,7 +1,12 @@
 package com.example.mywebquizengine.Model.dto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class UserTestAnswerRequest {
+    @NotNull
     private Long quizId;
+    @NotNull
     private Object answer;
 
     public Long getQuizId() {
