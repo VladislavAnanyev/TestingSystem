@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity(name = "USER_QUIZ_ANSWERS")
 @Inheritance(
-        strategy = InheritanceType.JOINED
+        strategy = InheritanceType.SINGLE_TABLE
 )
 public class UserQuizAnswer {
     @Id

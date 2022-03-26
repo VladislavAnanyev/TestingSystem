@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.List;
 
 @Entity(name = "TESTS")
@@ -35,11 +36,33 @@ public class Test {
     @JoinColumn(name = "COURSE_ID")
     private Course course;
 
+    private Calendar startTime;
+
+    private Calendar endTime;
+
+    private Integer attempts;
+
     private String description;
 
     private LocalTime duration;
 
     public Test() {}
+
+    public Calendar getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Calendar endTime) {
+        this.endTime = endTime;
+    }
+
+    public Calendar getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Calendar startTime) {
+        this.startTime = startTime;
+    }
 
     public List<Quiz> getQuizzes() {
         return quizzes;
@@ -62,6 +85,14 @@ public class Test {
             this.quizzes.forEach((quiz) -> quiz.setTest(this));
         }
         //this.quizzes = quizzes;
+    }
+
+    public Integer getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(Integer attempts) {
+        this.attempts = attempts;
     }
 
     public Long getTestId() {

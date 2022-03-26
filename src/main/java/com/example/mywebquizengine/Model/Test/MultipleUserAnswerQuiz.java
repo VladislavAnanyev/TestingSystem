@@ -12,7 +12,7 @@ import java.util.List;
 public class MultipleUserAnswerQuiz extends UserQuizAnswer {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "USER_QUIZ_MULTIPLE_ANSWERS")
+    @CollectionTable(name = "USER_QUIZ_MULTIPLE_ANSWERS", joinColumns=@JoinColumn(name = "QUIZ_ANSWER_ID"))
     //@OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "QUIZ_ANSWER_ID")
     private List<Integer> answer;

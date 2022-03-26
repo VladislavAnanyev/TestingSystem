@@ -6,11 +6,10 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 public interface UserView {
-    String getUsername();
+    String getEmail();
     String getFirstName();
     String getLastName();
     String getAvatar();
-    String getEmail();
     List<Role> getRoles();
     boolean isStatus();
     String getOnline();

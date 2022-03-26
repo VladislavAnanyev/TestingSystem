@@ -19,13 +19,13 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
     @Override
     Optional<User> findById(String s);
 
-    UserCommonView findByUsername(String username);
+    UserCommonView findByEmail(String email);
 
-    UserView findAllByUsername(String username);
+    UserView findAllByEmail(String email);
 
     Optional<User> findUserByEmail(String email);
 
-    ProfileView findUserByUsernameOrderByUsernameAsc(String username);
+//    ProfileView findUserByUsernameOrderByUsernameAsc(String username);
 
     @Modifying
     @Transactional
@@ -34,7 +34,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE USERS SET PASSWORD = :password, CHANGE_PASSWORD_CODE = :changePasswordCode WHERE USERNAME = :username", nativeQuery = true)
+    @Query(value = "UPDATE USERS SET PASSWORD = :password, CHANGE_PASSWORD_CODE = :changePasswordCode WHERE EMAIL = :username", nativeQuery = true)
     void changePassword(String password, String username, String changePasswordCode);
 
     @Modifying
@@ -63,7 +63,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE USERS SET CHANGE_PASSWORD_CODE = :mes WHERE USERNAME = :username", nativeQuery = true)
+    @Query(value = "UPDATE USERS SET CHANGE_PASSWORD_CODE = :mes WHERE EMAIL = :username", nativeQuery = true)
     void setChangePasswordCode(String username, String mes);
 
     @Modifying
@@ -73,7 +73,7 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     //@Modifying
     @Transactional
-    @Query(value = "select ONLINE from USERS WHERE USERNAME = :username", nativeQuery = true)
+    @Query(value = "select ONLINE from USERS WHERE EMAIL = :username", nativeQuery = true)
     String getOnline(String username);
 
 }

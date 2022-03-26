@@ -37,7 +37,7 @@ public class GeneralController {
 
     @GetMapping(path = "/")
     public String home(Model model, HttpServletRequest request) {
-        return "home";
+        return "redirect:/courses";
     }
 
 

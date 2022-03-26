@@ -59,6 +59,8 @@ function onConnected() {
     console.log('/topic/' + username2);
     stompClient2.subscribe('/topic/' + username2 + id, onMessageReceived);
 
+    console.log("uuu")
+
 
     // Tell your username to the server
     /*stompClient.send("/app/testchat",
@@ -83,6 +85,8 @@ function onError(error) {
 
 
 function onMessageReceived(payload) {
+    console.log("Привет")
+    console.log("ffff")
     let id = document.getElementById("testid").value
     //console.log(payload.body.replaceAll("\"", ""))
     let result = payload.body.replaceAll("\"", "")
@@ -134,7 +138,9 @@ function onMessageReceived(payload) {
     var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
         keyboard: false
     })
-    myModal.show()
+    myModal.toggle()
+
+    //myModal.show()
     chartpie(result)
 
 

@@ -1,12 +1,10 @@
 package com.example.mywebquizengine.Service;
 
 import com.example.mywebquizengine.Model.Projection.TestView;
-import com.example.mywebquizengine.Model.Test.MultipleAnswerQuiz;
-import com.example.mywebquizengine.Model.Test.Quiz;
-import com.example.mywebquizengine.Model.Test.StringAnswerQuiz;
-import com.example.mywebquizengine.Model.Test.Test;
+import com.example.mywebquizengine.Model.Test.*;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.AddQuizRequest;
+import com.example.mywebquizengine.Model.dto.MapAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.MultipleAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.StringAnswerQuizRequest;
 import com.example.mywebquizengine.Repos.TestRepository;
@@ -22,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 //@Transactional
@@ -42,10 +41,10 @@ public class TestService {
 
     public List<TestView> findTestsInCourseByName(Long courseId, String name) {
         //Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_Username(courseId, name);
+        return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_Email(courseId, name);
     }
 
-    public List<Test> getMyQuizNoPaging (String name) {
+    public List<Test> getMyQuizNoPaging(String name) {
         return testRepository.getQuizForThisNoPaging(name);
     }
 
@@ -59,7 +58,7 @@ public class TestService {
     }
 
     public Test findTest(Long id) {
-        if (testRepository.findById(id).isPresent()){
+        if (testRepository.findById(id).isPresent()) {
             return testRepository.findById(id).get();
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -91,47 +90,58 @@ public class TestService {
 
     public void add(Long courseId, LocalTime duration, List<Object> addQuizRequests,
                     String description, String name) {
-        //try {
-            Test test = new Test();
-            test.setCourse(courseService.findCourseById(courseId));
-            User user = userService.loadUserByUsernameProxy(name);
-            test.setDuration(duration);
-            test.setDescription(description);
 
-            List<Quiz> quizzes = new ArrayList<>();
-            for (Object objectRequest : addQuizRequests) {
-                AddQuizRequest addQuizRequest =  objectMapper.convertValue(objectRequest, AddQuizRequest.class);
-                if (addQuizRequest.getType().equals("MULTIPLE")) {
+        Test test = new Test();
+        test.setCourse(courseService.findCourseById(courseId));
+        User user = userService.loadUserByUsernameProxy(name);
+        test.setDuration(duration);
+        test.setDescription(description);
+
+        List<Quiz> quizzes = new ArrayList<>();
+        for (Object objectRequest : addQuizRequests) {
+            AddQuizRequest addQuizRequest = objectMapper.convertValue(objectRequest, AddQuizRequest.class);
+            switch (addQuizRequest.getType()) {
+                case "MULTIPLE" -> {
                     MultipleAnswerQuizRequest addQuizReq = objectMapper.convertValue(objectRequest, MultipleAnswerQuizRequest.class);
                     MultipleAnswerQuiz quiz = new MultipleAnswerQuiz();
                     quiz.setAnswer(addQuizReq.getAnswer());
                     quiz.setOptions(addQuizReq.getOptions());
                     quiz.setText(addQuizReq.getText());
                     quiz.setTitle(addQuizReq.getTitle());
-                    quiz.setType("MULTIPLE");
                     quizzes.add(quiz);
-                } else if (addQuizRequest.getType().equals("STRING")) {
-                    StringAnswerQuizRequest stringAnswerQuizRequest = objectMapper.convertValue(objectRequest, StringAnswerQuizRequest.class);
+                }
+                case "STRING" -> {
+                    StringAnswerQuizRequest stringAnswerQuizRequest =
+                            objectMapper.convertValue(objectRequest, StringAnswerQuizRequest.class);
                     StringAnswerQuiz quiz = new StringAnswerQuiz();
-                    quiz.setAnswer(stringAnswerQuizRequest.getAnswer());
+                   /* StringAnswer stringAnswer = new StringAnswer();
+                    stringAnswer.setStringAnswer();*/
+                    quiz.setAnswer(Collections.singletonList(stringAnswerQuizRequest.getAnswer()));
                     quiz.setText(stringAnswerQuizRequest.getText());
                     quiz.setTitle(stringAnswerQuizRequest.getTitle());
-                    quiz.setType("STRING");
                     quizzes.add(quiz);
-                } else if (addQuizRequest.getType().equals("MAP")) {}
-
+                }
+                case "MAP" -> {
+                    MapAnswerQuizRequest mapAnswerQuizRequest =
+                            objectMapper.convertValue(objectRequest, MapAnswerQuizRequest.class);
+                    MapAnswerQuiz mapAnswerQuiz = new MapAnswerQuiz();
+                    mapAnswerQuiz.setAnswer(mapAnswerQuizRequest.getAnswer());
+                    mapAnswerQuiz.setText(mapAnswerQuizRequest.getText());
+                    mapAnswerQuiz.setTitle(mapAnswerQuizRequest.getTitle());
+                    quizzes.add(mapAnswerQuiz);
+                }
             }
+        }
 
-            test.setQuizzes(quizzes);
-            test.setUser(user);
+        test.setQuizzes(quizzes);
+        test.setUser(user);
 
-            for (int i = 0; i < addQuizRequests.size(); i++) {
-                test.getQuizzes().get(i).setTest(test);
-            }
-            saveTest(test);
+        for (int i = 0; i < addQuizRequests.size(); i++) {
+            test.getQuizzes().get(i).setTest(test);
+        }
+        saveTest(test);
 
-        /*} catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }*/
     }
+
+
 }

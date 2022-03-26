@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity(name = "QUIZZES")
 @Inheritance(
-        strategy = InheritanceType.JOINED
+        strategy = InheritanceType.SINGLE_TABLE
 )
 public class Quiz {
 
@@ -25,14 +25,14 @@ public class Quiz {
     @NotNull
     private String text;
 
+    private String image;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "test_id")
     private Test test;
 
     @OneToMany(mappedBy = "quiz", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<UserQuizAnswer> userQuizAnswers;
-
-    private String type;
 
     public Quiz() {}
 
@@ -41,12 +41,12 @@ public class Quiz {
         this.text = text;
     }
 
-    public String getType() {
-        return type;
+    public String getImage() {
+        return image;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getTitle() {

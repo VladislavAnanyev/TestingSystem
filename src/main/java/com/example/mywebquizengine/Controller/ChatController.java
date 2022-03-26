@@ -87,7 +87,7 @@ public class ChatController {
 
             DialogWithUsersViewPaging dialog = messageService.getDialogWithPaging(dialog_id, page, pageSize, sortBy);
 
-            if (dialog.getUsers().stream().anyMatch(o -> o.getUsername()
+            if (dialog.getUsers().stream().anyMatch(o -> o.getEmail()
                     .equals(principal.getName()))) {
 
                 model.addAttribute("lastDialogs", messageService.getDialogsForApi(principal.getName()));
@@ -115,15 +115,13 @@ public class ChatController {
         return messageService.getMessages(Long.valueOf(dialog_id), page, pageSize, sortBy, principal.getName());
     }
 
-    @PostMapping(path = "/createGroup")
+   /* @PostMapping(path = "/createGroup")
     @ResponseBody
     public Long createGroup(@Valid @RequestBody Dialog newDialog,
                             @AuthenticationPrincipal Principal principal
     ) throws JsonProcessingException, ParseException {
         return messageService.createGroup(newDialog, principal.getName());
-    }
-
-
+    }*/
 
     @Modifying
     @Transactional
@@ -136,9 +134,6 @@ public class ChatController {
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
-
-
-
     @Modifying
     @Transactional
     @RabbitListener(queues = "incoming-messages")
@@ -146,13 +141,9 @@ public class ChatController {
         messageService.sendMessage(message, "ANDROID");
     }
 
-
     @GetMapping(path = "/error")
     public String handleError() {
         return "error";
     }
-
-
-
 
 }

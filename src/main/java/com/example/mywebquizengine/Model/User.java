@@ -3,8 +3,6 @@ package com.example.mywebquizengine.Model;
 import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.MywebquizengineApplication;
 import com.example.mywebquizengine.Service.UserService;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,15 +21,11 @@ import java.util.Map;
 public class User implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = -7422293274841574951L;
-    @Id
-    @NotBlank
-    /*@Pattern(regexp = """
-            [\S]{0,}
-            """) // без пробелов*/
-    private String username;
+
     @NotBlank
     @NotNull
     @Email
+    @Id
     private String email;
     private String activationCode;
     private String changePasswordCode;
@@ -63,8 +57,7 @@ public class User implements UserDetails, OAuth2User {
     private boolean status;
 
     @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    private Role role;
     private boolean online;
 
     public User() {
@@ -75,7 +68,6 @@ public class User implements UserDetails, OAuth2User {
     }
 
     public User(String username, String email, String firstName, String lastName, String password) {
-        this.username = username;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -84,7 +76,6 @@ public class User implements UserDetails, OAuth2User {
     }
 
     public User(String username, String firstName, String lastName, String avatar) {
-        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
@@ -117,7 +108,7 @@ public class User implements UserDetails, OAuth2User {
     @Override
     public List<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.toString())));
+        authorities.add(new SimpleGrantedAuthority(role.toString()));
         return authorities;
     }
 
@@ -155,21 +146,16 @@ public class User implements UserDetails, OAuth2User {
 
     public boolean isAdmin(String name) {
         return MywebquizengineApplication.ctx.getBean(UserService.class)
-                .loadUserByUsername(name).getRoles().contains(Role.ROLE_ADMIN);
+                .loadUserByUsername(name).getRole().equals(Role.ROLE_ADMIN);
     }
 
     public void grantAuthority(Role authority) {
-        if (roles == null) roles = new ArrayList<>();
-        this.roles.add(authority);
+        this.role = authority;
     }
 
     @Override
     public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        return email;
     }
 
     @Override
@@ -213,12 +199,12 @@ public class User implements UserDetails, OAuth2User {
         this.status = status;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setRole(Role roles) {
+        this.role = roles;
     }
 
     public String getChangePasswordCode() {
@@ -231,7 +217,7 @@ public class User implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return username;
+        return email;
     }
 
     @Override

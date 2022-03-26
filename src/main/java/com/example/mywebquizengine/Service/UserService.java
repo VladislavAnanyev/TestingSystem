@@ -1,6 +1,5 @@
 package com.example.mywebquizengine.Service;
 
-import com.example.mywebquizengine.Model.Projection.ProfileView;
 import com.example.mywebquizengine.Model.Projection.UserCommonView;
 import com.example.mywebquizengine.Model.Projection.UserView;
 import com.example.mywebquizengine.Model.Role;
@@ -26,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,7 +34,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.*;
 
 
@@ -64,8 +61,8 @@ public class UserService implements UserDetailsService {
     private String hostname;
 
     @Override
-    public User loadUserByUsername(String username) throws ResponseStatusException {
-        Optional<User> user = userRepository.findById(username);
+    public User loadUserByUsername(String email) throws ResponseStatusException {
+        Optional<User> user = userRepository.findById(email);
 
         if (user.isPresent()) {
             return user.get();
@@ -122,15 +119,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void updatePassword(User user, String changePasswordCode) {
-
+    public void updatePassword(String password, String changePasswordCode) {
         User savedUser = getUserViaChangePasswordCode(changePasswordCode);
-
-        user.setUsername(savedUser.getUsername());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setChangePasswordCode(UUID.randomUUID().toString());
-
-        userRepository.changePassword(user.getPassword(), user.getUsername(), user.getChangePasswordCode());
+        savedUser.setPassword(passwordEncoder.encode(password));
         savedUser.setChangePasswordCode(UUID.randomUUID().toString());
     }
 
@@ -143,15 +134,16 @@ public class UserService implements UserDetailsService {
 
     public User getUserViaChangePasswordCode(String changePasswordCode) {
 
-        if (userRepository.findByChangePasswordCode(changePasswordCode).isPresent()) {
-            return userRepository.findByChangePasswordCode(changePasswordCode).get();
+        Optional<User> optionalUser = userRepository.findByChangePasswordCode(changePasswordCode);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
     }
 
-    public User castToUserFromOauth(OAuth2AuthenticationToken authentication) {
+    /*public User castToUserFromOauth(OAuth2AuthenticationToken authentication) {
 
         User user = new User();
 
@@ -191,7 +183,7 @@ public class UserService implements UserDetailsService {
         //doInitialize(user);
 
         return user;
-    }
+    }*/
 
     private void rabbitInitialize(String username) {
 
@@ -210,7 +202,7 @@ public class UserService implements UserDetailsService {
     }
 
     public UserCommonView getUserView(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByEmail(username);
     }
 
     public AuthResponse signInViaJwt(AuthRequest authRequest) {
@@ -287,11 +279,12 @@ public class UserService implements UserDetailsService {
         }
     }*/
 
-    public UserView getAuthUser(String username) {
-        if (userRepository.findAllByUsername(username) == null) {
+    public UserView getAuthUser(String email) {
+
+        if (userRepository.findAllByEmail(email) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
-            return userRepository.findAllByUsername(username);
+            return userRepository.findAllByEmail(email);
         }
     }
 
@@ -322,10 +315,10 @@ public class UserService implements UserDetailsService {
         return userRepository.existsById(username);
     }
 
-    @Transactional
+    /*@Transactional
     public ProfileView getUserProfileById(String username) {
         return userRepository.findUserByUsernameOrderByUsernameAsc(username);
-    }
+    }*/
 
     public void getUserViaChangePasswordCodePhoneApi(String username, String code) {
         Optional<User> user = userRepository.findByChangePasswordCode(code);
@@ -360,17 +353,8 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(password));
         user.setStatus(true);
         user.setActivationCode(UUID.randomUUID().toString());
-        String mes = user.getFirstName() + " " + user.getLastName() + ", Добро пожаловать в WebQuizzes! "
-                + "Для активации аккаунта перейдите по ссылке: " + hostname + "/activate/" + user.getActivationCode()
-                + " Если вы не регистрировались на данном ресурсе, то проигнорируйте это сообщение";
 
-        /*try {
-            mailSender.send(user.getEmail(), "Активация аккаунта в WebQuizzes", mes);
-        } catch (Exception e) {
-            System.out.println("Отключено");
-        }*/
-
-        user.setAvatar(hostname + "/img/default.jpg");
+        user.setAvatar("https://" + hostname + "/img/default.jpg");
         user.setOnline(false);
         user.setEnabled(true);
         user.grantAuthority(Role.ROLE_USER);

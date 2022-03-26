@@ -12,7 +12,7 @@ public class AnswerChecker {
 
     public void checkAnswer(UserQuizAnswer answer){
 
-        if (quiz.getType().equals("MULTIPLE")) {
+        if (quiz instanceof MultipleAnswerQuiz) {
             MultipleUserAnswerQuiz multipleUserAnswerQuiz = (MultipleUserAnswerQuiz) answer;
             MultipleAnswerQuiz multipleAnswerQuiz = (MultipleAnswerQuiz) quiz;
             if (multipleUserAnswerQuiz.getAnswer().toString().equals(multipleAnswerQuiz.getAnswer().toString())) {
@@ -22,10 +22,10 @@ public class AnswerChecker {
                 this.feedback = "Wrong answer! Please, try again.";
                 this.success = false;
             }
-        } else if (quiz.getType().equals("STRING")) {
+        } else if (quiz instanceof StringAnswerQuiz) {
             StringUserAnswerQuiz stringUserAnswerQuiz = (StringUserAnswerQuiz) answer;
             StringAnswerQuiz stringAnswerQuiz = (StringAnswerQuiz) quiz;
-            if (stringUserAnswerQuiz.getAnswer().equals(stringAnswerQuiz.getAnswer())) {
+            if (stringUserAnswerQuiz.getAnswer().equals(stringAnswerQuiz.getAnswer().get(0))) {
                 this.feedback = "Congratulations, you're right!";
                 this.success = true;
             } else {

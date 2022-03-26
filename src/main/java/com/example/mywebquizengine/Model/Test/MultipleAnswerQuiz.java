@@ -16,7 +16,7 @@ import java.util.List;
 public class MultipleAnswerQuiz extends Quiz {
 
     @ElementCollection
-    @CollectionTable(name = "QUIZZES_MULTIPLE_OPTIONS")
+    @CollectionTable(name = "QUIZZES_MULTIPLE_OPTIONS", joinColumns=@JoinColumn(name = "QUIZ_ID"))
     @NotNull
     @NotEmpty
     @Size(min = 2)

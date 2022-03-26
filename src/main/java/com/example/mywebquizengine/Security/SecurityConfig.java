@@ -7,6 +7,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -101,14 +102,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
 
                     .anyRequest().authenticated()
 
-                    /*.and()
-                    .formLogin()*/
-
-                    /*.loginPage("/api/jwt")*//*.successForwardUrl("/api/jwt")*/
-                    /*.and().logout().logoutUrl("/api/logout").permitAll()*/
-
-                    //.and().oauth2Login().defaultSuccessUrl("/loginSuccess")
-                    /*.permitAll()*/
                     .and()
                     .logout().logoutUrl("/api/logout").logoutSuccessHandler(new SimpleUrlLogoutSuccessHandler())
                     .permitAll()
@@ -124,8 +117,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
 
         }
     }
-
-
 
     @Order(2)
     @Configuration
@@ -181,12 +172,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
             http
 
                     .authorizeRequests()
-                    .antMatchers("/googlee45a32e3d6f7edf4.html", "/signup", "/activate/*",
+                    .antMatchers( "/googlee45a32e3d6f7edf4.html", "/signup", "/activate/*",
                             "/quizzes", "/reg",  "/androidSign", "/ws/**", "/add", "/about/**",
-                            "/", "/signin", "/checkyandex", "/h2-console/**", "/.well-known/pki-validation/**",
+                            "/signin", "/checkyandex", "/h2-console/**", "/.well-known/pki-validation/**",
                             "/update/userinfo/pswrdwithoutauth", "/updatepass/**", "/testm", "/pass/**",
                             "/updatepassword/{activationCode}", "/yandex_135f209071de02b1.html",
-                            "/start/{activationCode}").permitAll()
+                            "/start/{activationCode}", "/password/forget").permitAll()
                     .antMatchers("/swagger-ui/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
 
@@ -195,11 +186,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
                         .loginPage("/signin")
 
                         .successHandler(myAuthenticationSuccessHandler)
-
-
-                        //.successForwardUrl("/profile")
-                        //.defaultSuccessUrl("/profile")
-                        //.failureUrl("/signin?error")
 
 
                     .and()

@@ -56,10 +56,10 @@ public class ApiUserController {
             return userService.getAuthUser(principal.getName());
     }
 
-    @GetMapping(path = "/user/{username}/profile")
+    /*@GetMapping(path = "/user/{username}/profile")
     public ProfileView getProfile(@PathVariable String username) {
         return userService.getUserProfileById(username);
-    }
+    }*/
 
 
     @PostMapping(path = "/upload")
@@ -86,7 +86,7 @@ public class ApiUserController {
 
     @PutMapping(path = "/user/password")
     public void changePassword(@RequestBody User user) {
-        userService.updatePassword(user, user.getChangePasswordCode());
+        userService.updatePassword(user.getPassword(), user.getChangePasswordCode());
     }
 
     @GetMapping(path = "/user/verify-password-code")

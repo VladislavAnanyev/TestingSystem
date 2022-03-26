@@ -4,20 +4,6 @@
 <@e.page>
 
 
-    <title>Вход</title>
-    <#macro logout>
-        <#if nowUser??>
-            <form action="/logout" method="post">
-                <button class="btn btn-primary mt-1" type="submit">Выйти</button>
-            </form>
-        <#else>
-            <form action="/signin" method="get">
-                <button class="btn btn-primary mt-1" type="submit">Войти</button>
-            </form>
-        </#if>
-
-    </#macro>
-
     <input type="hidden" id="courseId" value="${courseId?c}">
 
     <div class="form-group">

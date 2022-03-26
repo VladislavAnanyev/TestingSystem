@@ -1,34 +1,21 @@
 package com.example.mywebquizengine.Controller.api;
 
-import com.example.mywebquizengine.Controller.UserController;
 import com.example.mywebquizengine.Model.Role;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Repos.UserRepository;
-import com.example.mywebquizengine.Security.BCryptEncoderConfig;
 import com.example.mywebquizengine.Service.JWTUtil;
-import com.example.mywebquizengine.Service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
 import org.junit.After;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import javax.sql.DataSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -118,7 +105,6 @@ public class ApiUserControllerTest {
         User user = repository.findById("application").get();
         assertNull(user.getChangePasswordCode());
         assertNotNull(user.getPassword());
-        assertEquals("0", String.valueOf(user.getBalance()));
 
 
 
@@ -292,8 +278,8 @@ public class ApiUserControllerTest {
         User person = new User(name, "a.vlad.v@ya.ru", "Vladislav", "Ananyev",
                 passwordEncoder.encode("12345"));
         person.grantAuthority(Role.ROLE_USER);
-        person.setRoles(new ArrayList<>(Collections.singleton(Role.ROLE_USER)));
-        person.setPhotos(Collections.singletonList("https://localhost/img/default.jpg"));
+        person.setRole(new ArrayList<>(Collections.singleton(Role.ROLE_USER)));
+        person.setAvatar("https://localhost/img/default.jpg");
         return repository.save(person);
     }
 

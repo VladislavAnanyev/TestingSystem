@@ -39,8 +39,8 @@ public class CourseService {
         courseRepository.save(course);
     }
 
-    public ArrayList<CourseView> getAllCourses() {
-        return (ArrayList<CourseView>) courseRepository.findAllCourses();
+    public List<CourseView> getAllCourses() {
+        return courseRepository.findAllCourses();
     }
 
     public Course findCourseById(Long id) {
@@ -63,7 +63,6 @@ public class CourseService {
                 user.setActivationCode(uuid);
                 user.setStatus(false);
                 user.setEnabled(false);
-                user.setUsername(email);
                 user.setFirstName(email);
                 user.setLastName(email);
                 userService.saveUser(user);

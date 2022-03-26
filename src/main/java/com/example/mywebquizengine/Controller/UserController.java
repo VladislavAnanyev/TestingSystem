@@ -5,11 +5,13 @@ import com.example.mywebquizengine.Model.Projection.UserView;
 import com.example.mywebquizengine.Security.ActiveUserStore;
 import com.example.mywebquizengine.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
@@ -25,13 +27,6 @@ public class UserController {
     @Autowired
     private ActiveUserStore activeUserStore;
 
-    @GetMapping(path = "/profile")
-    public String getProfile(Model model , @AuthenticationPrincipal Principal principal) {
-        UserView user = userService.getAuthUser(principal.getName());
-        model.addAttribute("user", user);
-        return "profile";
-    }
-
     @GetMapping("/reg")
     public String login() {
         return "reg";
@@ -46,7 +41,7 @@ public class UserController {
     @PostMapping(path = "/signup")
     public String checkIn(RegistrationRequest request) {
         userService.processCheckIn(request.getActivationCode(), request.getFirstName(), request.getLastName(), request.getPassword());
-        return "redirect:/profile";
+        return "redirect:/signin";
     }
 
     @PostMapping(path = "/update/userinfo/password", consumes ={"application/json"} )
@@ -63,11 +58,12 @@ public class UserController {
     @PostMapping(path = "/update/userinfo/pswrdwithoutauth", consumes ={"application/json"} )
     public void tryToChangePassWithoutAuth(@RequestBody User in) {
         userService.sendCodeForChangePassword(in.getUsername());
+        throw new ResponseStatusException(HttpStatus.OK);
     }
 
     @GetMapping(path = "/updatepass/{changePasswordCode}")
-    public String changePasswordPage(@PathVariable String changePasswordCode) {
-        userService.getUserViaChangePasswordCode(changePasswordCode);
+    public String changePasswordPage(Model model, @PathVariable String changePasswordCode) {
+        model.addAttribute("user", userService.getUserViaChangePasswordCode(changePasswordCode));
         return "changePassword";
     }
 
@@ -77,8 +73,8 @@ public class UserController {
     }
 
     @PutMapping(path = "/updatepass/{changePasswordCode}", consumes ={"application/json"})
-    public String changePasswordUsingCode(@RequestBody User in, @PathVariable String changePasswordCode) {
-        userService.updatePassword(in, changePasswordCode);
+    public String changePasswordUsingCode(@RequestBody String password, @PathVariable String changePasswordCode) {
+        userService.updatePassword(password, changePasswordCode);
         return "changePassword";
     }
 
@@ -98,6 +94,11 @@ public class UserController {
             model.addAttribute("user", user);
             return "user";
         }
+    }
+
+    @GetMapping(path = "/password/forget")
+    public String getForgetPasswordPage() {
+        return "forgetPassword";
     }
 
     @GetMapping(path = "/getUserList")

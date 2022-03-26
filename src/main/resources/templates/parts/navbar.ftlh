@@ -290,10 +290,12 @@
                             <div class="profile-body">
                                 <div class="avatar avatar-xl">
                                     <img class="avatar-img" src="${nowUser.principal.avatar}" alt="#">
+                                    <input id="upload-chat-img" class="d-none" type="file">
+                                    <label class="stretched-label mb-0" for="upload-chat-img"></label>
                                 </div>
 
                                 <h4 class="mb-1">${nowUser.principal.firstName} ${nowUser.principal.lastName}</h4>
-                                <p>last seen 5 minutes ago</p>
+                                <p>Онлайн</p>
                             </div>
                         </div>
                         <!-- Header -->

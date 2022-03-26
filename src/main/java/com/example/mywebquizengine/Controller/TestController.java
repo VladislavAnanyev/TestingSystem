@@ -46,7 +46,7 @@ public class TestController {
                 request.getDuration(),
                 request.getQuizzes(),
                 request.getDescription(),
-                principal.getName()
+                "a.vlad.v@yandex.ru"
         );
         return "redirect:/";
     }

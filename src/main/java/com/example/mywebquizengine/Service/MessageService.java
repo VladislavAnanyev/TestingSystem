@@ -157,7 +157,7 @@ public class MessageService {
         DialogWithUsersViewPaging dialog = dialogRepository.findAllDialogByDialogId(dialogId);
 
         // If user contains in dialog
-        if (dialog.getUsers().stream().anyMatch(o -> o.getUsername()
+        if (dialog.getUsers().stream().anyMatch(o -> o.getEmail()
                 .equals(username))) {
             return dialog;
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -241,7 +241,7 @@ public class MessageService {
     }
 
 
-    public Long createGroup(Dialog newDialog, String username) throws JsonProcessingException, ParseException {
+    /*public Long createGroup(Dialog newDialog, String username) throws JsonProcessingException, ParseException {
 
         User authUser = new User();
 
@@ -291,7 +291,7 @@ public class MessageService {
             return dialog.getDialogId();
 
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-    }
+    }*/
 
     public DialogWithUsersViewPaging getDialogWithPaging(String dialog_id, Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());

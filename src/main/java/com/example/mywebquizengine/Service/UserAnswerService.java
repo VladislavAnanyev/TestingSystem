@@ -12,11 +12,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.math.BigInteger;
+import java.security.Principal;
 import java.util.*;
 
 @Service
@@ -139,4 +141,40 @@ public class UserAnswerService  {
         List<Integer> answers = userQuizAnswerRepository.getAnswerIdForQuiz(id);
         answers.forEach(answer -> userQuizAnswerRepository.deleteById(answer));
     }*/
+
+    public boolean checkComplete(Long testId) {
+        Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long countComplete = userTestAnswerRepository.getCountOfCompleteAttempts(principal.getName(), testId);
+        return countComplete >= 1;
+    }
+
+    public Integer getPercentageOfComplete(Long courseId) {
+        return userTestAnswerRepository.getPercentageOfComplete(courseId);
+    }
+
+    public boolean isAvailable(Test test, String name) {
+        boolean available = true;
+        Integer userAttempts = userTestAnswerRepository.getUserAttempts(test.getTestId(), name);
+        if (test.getAttempts() != null && userAttempts >= test.getAttempts()) {
+            available = false;
+        }
+
+        Calendar now = new GregorianCalendar();
+        if (test.getStartTime() != null) {
+            if (now.before(test.getStartTime())) {
+                available = false;
+            }
+        }
+
+        if (test.getEndTime() != null) {
+            Calendar endTimePlusOneMinute = test.getEndTime();
+            endTimePlusOneMinute.add(Calendar.MINUTE, 1);
+            if (now.after(endTimePlusOneMinute)) {
+                available = false;
+            }
+        }
+
+        return available;
+
+    }
 }

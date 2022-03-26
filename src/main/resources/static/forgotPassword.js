@@ -1,16 +1,16 @@
 function sendEmailMsgWithoutAuth() {
     let xhr = new XMLHttpRequest();
-    let username = $('input[name=name]').val();
+    let username = document.getElementById("resetpassword-email")
 
     let json = {
-        username: username
+        email: username.value
     }
-    console.log(username)
+    console.log(username.value)
     xhr.open('POST', '/update/userinfo/pswrdwithoutauth');
     xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
     xhr.onreadystatechange = function () {
         if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            console.log(username)
+            console.log(username.value)
         }
     };
     xhr.send(JSON.stringify(json));

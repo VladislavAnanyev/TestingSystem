@@ -9,4 +9,6 @@ public interface TestView {
     Integer getNumberOfQuestions();
     @Value("#{target.user.username}")
     String getAuthor();
+    @Value("#{@userAnswerService.checkComplete(target.testId)}")
+    boolean isComplete();
 }

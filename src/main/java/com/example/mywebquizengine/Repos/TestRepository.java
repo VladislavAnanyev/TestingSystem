@@ -32,10 +32,12 @@ public interface TestRepository extends CrudRepository<Test, Long>,
 
     List<TestView> findTestsByCourse_CourseId(Long courseId);
 
-    List<TestView> findTestsByCourse_CourseIdAndCourse_Owner_Username(Long courseId, String name);
+    List<TestView> findTestsByCourse_CourseIdAndCourse_Owner_Email(Long courseId, String name);
 
     @Transactional
     @Query(nativeQuery = true, value = "DELETE FROM TESTS WHERE TEST_ID =:id")
     @Modifying
     void nativeDeleteTestById(Long id);
+
+
 }

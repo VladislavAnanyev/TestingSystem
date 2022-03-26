@@ -8,6 +8,15 @@ public class CreateTestRequest {
     private LocalTime duration;
     private List<Object> quizzes;
     private Long courseId;
+    private Integer attempts;
+
+    public Integer getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(Integer attempts) {
+        this.attempts = attempts;
+    }
 
     public Long getCourseId() {
         return courseId;
@@ -20,10 +29,6 @@ public class CreateTestRequest {
     public String getDescription() {
         return description;
     }
-/*
-    public List<AddQuizRequest> getQuizzes() {
-        return quizzes;
-    }*/
 
     public LocalTime getDuration() {
         return duration;
@@ -36,10 +41,6 @@ public class CreateTestRequest {
     public void setDuration(LocalTime duration) {
         this.duration = duration;
     }
-/*
-    public void setQuizzes(List<AddQuizRequest> quizzes) {
-        this.quizzes = quizzes;
-    }*/
 
     public List<Object> getQuizzes() {
         return quizzes;

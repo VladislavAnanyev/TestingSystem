@@ -59,7 +59,11 @@ public class MyAuthenticationSuccessHandler extends
         if (savedRequest != null) {
             targetUrl = savedRequest.getRedirectUrl();
         } else {
-            targetUrl = "/profile";
+            targetUrl = request.getRequestURI();
+        }
+
+        if (targetUrl.contains("signin")) {
+            targetUrl = "/courses";
         }
 
         redirectStrategy.sendRedirect(request, response, targetUrl);

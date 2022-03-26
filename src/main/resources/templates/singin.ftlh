@@ -1,8 +1,70 @@
-<#import "parts/common.ftlh" as e>
+<#import "parts/signinCommon.ftlh" as e>
 <#include "parts/security.ftlh">
 
 <@e.page>
 
+<#--<!-- Template CSS &ndash;&gt;
+<link rel="stylesheet" href="./signin_files/template.bundle.css">
+<link rel="stylesheet" href="./signin_files/template.dark.bundle.css" media="(prefers-color-scheme: dark)">
+<link id="chromealerabat-link" rel="stylesheet" type="text/css" href="chrome-extension://dacdinoicboceafielngnmjjplncljhj/content.css"></head>
+-->
+    <body class="bg-light">
+
+    <div class="container">
+        <form action="/signin" method="post">
+            <div class="row align-items-center justify-content-center min-vh-100 gx-0">
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="card card-shadow border-0">
+                        <div class="card-body">
+                            <div class="row g-6">
+                                <div class="col-12">
+                                    <div class="text-center">
+                                        <h3 class="fw-bold mb-2">Sign In</h3>
+                                        <p>Login to your account</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="signin-email" name="username"
+                                               placeholder="Email">
+                                        <label for="signin-email">Email</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" name="password" id="signin-password"
+                                               placeholder="Password">
+                                        <label for="signin-password">Password</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <button class="btn btn-block btn-lg btn-primary w-100" type="submit">Sign In
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Text -->
+                    <div class="text-center mt-8">
+                        <p>Don't have an account yet? <a
+                                    href="https://offsetcode.com/themes/messenger/2.1.0/signup.html">Sign
+                                up</a></p>
+                        <p><a href="/password/forget">Forgot
+                                Password?</a>
+                        </p>
+                    </div>
+                </div>
+
+            </div> <!-- / .row -->
+        </form>
+    </div>
+
+<#--
 
     <title>Вход</title>
     <script src="/static/forgotPassword.js"></script>
@@ -49,10 +111,10 @@
             <label for="exampleInputPassword1">Пароль</label>
             <input type="password" class="form-control" id="exampleInputPassword1" name="password">
         </div>
-        <#--<div class="form-group form-check">
+        &lt;#&ndash;<div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="exampleCheck1">
             <label class="form-check-label" for="exampleCheck1">Запомнить меня</label>
-        </div>-->
+        </div>&ndash;&gt;
         <button type="submit" class="btn btn-primary">Войти</button>
         <button type="button" class="btn btn-primary my-1" data-toggle="modal" data-target="#staticBackdrop">
             Забыли пароль?
@@ -76,8 +138,8 @@
                 <div class="form-group">
 
                     <input type="text" class="form-control" id="name" placeholder="Введите имя пользователя"  aria-describedby="emailHelp" name="name">
-                    <#--<input type="text" class="form-control" id="password1" placeholder="Придумайте новый пароль"  aria-describedby="emailHelp" name="password1">
-                    <input type="text" class="form-control mt-3" id="password2" placeholder="Введите новый пароль ещё раз" aria-describedby="emailHelp" name="password2">-->
+                    &lt;#&ndash;<input type="text" class="form-control" id="password1" placeholder="Придумайте новый пароль"  aria-describedby="emailHelp" name="password1">
+                    <input type="text" class="form-control mt-3" id="password2" placeholder="Введите новый пароль ещё раз" aria-describedby="emailHelp" name="password2">&ndash;&gt;
                 </div>
             </div>
             <div class="modal-footer">
@@ -86,5 +148,6 @@
 
         </div>
     </div>
+-->
 
 </@e.page>

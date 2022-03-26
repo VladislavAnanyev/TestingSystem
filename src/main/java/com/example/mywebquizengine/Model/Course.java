@@ -20,6 +20,15 @@ public class Course {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Test> tests;
+    private String image;
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public String getName() {
         return name;
