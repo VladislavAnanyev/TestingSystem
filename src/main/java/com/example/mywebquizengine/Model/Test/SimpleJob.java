@@ -6,7 +6,6 @@ import com.example.mywebquizengine.MywebquizengineApplication;
 import com.example.mywebquizengine.Service.UserAnswerService;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +25,7 @@ public class SimpleJob extends QuartzJobBean {
         UserTestAnswer userTestAnswer2 = userAnswerService.findByUserAnswerId(dataMap.getLong("answer"));
 
         if (userTestAnswer2.getCompletedAt() == null) {
-            userAnswerController.getAnswerOnTest(String.valueOf(dataMap.get("test")), userTestAnswer);
+            userAnswerController.sendAnswer(userTestAnswer.getUserAnswerId());
         }
 
         System.out.println("Задание выполнено в: " + new GregorianCalendar().getTime());

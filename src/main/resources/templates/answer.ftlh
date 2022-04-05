@@ -2,16 +2,11 @@
 <#include "parts/security.ftlh">
 
 <@e.page>
-<#--    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>-->
-
-<#--    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" type="text/css" rel="stylesheet">-->
     <link type="text/html" rel="stylesheet" href="/static/chart.css">
     <link href="/static/timer.css" type="text/css" rel="stylesheet">
-
     <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>
     <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-<#--    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>-->
 
     <title>Ответить</title>
 
@@ -23,35 +18,10 @@
         <input type="hidden" id="time" value="${timeout?datetime?string ["MM.dd.yyyy HH:mm:ss"]}">
     </#if>
 
-<#--<#if test_id.duration??>
-    <div class="alltime mb-3" id="clock">
-        <h1 class="countdown-title">Осталось времени</h1>
-        <div id="countdown" class="countdown">
-            <div class="countdown-number">
-                <span class="days countdown-time"></span>
-                <span class="countdown-text">Дни</span>
-            </div>
-            <div class="countdown-number">
-                <span class="hours countdown-time"></span>
-                <span class="countdown-text">Часы</span>
-            </div>
-            <div class="countdown-number">
-                <span class="minutes countdown-time"></span>
-                <span class="countdown-text">Минуты</span>
-            </div>
-            <div class="countdown-number">
-                <span class="seconds countdown-time"></span>
-                <span class="countdown-text">Секунды</span>
-            </div>
-        </div>
-    </div>
-</#if>-->
-
-
-    <div>
+    <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" class="scrollspy-example" tabindex="0">
 
         <#list test_id.quizzes as quiz>
-            <div class="card quiz mt-2 card mb-3 shadow p-3 mb-5 <#--bg-white--> rounded">
+            <div id="list-item-${quiz_index + 1}" class="card quiz mt-2 card mb-3 shadow p-3 mb-5 <#--bg-white--> rounded">
                 <b class="mr-4">${quiz_index + 1}.</b>
                 <div class="card-body">
                     <div id="test${quiz_index}">
@@ -69,13 +39,14 @@
                                         <#list quiz.answer as k,v>
                                             <div class="row align-items-center gx-5 mt-2">
                                                 <div class="col">
-                                                    <h5>${k}</h5>
+                                                    <h5 class="map${quiz.quizId?c}key">${k}</h5>
                                                 </div>
                                                 <div class="col">
                                                     <div class="row">
-                                                        <select class="form-select" aria-label="Default select example">
+                                                        <select onchange="mapAnswer(${test_id.testId?c}, ${quiz.quizId?c})" class="form-select" aria-label="Default select example">
+                                                            <option disabled selected>Выберите ответ</option>
                                                             <#list quiz.answer?values as value>
-                                                                <option value="1">${value}</option>
+                                                                <option class="map${quiz.quizId?c}value" value="${value}">${value}</option>
                                                             </#list>
                                                         </select>
                                                     </div>
@@ -143,10 +114,8 @@
 
                         <#if quiz.class == "class com.example.mywebquizengine.Model.Test.StringAnswerQuiz">
                             <div id="inputAnswer" class="custom-control mt-3">
-
-                                <input required type="text" class="form-control" id="stringAnswer1"
+                                <input oninput="onInput(${quiz.quizId?c}, ${quiz_index+1})" required type="text" class="form-control" id="stringAnswer${quiz_index+1}"
                                        placeholder="Введите ответ">
-
                             </div>
                         </#if>
 
@@ -226,36 +195,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
         <script src="/static/session.js"></script>
+        <script src="/static/mapAnswer.js"></script>
+        <script src="/static/onInputAnswer.js"></script>
         <script>
 
-            //const input = document.querySelector('input')
-
-            document.onkeyup = function (e) {
-                console.log("123")
-
-                let text = document.getElementById('stringAnswer1')
-
-                if (text.value !== "") {
-                    let json = {
-                        answer: text.value,
-                        quizId: Number(${test_id.quizzes[0].quizId?c})
-                    }
-
-                    console.log(json)
-                    let xhrTyping = new XMLHttpRequest();
-
-                    xhrTyping.open('POST', '/answersession/' + ${test_id.testId?c}, true);
-                    xhrTyping.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-                    xhrTyping.onreadystatechange = function () {
-                        if (xhrTyping.readyState === XMLHttpRequest.DONE && xhrTyping.status === 200) {
-                            console.log("Успех")
-                        }
-                    };
-                    xhrTyping.send(JSON.stringify(json));
-                }
-
-
-            };
         </script>
 
 

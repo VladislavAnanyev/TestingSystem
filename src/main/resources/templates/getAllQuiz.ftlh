@@ -24,8 +24,8 @@
                         <div class="card-body">
                             <h5 class="card-title">${test.description}</h5>
                             <p class="card-text">Количество вопросов: ${test.numberOfQuestions}</p>
-                            <p class="card-text"><small class="text-muted">Автор: <a
-                                            href="/about/${test.author}">${test.author}</a></small>
+                            <#--<p class="card-text"><small class="text-muted">Автор: <a
+                                            href="/about/${test.author}">${test.author}</a></small>-->
                             </p>
                         </div>
 
@@ -59,12 +59,12 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <form method="get" action="/quizzes/${test.testId?c}/solve">
+                                        <form method="get" action="/test/answer/${test.testId?c}/start">
                                             <button type="submit" <#--onclick="restoreSession(false, ${testList.id?c})"-->
                                                     class="btn btn-secondary" <#--data-dismiss="modal"-->>Нет
                                             </button>
                                         </form>
-                                        <form method="get" action="/quizzes/${test.testId?c}/solve">
+                                        <form method="get" action="/test/answer/${test.testId?c}/start">
                                             <input type="hidden" name="restore" value="true"/>
                                             <button type="submit" <#--onclick="restoreSession(true, ${testList.id?c})"-->
                                                     class="btn btn-primary">Да
@@ -81,7 +81,7 @@
             </#list>
         </div>
 
-        <div class="row">
+        <#--<div class="row">
 
             <div class="col">
                 <nav aria-label="Page navigation example">
@@ -104,7 +104,7 @@
                     </ul>
                 </nav>
             </div>
-        </div>
+        </div>-->
     </div>
 
 </@e.page>

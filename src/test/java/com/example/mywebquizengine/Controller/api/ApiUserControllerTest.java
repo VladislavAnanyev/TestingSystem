@@ -278,7 +278,7 @@ public class ApiUserControllerTest {
         User person = new User(name, "a.vlad.v@ya.ru", "Vladislav", "Ananyev",
                 passwordEncoder.encode("12345"));
         person.grantAuthority(Role.ROLE_USER);
-        person.setRole(new ArrayList<>(Collections.singleton(Role.ROLE_USER)));
+        person.setRole(Role.ROLE_USER);
         person.setAvatar("https://localhost/img/default.jpg");
         return repository.save(person);
     }

@@ -1,7 +1,7 @@
 package com.example.mywebquizengine.Controller;
 
 import com.example.mywebquizengine.Model.Test.Test;
-import com.example.mywebquizengine.Model.dto.CreateTestRequest;
+import com.example.mywebquizengine.Model.dto.input.CreateTestRequest;
 import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.io.IOException;
 import java.security.Principal;
 
 @Validated
@@ -33,20 +32,24 @@ public class TestController {
     @Autowired
     private TestService testService;
 
-    @GetMapping(path = "/course/{id}/test/add")
-    public String addTest(Model model, @PathVariable Long id) {
-        model.addAttribute("courseId", id);
+    @GetMapping(path = "/course/{courseId}/test/create")
+    public String addTest(@PathVariable Long courseId, Model model) {
+        model.addAttribute("courseId", courseId);
         return "addQuiz";
     }
 
-    @PostMapping(path = "/quizzes", consumes = {"application/json"})
-    public String addTest(@RequestBody @Valid CreateTestRequest request, @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
+    @PostMapping(path = "/test/create", consumes = {"application/json"})
+    public String addTest(
+            @RequestBody @Valid CreateTestRequest request,
+            @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
         testService.add(
                 request.getCourseId(),
                 request.getDuration(),
                 request.getQuizzes(),
                 request.getDescription(),
-                "a.vlad.v@yandex.ru"
+                principal.getName(),
+                request.getStartAt(),
+                request.getFinishAt()
         );
         return "redirect:/";
     }
@@ -54,12 +57,9 @@ public class TestController {
     @GetMapping(path = "/quizzes")
     public String getQuizzes(Model model, @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                              @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(10) Integer pageSize,
-                             @RequestParam(defaultValue = "id") String sortBy) throws IOException {
-
-        Page<Test> page1 = testService.getAllQuizzes(page, pageSize, sortBy);
-
-
-        model.addAttribute("test", page1.getContent());
+                             @RequestParam(defaultValue = "id") String sortBy) {
+        Page<Test> quizzes = testService.getAllQuizzes(page, pageSize, sortBy);
+        model.addAttribute("test", quizzes.getContent());
         return "getAllQuiz";
     }
 
@@ -88,11 +88,12 @@ public class TestController {
     }
 
     @GetMapping(path = "/quizzes/{id}/info/")
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
+    //@PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
     public String getInfo(@PathVariable Long id, Model model,
                           @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                           @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
-                          @RequestParam(defaultValue = "completed_at") String sortBy, @AuthenticationPrincipal Principal principal) {
+                          @RequestParam(defaultValue = "completed_at") String sortBy,
+                          @AuthenticationPrincipal Principal principal) {
 
         Test test = testService.findTest(id);
         model.addAttribute("quizzes", test.getQuizzes());
@@ -100,6 +101,4 @@ public class TestController {
         model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, page, pageSize, sortBy).getContent());
         return "info";
     }
-
-
 }

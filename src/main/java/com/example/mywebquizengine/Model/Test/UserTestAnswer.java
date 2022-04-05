@@ -18,6 +18,7 @@ public class UserTestAnswer {
     private User user;
 
     //@OnDelete(action = OnDeleteAction.CASCADE)
+    @OrderBy(value = "quiz.quizId")
     @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UserQuizAnswer> userQuizAnswers;
 

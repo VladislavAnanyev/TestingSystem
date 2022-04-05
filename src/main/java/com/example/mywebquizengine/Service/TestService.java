@@ -3,10 +3,10 @@ package com.example.mywebquizengine.Service;
 import com.example.mywebquizengine.Model.Projection.TestView;
 import com.example.mywebquizengine.Model.Test.*;
 import com.example.mywebquizengine.Model.User;
-import com.example.mywebquizengine.Model.dto.AddQuizRequest;
-import com.example.mywebquizengine.Model.dto.MapAnswerQuizRequest;
-import com.example.mywebquizengine.Model.dto.MultipleAnswerQuizRequest;
-import com.example.mywebquizengine.Model.dto.StringAnswerQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.AddQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.MapAnswerQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.MultipleAnswerQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.StringAnswerQuizRequest;
 import com.example.mywebquizengine.Repos.TestRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,9 +90,10 @@ public class TestService {
     }
 
     public void add(Long courseId, LocalTime duration, List<Object> addQuizRequests,
-                    String description, String name) {
-
+                    String description, String name, Calendar startAt, Calendar finishAt) {
         Test test = new Test();
+        test.setStartTime(startAt);
+        test.setEndTime(finishAt);
         test.setCourse(courseService.findCourseById(courseId));
         User user = userService.loadUserByUsernameProxy(name);
         test.setDuration(duration);
@@ -134,14 +136,11 @@ public class TestService {
         }
 
         test.setQuizzes(quizzes);
-        test.setUser(user);
+        //test.setUser(user);
 
         for (int i = 0; i < addQuizRequests.size(); i++) {
             test.getQuizzes().get(i).setTest(test);
         }
         saveTest(test);
-
     }
-
-
 }

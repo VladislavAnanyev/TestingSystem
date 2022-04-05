@@ -1,4 +1,4 @@
-package com.example.mywebquizengine.Model.dto;
+package com.example.mywebquizengine.Model.dto.input;
 
 public class CreateCourseRequest {
     private String courseName;

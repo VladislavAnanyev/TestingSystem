@@ -3,15 +3,18 @@ package com.example.mywebquizengine.Service;
 
 import com.example.mywebquizengine.Model.Test.*;
 import com.example.mywebquizengine.Model.User;
+import com.example.mywebquizengine.Model.dto.output.SendAnswerResponse;
 import com.example.mywebquizengine.Repos.UserQuizAnswerRepository;
 import com.example.mywebquizengine.Repos.UserTestAnswerRepository;
-import org.quartz.JobDataMap;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,14 +22,21 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.security.Principal;
+import java.util.Calendar;
 import java.util.*;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 @Service
-public class UserAnswerService  {
+public class UserAnswerService {
 
     @Autowired
     private UserQuizAnswerRepository userQuizAnswerRepository;
 
+    @Autowired
+    private QuizService quizService;
 
     @Autowired
     private UserTestAnswerRepository userTestAnswerRepository;
@@ -34,11 +44,12 @@ public class UserAnswerService  {
     @Autowired
     private TestService testService;
 
-    /*public void saveAnswer(UserQuizAnswer userQuizAnswer){
-        userQuizAnswerRepository.save(userQuizAnswer);
-    }*/
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
-    //@Transactional
+    @Autowired
+    private UserService userService;
+
     public UserTestAnswer findLastUserTestAnswer(JobDataMap jobDataMap) {
         return userTestAnswerRepository.findLastUserAnswerEager(jobDataMap.getString("username")).get();
     }
@@ -52,33 +63,11 @@ public class UserAnswerService  {
 
     }
 
-    public void saveAnswer(UserTestAnswer userTestAnswer) {
+    private void saveAnswer(UserTestAnswer userTestAnswer) {
         UserTestAnswer lastUserAnswer = userTestAnswerRepository.findById(userTestAnswer.getUserAnswerId()).get();
         lastUserAnswer.setCompletedAt(userTestAnswer.getCompletedAt());
         lastUserAnswer.setPercent(userTestAnswer.getPercent());
     }
-
-    /*public void saveTempAnswer(UserQuizAnswer userQuizAnswer, String name, String type) {
-        for (int i = 0; i < lastUserAnswer.getUserQuizAnswers().size(); i++) {
-            if (type.equals("MULTIPLE")) {
-            } else if (type.equals("STRING")) {
-                StringUserAnswerQuiz answerQuiz = (StringUserAnswerQuiz) lastUserAnswer.getUserQuizAnswers().get(i);
-
-                if (userQuizAnswer.getQuiz().getQuizId().equals(lastUserAnswer.getUserQuizAnswers().get(i).getQuiz().getQuizId())) {
-
-                }
-            }
-        }
-
-        //userTestAnswerRepository.save(lastUserAnswer);
-        //lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
-    }*/
-
-    /*public Page<UserQuizAnswer> getCompleted (String name, Integer page,
-                                              Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return userQuizAnswerRepository.getCompleteAnswersForUser(name, paging);
-    }*/
 
     public Page<UserTestAnswer> getPageAnswersById(Long id, Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
@@ -97,16 +86,16 @@ public class UserAnswerService  {
         Test test = testService.findTest(id);
         ArrayList<Long> list = new ArrayList<>();
 
-        for (Quiz quiz: test.getQuizzes()) {
+        for (Quiz quiz : test.getQuizzes()) {
             list.add(quiz.getQuizId());
         }
 
         List<Object[]> result = userQuizAnswerRepository.getAnswerStat(list);
         Map<BigInteger, Double> map = null;
-        if(result != null && !result.isEmpty()){
+        if (result != null && !result.isEmpty()) {
             map = new HashMap<>();
             for (Object[] object : result) {
-                map.put(((BigInteger)object[0]), (Double) object[1]);
+                map.put(((BigInteger) object[0]), (Double) object[1]);
             }
         }
         return map;
@@ -114,7 +103,7 @@ public class UserAnswerService  {
     }
 
     public Double getStatistics(Integer id, Integer answer) {
-        return ((double) userQuizAnswerRepository.getTrueAnswers(id, answer)/(double) userQuizAnswerRepository.getCountById(id, answer)) * 100;
+        return ((double) userQuizAnswerRepository.getTrueAnswers(id, answer) / (double) userQuizAnswerRepository.getCountById(id, answer)) * 100;
     }
 
     public ArrayList<Long> getAnswersByTestId(Long id) {
@@ -132,15 +121,6 @@ public class UserAnswerService  {
         } else return null;
 
     }
-
-    /*public Integer getStat(Integer id) {
-        return userTestAnswerRepository.getLastFalseById();
-    }*/
-
-   /* public void deleteAnswer(Integer id) {
-        List<Integer> answers = userQuizAnswerRepository.getAnswerIdForQuiz(id);
-        answers.forEach(answer -> userQuizAnswerRepository.deleteById(answer));
-    }*/
 
     public boolean checkComplete(Long testId) {
         Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -175,6 +155,183 @@ public class UserAnswerService  {
         }
 
         return available;
+    }
 
+    public void checkAnswer(Long userTestAnswerId) {
+        UserTestAnswer userTestAnswer = findByUserAnswerId(userTestAnswerId);
+        Test test = userTestAnswer.getTest();
+        StringBuilder result = new StringBuilder();
+        List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
+        int trueAnswers = 0;
+
+        for (int i = 0; i < test.getQuizzes().size(); i++) {
+            UserQuizAnswer quizAnswer = new UserQuizAnswer();
+            AnswerChecker answerChecker = new AnswerChecker();
+
+            Quiz quiz = quizService.findQuiz(test.getQuizzes().get(i).getQuizId());
+            answerChecker.quiz = quiz;
+
+            if (quiz instanceof MultipleAnswerQuiz) {
+                quizAnswer = new MultipleUserAnswerQuiz();
+                MultipleUserAnswerQuiz userQuizAnswer = (MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i);
+                answerChecker.checkAnswer(userQuizAnswer);
+                ((MultipleUserAnswerQuiz) quizAnswer).setAnswer(((MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
+            } else if (quiz instanceof StringAnswerQuiz) {
+                quizAnswer = new StringUserAnswerQuiz();
+                List<UserQuizAnswer> answers = userTestAnswer.getUserQuizAnswers();
+                if (answers == null) {
+                    StringUserAnswerQuiz answerQuiz = new StringUserAnswerQuiz();
+                    answerQuiz.setAnswer("");
+                    answerChecker.checkAnswer(answerQuiz);
+                } else {
+                    answerChecker.checkAnswer(answers.get(i));
+                }
+                ((StringUserAnswerQuiz) quizAnswer).setAnswer(((StringUserAnswerQuiz) answers.get(i)).getAnswer());
+            } else if (quiz instanceof MapAnswerQuiz) {
+                quizAnswer = new MapUserAnswerQuiz();
+                MapUserAnswerQuiz mapUserAnswerQuiz = (MapUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i);
+                answerChecker.checkAnswer(mapUserAnswerQuiz);
+                ((MapUserAnswerQuiz) quizAnswer).setAnswer(((MapUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
+            }
+
+            quizAnswer.setQuiz(quiz);
+            quizAnswer.setStatus(answerChecker.isSuccess());
+            userQuizAnswers.add(quizAnswer);
+
+
+            if (quizAnswer.getStatus()) {
+                result.append("1");
+                trueAnswers++;
+            } else {
+                result.append("0");
+            }
+        }
+
+        double percent = ((double) trueAnswers / (double) test.getQuizzes().size()) * 100.0;
+
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
+        Calendar nowDate = new GregorianCalendar();
+        nowDate.setTimeZone(timeZone);
+
+        userTestAnswer.setUserQuizAnswers(userQuizAnswers);
+        userTestAnswer.setPercent(percent);
+        userTestAnswer.setCompletedAt(nowDate);
+        saveAnswer(userTestAnswer);
+
+        String destination = "/topic/" + userTestAnswer.getUser().getUsername() + userTestAnswer.getUserAnswerId();
+
+        char[] charsResult = result.toString().toCharArray();
+        SendAnswerResponse sendAnswerResponse = new SendAnswerResponse();
+        sendAnswerResponse.setPercent(percent);
+        if (test.isDisplayAnswers()) {
+            sendAnswerResponse.setResult(charsResult);
+        }
+
+        simpMessagingTemplate.convertAndSend(destination, sendAnswerResponse);
+    }
+
+    public void updateAnswer(Long quizId, Object answer, String username) {
+        Quiz quiz = quizService.findQuiz(quizId);
+        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(username).get();
+
+        Long userQuizAnswerId = null;
+        for (UserQuizAnswer quizAnswer : lastUserAnswer.getUserQuizAnswers()) {
+            if (quizAnswer.getQuiz().getQuizId().equals(quizId)) {
+                userQuizAnswerId = quizAnswer.getQuizAnswerId();
+            }
+        }
+
+        UserQuizAnswer userQuizAnswer;
+        if (userQuizAnswerId != null) {
+            userQuizAnswer = userQuizAnswerRepository.findById(userQuizAnswerId).get();
+            if (quiz instanceof MultipleAnswerQuiz) {
+                ((MultipleUserAnswerQuiz) userQuizAnswer).setAnswer((List<Integer>) answer);
+            } else if (quiz instanceof StringAnswerQuiz) {
+                ((StringUserAnswerQuiz) userQuizAnswer).setAnswer((String) answer);
+            } else if (quiz instanceof MapAnswerQuiz) {
+                ((MapUserAnswerQuiz) userQuizAnswer).setAnswer((HashMap<String, String>) answer);
+            }
+        } else {
+            if (quiz instanceof MultipleAnswerQuiz) {
+                MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
+                multipleUserAnswerQuiz.setQuiz(quiz);
+                multipleUserAnswerQuiz.setAnswer((List<Integer>) answer);
+
+                userQuizAnswer = multipleUserAnswerQuiz;
+                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
+            } else if (quiz instanceof StringAnswerQuiz) {
+                StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
+                stringUserAnswerQuiz.setQuiz(quiz);
+                stringUserAnswerQuiz.setAnswer((String) answer);
+
+                userQuizAnswer = stringUserAnswerQuiz;
+                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
+            } else if (quiz instanceof MapAnswerQuiz) {
+                MapUserAnswerQuiz mapUserAnswerQuiz = new MapUserAnswerQuiz();
+                mapUserAnswerQuiz.setQuiz(quiz);
+                mapUserAnswerQuiz.setAnswer((HashMap<String, String>) answer);
+
+                userQuizAnswer = mapUserAnswerQuiz;
+                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
+            }
+        }
+
+        userTestAnswerRepository.save(lastUserAnswer);
+    }
+
+    public String startAnswer(Long testId, String restore, String name) throws SchedulerException {
+        Test test = testService.findTest(testId);
+        UserTestAnswer userTestAnswer;
+        if (isAvailable(test, name)) {
+            UserTestAnswer lastUserTestAnswer = checkLastComplete(userService.loadUserByUsernameProxy(name), testId);
+
+            if (Boolean.parseBoolean(restore) && lastUserTestAnswer != null && lastUserTestAnswer.getCompletedAt() == null) {
+                userTestAnswer = lastUserTestAnswer;
+            } else {
+                userTestAnswer = new UserTestAnswer();
+                Calendar calendar = new GregorianCalendar();
+                userTestAnswer.setStartAt(calendar);
+                userTestAnswer.setTest(testService.findTest(testId));
+                userTestAnswer.setUser(userService.loadUserByUsernameProxy(name));
+                saveStartAnswer(userTestAnswer);
+
+                if (test.getDuration() != null) {
+                    Calendar jobCalendar = new GregorianCalendar();
+                    jobCalendar.set(Calendar.SECOND, jobCalendar.get(Calendar.SECOND) + test.getDuration().getSecond());
+                    jobCalendar.set(Calendar.MINUTE, jobCalendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
+                    jobCalendar.set(Calendar.HOUR, jobCalendar.get(Calendar.HOUR) + test.getDuration().getHour());
+
+
+                    SchedulerFactory sf = new StdSchedulerFactory();
+                    Scheduler scheduler = sf.getScheduler();
+
+                    JobDetail job = newJob(SimpleJob.class)
+                            .withIdentity(UUID.randomUUID().toString(), "group1")
+                            .usingJobData("username", userService.loadUserByUsernameProxy(name).getUsername())
+                            .usingJobData("test", test.getTestId())
+                            .usingJobData("answer", userTestAnswer.getUserAnswerId())
+                            .build();
+
+
+                    CronTrigger trigger = newTrigger()
+                            .withIdentity(UUID.randomUUID().toString(), "group1")
+                            .withSchedule(cronSchedule(jobCalendar.get(Calendar.SECOND) + " " +
+                                    jobCalendar.get(Calendar.MINUTE) + " " +
+                                    jobCalendar.get(Calendar.HOUR_OF_DAY) + " " +
+                                    jobCalendar.get(Calendar.DAY_OF_MONTH) + " " +
+                                    (jobCalendar.get(Calendar.MONTH) + 1) + " ? " +
+                                    jobCalendar.get(Calendar.YEAR)))
+                            .build();
+
+                    scheduler.scheduleJob(job, trigger);
+
+                    System.out.println("Задание выполнится в: " + jobCalendar.getTime());
+
+                    scheduler.start();
+                }
+            }
+        } else return "redirect:/courses";
+
+        return "redirect:/test/" + test.getTestId() + "/" + userTestAnswer.getUserAnswerId() + "/solve/";
     }
 }

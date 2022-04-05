@@ -16,7 +16,7 @@ function addOptions(numTest) {
         "                    </svg>\n" +
         "                </a>"
 
-    let opt = document.getElementById(numTest + "optionstest");
+    let opt = document.getElementById(numTest + "optionstext");
     opt.append(div);
 
     /*<div class="custom-control custom-checkbox mt-2" id="${oldQuiz_index+1}Id${opt_index+1}">

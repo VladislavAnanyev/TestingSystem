@@ -32,6 +32,16 @@ public class AnswerChecker {
                 this.feedback = "Wrong answer! Please, try again.";
                 this.success = false;
             }
+        } else if (quiz instanceof MapAnswerQuiz) {
+            MapUserAnswerQuiz mapUserAnswerQuiz = (MapUserAnswerQuiz) answer;
+            MapAnswerQuiz mapAnswerQuiz = (MapAnswerQuiz) quiz;
+            if (mapUserAnswerQuiz.getAnswer().equals(mapAnswerQuiz.getAnswer())) {
+                this.feedback = "Congratulations, you're right!";
+                this.success = true;
+            } else {
+                this.feedback = "Wrong answer! Please, try again.";
+                this.success = false;
+            }
         }
 
     }

@@ -45,7 +45,7 @@ function f(id) {
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open('POST', '/quizzes/' + id + '/solve/',true);
+    xhr.open('POST', '/test/answer/' + answerId.value + '/send',true);
     xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
     xhr.onreadystatechange = function () {
         if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
@@ -79,43 +79,11 @@ function f(id) {
     xhr.send(JSON.stringify(json));
 }
 
-function chartpie(array) {
+function chartpie(percent) {
 
+    let stat = percent / 100.0
 
     $(document).ready(function () {
-        /*let xhr = new XMLHttpRequest();
-
-        xhr.open('GET', '/quizzes/' + id +'/solve/info', true);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-
-                let countFalse = xhr.response
-                console.log(countFalse)
-                console.log(countFalse)
-                console.log(countFalse)
-                console.log(countFalse)
-                console.log(countFalse)
-
-            }
-        };
-        xhr.send(id);*/
-        let size = document.getElementsByClassName("quiz");
-        let trueAnswers = 0
-        let countAnswers = size.length
-
-
-        for (let i = 0; i < countAnswers; i++) {
-
-            if (array[i] == 1) {
-                console.log(array[i])
-                trueAnswers++
-            }
-        }
-
-        let stat = trueAnswers/countAnswers
-        console.log(stat)
-
         var ctx = $("#chart-line");
         var myLineChart = new Chart(ctx, {
             type: 'doughnut',

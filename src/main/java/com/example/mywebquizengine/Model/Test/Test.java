@@ -3,6 +3,7 @@ package com.example.mywebquizengine.Model.Test;
 import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -22,11 +23,6 @@ public class Test {
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<@Valid Quiz> quizzes;
 
-    @ManyToOne/*(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)*/
-    @JoinColumn(name = "username")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private User user;
-
     //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTestAnswer> userTestAnswers;
@@ -45,6 +41,9 @@ public class Test {
     private String description;
 
     private LocalTime duration;
+
+    @ColumnDefault("true")
+    private boolean displayAnswers = true;
 
     public Test() {}
 
@@ -103,14 +102,6 @@ public class Test {
         this.testId = id;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public void setUserTestAnswers(List<UserTestAnswer> answers) {
         //this.answers = answers;
         /*
@@ -156,5 +147,13 @@ public class Test {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public boolean isDisplayAnswers() {
+        return displayAnswers;
+    }
+
+    public void setDisplayAnswers(boolean displayAnswers) {
+        this.displayAnswers = displayAnswers;
     }
 }

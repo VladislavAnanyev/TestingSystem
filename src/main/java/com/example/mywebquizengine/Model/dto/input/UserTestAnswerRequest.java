@@ -1,4 +1,4 @@
-package com.example.mywebquizengine.Model.dto;
+package com.example.mywebquizengine.Model.dto.input;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

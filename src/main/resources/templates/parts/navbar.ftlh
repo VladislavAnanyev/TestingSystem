@@ -38,7 +38,7 @@
 
             <!-- New chat -->
             <li class="nav-item">
-                <a class="nav-link py-0 py-lg-8" id="tab-create-chat" href="#tab-content-create-chat"
+                <a class="nav-link py-0 py-lg-8" id="tab-create-chat" onclick="location.href= '/courses'"  href="#<#--tab-content-create-chat-->"
                    title="Create chat" data-bs-toggle="tab" role="tab">
                     <div class="icon icon-xl">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -51,7 +51,6 @@
                 </a>
             </li>
 
-            <!-- Friends -->
             <li class="nav-item">
                 <a class="nav-link py-0 py-lg-8" id="tab-friends" href="#tab-content-friends" title="Friends"
                    data-bs-toggle="tab" role="tab">
@@ -68,7 +67,6 @@
                 </a>
             </li>
 
-            <!-- Chats -->
             <li class="nav-item">
                 <a class="nav-link active py-0 py-lg-8" id="tab-chats" href="#tab-content-chats" title="Chats"
                    data-bs-toggle="tab" role="tab">
@@ -85,7 +83,6 @@
                 </a>
             </li>
 
-            <!-- Notification -->
             <li class="nav-item">
                 <a class="nav-link py-0 py-lg-8" id="tab-notifications" href="#tab-content-notifications"
                    title="Notifications" data-bs-toggle="tab" role="tab">
@@ -100,7 +97,6 @@
                 </a>
             </li>
 
-            <!-- Support -->
             <li class="nav-item d-none d-xl-block flex-xl-grow-1">
                 <a class="nav-link py-0 py-lg-8" id="tab-support" href="#tab-content-support" title="Support"
                    data-bs-toggle="tab" role="tab">
@@ -116,7 +112,6 @@
                 </a>
             </li>
 
-            <!-- Settings -->
             <li class="nav-item d-none d-xl-block">
                 <a class="nav-link py-0 py-lg-8" id="tab-settings" href="#tab-content-settings" title="Settings"
                    data-bs-toggle="tab" role="tab">

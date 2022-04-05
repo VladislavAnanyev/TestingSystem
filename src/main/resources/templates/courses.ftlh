@@ -35,7 +35,7 @@
                         </div>
 
                         <#if course.ownerEmail = name>
-                            <a href="/course/${course.courseId?c}/test/add">
+                            <a href="/course/${course.courseId?c}/test/create">
                                 <button type="button" class="btn btn-primary ml-3 mb-3">
                                     Добавить тест
                                 </button>

@@ -16,10 +16,10 @@
                             <p class="card-text">Количество вопросов: ${test.numberOfQuestions}</p>
 <#--                            <p class="card-text">Количество ответов пользователей: ${test.answers?size}</p>-->
 
-                            <p class="card-text"><small class="text-muted">Автор: <a
+                           <#-- <p class="card-text"><small class="text-muted">Автор: <a
                                             href="/about/${test.author}">
                                         ${test.author}
-                                    </a></small></p>
+                                    </a></small></p>-->
                         </div>
 
                         <div class="col">

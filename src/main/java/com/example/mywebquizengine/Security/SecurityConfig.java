@@ -214,8 +214,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
                     .frameOptions()
                     .sameOrigin().and()
                     .requiresChannel()
-                    .anyRequest()
-                    .requiresSecure().and()
+                    /*.anyRequest()
+                    .requiresSecure()*/.and()
 
                     .sessionManagement().maximumSessions(100).sessionRegistry(sessionRegistry())
                     .and().sessionCreationPolicy(SessionCreationPolicy.NEVER).sessionFixation().none();

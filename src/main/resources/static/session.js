@@ -19,7 +19,7 @@ function session(id, quizId) {
 
     let xhr = new XMLHttpRequest();
     console.log(test)
-    xhr.open('POST', '/answersession/' + id, true);
+    xhr.open('POST', '/test/answer/update', true);
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

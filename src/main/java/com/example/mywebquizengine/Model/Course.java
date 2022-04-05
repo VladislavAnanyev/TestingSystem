@@ -15,7 +15,7 @@ public class Course {
     private String name;
     @ManyToOne
     private User owner;
-    @OneToMany
+    @ManyToMany(mappedBy = "courses", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<User> members;
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)

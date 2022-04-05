@@ -17,15 +17,34 @@ function addTest() {
 
         let countOfQuiz = document.getElementsByClassName("quiz").length;
         let title = document.getElementsByName("title");
-        let text = document.getElementsByName("text");
+        console.log(title)
+        let text = document.getElementsByName("question");
+        console.log(text)
+        let time = null
+        let startDate = null
+        let endDate = null
+        let attempts = null
+        let viewAnswers = false
 
-        let time = document.getElementById("time")
-
-        if (!document.getElementById("flexRadioDefault2").checked) {
-            time = null
+        if (document.getElementById("flexRadioDefault2").checked) {
+            time = document.getElementById("time").value
         }
 
-        let stringAnswer = document.getElementById('stringAnswer1')
+        if (document.getElementById("flexRadioDefault10").checked) {
+            viewAnswers = true
+        }
+
+        if (document.getElementById("flexRadioDefault8").checked) {
+            attempts = document.getElementById('attempts').value
+        }
+
+        if (document.getElementById("flexRadioDefault4").checked) {
+            startDate = document.getElementById('startDate').value
+        }
+
+        if (document.getElementById("flexRadioDefault6").checked) {
+            endDate = document.getElementById('endDate').value
+        }
 
         for (let i = 0; i < countOfQuiz; i++) {
             let options = document.getElementsByName(String(Number(i+1) + "options"));
@@ -58,12 +77,33 @@ function addTest() {
                     options:opt_values,
                     answer: answer_values
                 }
-            } else {
+            } else if (document.getElementById(String(Number(i+1) +'inputAnswer')).hidden === false) {
+                let stringAnswer = document.getElementById('stringAnswer' + Number(i + 1))
+
                 quiz = {
                     type: "STRING",
                     title: title[i].value,
                     text: text[i].value,
                     answer: stringAnswer.value
+                }
+            } else if (document.getElementById(String(Number(i+1) +'mapAnswer')).hidden === false) {
+                let map = new Map()
+
+                let map_keys = document.getElementsByClassName('mapkey' + Number(i+1))
+                let map_values = document.getElementsByClassName('mapvalue' + Number(i+1))
+                for (let i = 0; i < map_values.length; i++) {
+                    map.set(map_keys[i].value, map_values[i].value)
+                }
+
+                const obj = Object.fromEntries(map);
+                console.log(obj)
+                console.log(JSON.stringify(obj))
+
+                quiz = {
+                    type: "MAP",
+                    title: title[i].value,
+                    text: text[i].value,
+                    answer: obj
                 }
             }
 
@@ -75,26 +115,20 @@ function addTest() {
 
         let json;
 
-        if (time != null) {
-
-
-            json = {
-                description: name.value,
-                quizzes: quizzes_mas,
-                duration: time.value,
-                courseId: courseId.value
-            }
-        } else {
-            json = {
-                description: name.value,
-                quizzes: quizzes_mas,
-                courseId: courseId.value
-            }
+        json = {
+            description: name.value,
+            quizzes: quizzes_mas,
+            duration: time,
+            courseId: courseId.value,
+            startAt: startDate,
+            finishAt: endDate,
+            attempts: attempts,
+            displayAnswers: viewAnswers
         }
-        //console.log("abcde")
+
         console.log(json)
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', '/quizzes/',true);
+        xhr.open('POST', '/test/create',true);
         xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

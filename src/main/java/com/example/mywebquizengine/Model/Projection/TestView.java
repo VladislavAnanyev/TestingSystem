@@ -7,8 +7,9 @@ public interface TestView {
     String getDescription();
     @Value("#{target.quizzes.size()}")
     Integer getNumberOfQuestions();
-    @Value("#{target.user.username}")
-    String getAuthor();
+    /*@Value("#{target.user.username}")
+    String getAuthor();*/
     @Value("#{@userAnswerService.checkComplete(target.testId)}")
     boolean isComplete();
+    Integer getAttempts();
 }

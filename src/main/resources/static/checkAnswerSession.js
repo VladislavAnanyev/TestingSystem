@@ -14,12 +14,12 @@ function checkAnswerSession(id) {
                 myModal.toggle()
                 console.log(xhr.response)
             } else {
-                document.location.href = "/quizzes/" + id + "/solve";
+                document.location.href =  "/test/answer/+ " + id + "/start";
                 console.log(xhr.response)
             }
 
         } else if (xhr.status === 404) {
-            location.href = "/quizzes/" + id + "/solve";
+            location.href = "/test/answer/+ " + id + "/start";
         }
     };
     xhr.send()

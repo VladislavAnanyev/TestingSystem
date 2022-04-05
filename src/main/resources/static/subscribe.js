@@ -288,13 +288,8 @@ function onMessageReceived(payload) {
             //}
         }
 
-
         let last = document.getElementById("msg");
-
-
-            last.append(div)
-
-
+        last.append(div)
         var div3 = $("#msg");
         div3.scrollTop(div3.prop('scrollHeight'));
         }

@@ -1,6 +1,7 @@
-package com.example.mywebquizengine.Model.dto;
+package com.example.mywebquizengine.Model.dto.input;
 
 import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.List;
 
 public class CreateTestRequest {
@@ -9,6 +10,33 @@ public class CreateTestRequest {
     private List<Object> quizzes;
     private Long courseId;
     private Integer attempts;
+    private Calendar startAt;
+    private Calendar finishAt;
+    private boolean displayAnswers;
+
+    public Calendar getFinishAt() {
+        return finishAt;
+    }
+
+    public Calendar getStartAt() {
+        return startAt;
+    }
+
+    public void setFinishAt(Calendar finishAt) {
+        this.finishAt = finishAt;
+    }
+
+    public void setStartAt(Calendar startAt) {
+        this.startAt = startAt;
+    }
+
+    public boolean isDisplayAnswers() {
+        return displayAnswers;
+    }
+
+    public void setDisplayAnswers(boolean displayAnswers) {
+        this.displayAnswers = displayAnswers;
+    }
 
     public Integer getAttempts() {
         return attempts;
