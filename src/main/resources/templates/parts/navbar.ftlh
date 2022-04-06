@@ -5,7 +5,7 @@
 
     <nav class="navigation d-flex flex-column text-center navbar navbar-light hide-scrollbar">
         <!-- Brand -->
-        <a href="index.html" title="Messenger" class="d-none d-xl-block mb-6">
+        <#--<a href="index.html" title="Messenger" class="d-none d-xl-block mb-6">
             <svg version="1.1" width="46px" height="46px" fill="currentColor" xmlns="http://www.w3.org/2000/svg" x="0px"
                  y="0px" viewBox="0 0 46 46" enable-background="new 0 0 46 46" xml:space="preserve">
                         <polygon opacity="0.7" points="45,11 36,11 35.5,1 "/>
@@ -17,7 +17,7 @@
                 <polygon points="17,26 1,26 10.8,20.1 "/>
                     </svg>
 
-        </a>
+        </a>-->
 
         <!-- Nav items -->
         <ul class="d-flex nav navbar-nav flex-row flex-xl-column flex-grow-1 justify-content-between justify-content-xl-center align-items-center w-100 py-4 py-lg-2 px-lg-3"
@@ -68,7 +68,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link active py-0 py-lg-8" id="tab-chats" href="#tab-content-chats" title="Chats"
+                <a class="nav-link active py-0 py-lg-8" id="tab-chats" href="#" onclick="location.href= '/chat'" <#--href="#tab-content-chats"--> title="Chats"
                    data-bs-toggle="tab" role="tab">
                     <div class="icon icon-xl icon-badged">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

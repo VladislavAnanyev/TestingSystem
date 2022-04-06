@@ -34,8 +34,8 @@ public class UserController {
 
     @GetMapping(path = "/authuser")
     @ResponseBody
-    public String getAuthUsername(@AuthenticationPrincipal Principal principal) {
-        return principal.getName();
+    public Long getAuthUsername(@AuthenticationPrincipal User authUser) {
+        return authUser.getUserId();
     }
 
     @PostMapping(path = "/signup")
@@ -45,19 +45,19 @@ public class UserController {
     }
 
     @PostMapping(path = "/update/userinfo/password", consumes ={"application/json"} )
-    public void tryToChangePassWithAuth(@AuthenticationPrincipal Principal principal) {
-        userService.sendCodeForChangePassword(principal.getName());
+    public void tryToChangePassWithAuth(@AuthenticationPrincipal User authUser) {
+        userService.sendCodeForChangePassword(authUser.getUserId());
     }
 
-    @GetMapping("/loggedUsers")
+    /*@GetMapping("/loggedUsers")
     @ResponseBody
     public ArrayList<String> getLoggedUsers(Locale locale, Model model) {
         return (ArrayList<String>) activeUserStore.getUsers();
-    }
+    }*/
 
     @PostMapping(path = "/update/userinfo/pswrdwithoutauth", consumes ={"application/json"} )
     public void tryToChangePassWithoutAuth(@RequestBody User in) {
-        userService.sendCodeForChangePassword(in.getUsername());
+        userService.sendCodeForChangePassword(in.getUserId());
         throw new ResponseStatusException(HttpStatus.OK);
     }
 
@@ -79,15 +79,15 @@ public class UserController {
     }
 
     @Transactional
-    @PutMapping(path = "/update/user/{username}", consumes={"application/json"})
-    @PreAuthorize(value = "#principal.name.equals(#username)")
-    public void changeUser(@PathVariable String username, @RequestBody User user, @AuthenticationPrincipal Principal principal) {
-        userService.updateUser(user.getLastName(), user.getFirstName(), username);
+    @PutMapping(path = "/update/user/{userId}", consumes={"application/json"})
+//    @PreAuthorize(value = "#principal.name.equals(#userId)")
+    public void changeUser(@PathVariable Long userId, @RequestBody User user, @AuthenticationPrincipal User authUser) {
+        userService.updateUser(user.getLastName(), user.getFirstName(), userId);
     }
 
     @GetMapping(path = "/about/{username}")
-    public String getInfoAboutUser(Model model, @PathVariable String username, @AuthenticationPrincipal Principal principal) {
-        if (principal != null && username.equals(userService.loadUserByUsername(principal.getName()).getUsername())) {
+    public String getInfoAboutUser(Model model, @PathVariable String username, @AuthenticationPrincipal User authUser) {
+        if (authUser != null && username.equals(userService.loadUserByUserId(authUser.getUserId()).getUsername())) {
             return "redirect:/profile";
         } else {
             User user = userService.loadUserByUsername(username);

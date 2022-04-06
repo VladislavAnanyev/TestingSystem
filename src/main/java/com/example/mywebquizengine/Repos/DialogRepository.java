@@ -18,10 +18,10 @@ public interface DialogRepository extends CrudRepository<Dialog, Long>, JpaRepos
     @Query(value = """
             SELECT DIALOG_ID, COUNT(DIALOG_ID)
             FROM USERS_DIALOGS a
-            WHERE (USER_ID = :firstUser or USER_ID = :secondUser) AND
+            WHERE (USER_ID = :firstUserId or USER_ID = :secondUserId) AND
                   (SELECT COUNT(DIALOG_ID) FROM USERS_DIALOGS b where b.DIALOG_ID = a.DIALOG_ID) = 2
             GROUP BY DIALOG_ID HAVING COUNT(DIALOG_ID) = 2""", nativeQuery = true)
-    Long findDialogByName(String firstUser, String secondUser);
+    Long findDialogByName(Long firstUserId, Long secondUserId);
 
 
     DialogWithUsersViewPaging findAllDialogByDialogId(Long id);

@@ -62,19 +62,27 @@ public class UserService implements UserDetailsService {
 
     @Override
     public User loadUserByUsername(String email) throws ResponseStatusException {
-        Optional<User> user = userRepository.findById(email);
+        Optional<User> user = userRepository.findUserEntityByEmail(email);
 
         if (user.isPresent()) {
             return user.get();
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    public User loadUserByUsernameProxy(String username) throws UsernameNotFoundException {
-        return userRepository.getOne(username);
+    public User loadUserByUserId(Long userId) throws ResponseStatusException {
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isPresent()) {
+            return user.get();
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    public void updateUser(String lastName, String firstName, String username) {
-        userRepository.updateUserInfo(firstName, lastName, username);
+    public User loadUserByUserIdProxy(Long userId) throws UsernameNotFoundException {
+        return userRepository.getOne(userId);
+    }
+
+    public void updateUser(String lastName, String firstName, Long userId) {
+        userRepository.updateUserInfo(firstName, lastName, userId);
     }
 
     public void sendCodeForChangePasswordFromPhone(String username) {
@@ -102,9 +110,9 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void sendCodeForChangePassword(String username) {
+    public void sendCodeForChangePassword(Long userId) {
 
-        User user = loadUserByUsername(username);
+        User user = loadUserByUserId(userId);
 
         String code = UUID.randomUUID().toString();
         userRepository.setChangePasswordCode(user.getUsername(), code);
@@ -279,17 +287,17 @@ public class UserService implements UserDetailsService {
         }
     }*/
 
-    public UserView getAuthUser(String email) {
-
-        if (userRepository.findAllByEmail(email) == null) {
+    public UserView getAuthUser(Long userId) {
+        UserView allByUserId = userRepository.findAllByUserId(userId);
+        if (allByUserId == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
-            return userRepository.findAllByEmail(email);
+            return allByUserId;
         }
     }
 
     @Transactional
-    public void uploadPhoto(MultipartFile file, String username) {
+    public void uploadPhoto(MultipartFile file, Long userId) {
         if (!file.isEmpty()) {
             try {
                 String uuid = UUID.randomUUID().toString();
@@ -302,7 +310,7 @@ public class UserService implements UserDetailsService {
 
                 String photoUrl = hostname + "/img/" + uuid + ".jpg";
 
-                User user = loadUserByUsername(username);
+                User user = loadUserByUserId(userId);
                 user.setAvatar(photoUrl);
 
             } catch (IOException e) {
@@ -311,8 +319,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public Boolean checkForExistUser(String username) {
-        return userRepository.existsById(username);
+    public Boolean checkForExistUser(Long userId) {
+        return userRepository.existsById(userId);
     }
 
     /*@Transactional

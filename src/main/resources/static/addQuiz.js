@@ -49,6 +49,7 @@ function addQuiz() {
         "                    </div>\n" +
         "                </div>" +
         "    <div hidden class=\"options\" id=\"" + allTest + "optionstest\">\n" +
+        " <div id='" + allTest + "optionstext'" +
         "        <label for=\"exampleFormControlInput1\">Варианты ответа</label>\n" +
         "    <div class=\"custom-control custom-checkbox\" id=" + allTest + "Id" + count + "\>\n" +
         "<input type=\"checkbox\" class=\"custom-control-input " + allTest + "input\" id=" + Number(allTest) + "customCheck" + Number(count) + "\ name=" + allTest + "check\ value=" + Number(count - 1) + ">\n" +
@@ -96,6 +97,7 @@ function addQuiz() {
         "\n" +
         "    </div>\n" +
         "</form>" +
+        "</div>" +
         "    <div>\n" +
         "        <button onclick=\"addOptions(" + allTest + ")\" class=\"btn btn-primary mt-2\">Добавить вариант</button>\n" +
         "    </div>" +

@@ -35,8 +35,6 @@ public interface QuizRepository extends CrudRepository<Quiz, Long>, PagingAndSor
     @Query(value = "UPDATE QUIZZES SET TITLE = :title, TEXT = :text WHERE ID = :id",nativeQuery = true)
     void updateQuizById(Integer id, String title, String text);
 
-
-
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM QUIZZES_ANSWER WHERE QUIZZES_ID = :id", nativeQuery = true)

@@ -26,11 +26,12 @@
 
 <#--    <#if nowUser.principal.username??>-->
         <#assign
-        name = nowUser.name
-
-
-        <#--        balance = nowUser.principal.getBalance()-->
+        name = nowUser.principal.username
             >
+
+    <#assign
+    nameId = nowUser.principal.userId
+    >
 
     <#if nowUser.authorities?seq_contains("ROLE_ADMIN")>
         <#assign

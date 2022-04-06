@@ -22,10 +22,13 @@ public class User implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = -7422293274841574951L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long userId;
+
     @NotBlank
     @NotNull
     @Email
-    @Id
     private String email;
     private String activationCode;
     private String changePasswordCode;
@@ -49,7 +52,7 @@ public class User implements UserDetails, OAuth2User {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "courses_members",
-            joinColumns = @JoinColumn(name = "user_email"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     private List<Course> courses = new ArrayList<>();
@@ -83,9 +86,18 @@ public class User implements UserDetails, OAuth2User {
     }
 
     public User(String username, String firstName, String lastName, String avatar) {
+        this.email = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public List<Dialog> getDialogs() {
@@ -232,7 +244,7 @@ public class User implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return email;
+        return String.valueOf(userId);
     }
 
     @Override

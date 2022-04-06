@@ -18,5 +18,4 @@ public class ActiveUserStore {
     public void setUsers(List<String> users) {
         this.users = users;
     }
-
 }

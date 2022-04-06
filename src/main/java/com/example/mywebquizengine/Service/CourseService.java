@@ -32,10 +32,10 @@ public class CourseService {
     @Value("${hostname}")
     private String hostname;
 
-    public void createCourse(String name, String username) {
+    public void createCourse(String name, Long userId) {
         Course course = new Course();
         course.setName(name);
-        course.setOwner(userService.loadUserByUsername(username));
+        course.setOwner(userService.loadUserByUserId(userId));
         courseRepository.save(course);
     }
 
@@ -51,9 +51,9 @@ public class CourseService {
     }
 
     @Transactional
-    public void addMember(Long courseId, String email, String name) {
+    public void addMember(Long courseId, String email, Long userId) {
         Course course = findCourseById(courseId);
-        if (course.getOwner().getUsername().equals(name)) {
+        if (course.getOwner().getUserId().equals(userId)) {
             User user = new User();
             try {
                 user = userService.loadUserByEmail(email);
@@ -77,7 +77,7 @@ public class CourseService {
         } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вы не создатель этого курса");
     }
 
-    public List<CourseView> getMyCourses(String name) {
-        return courseRepository.findCourseByMembers(name);
+    public List<CourseView> getMyCourses(Long userId) {
+        return courseRepository.findCourseByMembers(userId);
     }
 }

@@ -52,8 +52,8 @@ public class ApiUserController {
 
 
     @GetMapping(path = "/authuser")
-    public UserView getApiAuthUser(@AuthenticationPrincipal Principal principal)  {
-            return userService.getAuthUser(principal.getName());
+    public UserView getApiAuthUser(@AuthenticationPrincipal User authUser)  {
+            return userService.getAuthUser(authUser.getUserId());
     }
 
     /*@GetMapping(path = "/user/{username}/profile")
@@ -63,15 +63,15 @@ public class ApiUserController {
 
 
     @PostMapping(path = "/upload")
-    public void uploadPhoto(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal Principal principal) {
-        userService.uploadPhoto(file, principal.getName());
+    public void uploadPhoto(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal User authUser) {
+        userService.uploadPhoto(file, authUser.getUserId());
     }
 
 
     @PutMapping(path = "/user", consumes={"application/json"})
     public void changeUser(@RequestBody User user,
-                           @AuthenticationPrincipal Principal principal) {
-        userService.updateUser(user.getLastName(), user.getFirstName(), principal.getName());
+                           @AuthenticationPrincipal User authUser) {
+        userService.updateUser(user.getLastName(), user.getFirstName(), authUser.getUserId());
     }
 
     @PostMapping(path = "/user/send-change-password-code")
@@ -80,8 +80,8 @@ public class ApiUserController {
     }
 
     /*@PostMapping(path = "/user/send-change-password-code")
-    public void sendChangePasswordCodeWithAuth(@AuthenticationPrincipal Principal principal) {
-        userService.sendCodeForChangePasswordFromPhone(principal.getName());
+    public void sendChangePasswordCodeWithAuth(@AuthenticationPrincipal User authUser) {
+        userService.sendCodeForChangePasswordFromPhone(authUser.getUserId());
     }*/
 
     @PutMapping(path = "/user/password")
@@ -94,9 +94,11 @@ public class ApiUserController {
         userService.getUserViaChangePasswordCodePhoneApi(user.getUsername(), user.getChangePasswordCode());
     }
 
+/*
     @GetMapping(path = "/user/check-username")
     public Boolean checkExistUser(@RequestParam String username) {
         return userService.checkForExistUser(username);
     }
+*/
 
 }

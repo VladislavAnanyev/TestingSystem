@@ -11,17 +11,20 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.sql.DataSourceDefinitions;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, String>, JpaRepository<User, String> {
-    @Override
-    Optional<User> findById(String s);
+public interface UserRepository extends CrudRepository<User, Long>, JpaRepository<User, Long> {
 
     UserCommonView findByEmail(String email);
 
+    Optional<User> findUserEntityByEmail(String username);
+
     UserView findAllByEmail(String email);
+
+    UserView findAllByUserId(Long userId);
 
     Optional<User> findUserByEmail(String email);
 
@@ -29,8 +32,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE USERS SET FIRST_NAME = :firstname, LAST_NAME = :lastname WHERE USERNAME = :username", nativeQuery = true)
-    void updateUserInfo(String firstname, String lastname, String username);
+    @Query(nativeQuery = true, value = "SELECT * FROM USERS")
+    void updateUserInfo(String firstname, String lastname, Long userId);
 
     @Modifying
     @Transactional
@@ -39,8 +42,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE USERS SET AVATAR = :avatarName WHERE USERNAME = :username", nativeQuery = true)
-    void setAvatar(String avatarName, String username);
+    @Query(value = "UPDATE USERS SET AVATAR = :avatarName WHERE USER_ID = :userId", nativeQuery = true)
+    void setAvatar(String avatarName, Long userId);
 
 
     @Query(value = "SELECT * FROM USERS WHERE ACTIVATION_CODE = :activationCode",nativeQuery = true )
@@ -48,8 +51,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE USERS SET status = true WHERE USERNAME = :username", nativeQuery = true)
-    void activateAccount(String username);
+    @Query(value = "UPDATE USERS SET status = true WHERE USER_ID = :userId", nativeQuery = true)
+    void activateAccount(Long userId);
 
     /*@Modifying
     @Transactional
@@ -68,8 +71,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaReposit
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE USERS SET ONLINE = :status WHERE USERNAME = :username", nativeQuery = true)
-    void setOnline(String username, String status);
+    @Query(value = "UPDATE USERS SET ONLINE = :status WHERE USER_ID = :userId", nativeQuery = true)
+    void setOnline(Long userId, String status);
 
     //@Modifying
     @Transactional

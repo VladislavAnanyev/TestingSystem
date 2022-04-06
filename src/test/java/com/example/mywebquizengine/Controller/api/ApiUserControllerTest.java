@@ -89,7 +89,7 @@ public class ApiUserControllerTest {
     public void testSignUp() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.v@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -102,7 +102,7 @@ public class ApiUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.jwtToken").isString());
 
-        User user = repository.findById("application").get();
+        User user = repository.findUserByEmail("application").get();
         assertNull(user.getChangePasswordCode());
         assertNotNull(user.getPassword());
 
@@ -115,7 +115,7 @@ public class ApiUserControllerTest {
 
         createTestPerson("application");
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -131,7 +131,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBadPassword() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -147,7 +147,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBadUsername() throws Exception {
 
         String json = """
-                {"username": "    ",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -179,7 +179,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithoutEmail() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
                     "password": "12345"}
@@ -194,7 +194,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBadEmail() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -210,7 +210,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBlankEmail() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -226,7 +226,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithoutFirstName() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "",
                     "lastName": "Ананьев",
@@ -245,7 +245,7 @@ public class ApiUserControllerTest {
         createTestPerson("application");
 
         String json = """
-                {"username": "application",
+                {"username": "a.vlad.c@ya.ru",
                  "password": "12345"}
                       """;
 
@@ -263,7 +263,7 @@ public class ApiUserControllerTest {
         createTestPerson("application");
 
         String json = """
-                {"username": "application",
+                {"username": "a.vlad.c@ya.ru",
                  "password": "12346"}
                       """;
 

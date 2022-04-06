@@ -1,6 +1,7 @@
 package com.example.mywebquizengine.Controller;
 
 import com.example.mywebquizengine.Model.Test.Test;
+import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.input.CreateTestRequest;
 import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserAnswerService;
@@ -41,13 +42,13 @@ public class TestController {
     @PostMapping(path = "/test/create", consumes = {"application/json"})
     public String addTest(
             @RequestBody @Valid CreateTestRequest request,
-            @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
+            @AuthenticationPrincipal User authUser) throws ResponseStatusException {
         testService.add(
                 request.getCourseId(),
                 request.getDuration(),
                 request.getQuizzes(),
                 request.getDescription(),
-                principal.getName(),
+                authUser.getUserId(),
                 request.getStartAt(),
                 request.getFinishAt()
         );
@@ -64,8 +65,8 @@ public class TestController {
     }
 
     @DeleteMapping(path = "/quizzes/{id}")
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public void deleteTest(@PathVariable Long id, @AuthenticationPrincipal Principal principal) {
+//    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#principal.name)")
+    public void deleteTest(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
         testService.deleteTest(id);
         throw new ResponseStatusException(HttpStatus.OK);
     }
@@ -73,15 +74,15 @@ public class TestController {
 
     @PutMapping(path = "/update/{id}", consumes = {"application/json"})
     @ResponseBody
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
+//    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
     public void changeTest(@PathVariable Long id, @Valid @RequestBody Test test,
-                           @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
+                           @AuthenticationPrincipal User authUser) throws ResponseStatusException {
         testService.updateTest(id, test);
     }
 
     @GetMapping(path = "/update/{id}")
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal Principal principal) {
+//    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
+    public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal User authUser) {
         Test tempTest = testService.findTest(id);
         model.addAttribute("oldTest", tempTest);
         return "updateQuiz";
@@ -93,7 +94,7 @@ public class TestController {
                           @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                           @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
                           @RequestParam(defaultValue = "completed_at") String sortBy,
-                          @AuthenticationPrincipal Principal principal) {
+                          @AuthenticationPrincipal User authUser) {
 
         Test test = testService.findTest(id);
         model.addAttribute("quizzes", test.getQuizzes());

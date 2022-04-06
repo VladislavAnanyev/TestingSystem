@@ -40,14 +40,14 @@ public class TestService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public List<TestView> findTestsInCourseByName(Long courseId, String name) {
+    public List<TestView> findTestsInCourseByName(Long courseId, Long userId) {
         //Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_Email(courseId, name);
+        return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_UserId(courseId, userId);
     }
 
-    public List<Test> getMyQuizNoPaging(String name) {
+/*    public List<Test> getMyQuizNoPaging(String name) {
         return testRepository.getQuizForThisNoPaging(name);
-    }
+    }*/
 
     public Page<Test> getAllQuizzes(Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
@@ -72,7 +72,8 @@ public class TestService {
 
     public void deleteTest(Long id) {
         if (testRepository.findById(id).isPresent()) {
-            testRepository.nativeDeleteTestById(id);
+            //testRepository.nativeDeleteTestById(id);
+            testRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -90,12 +91,12 @@ public class TestService {
     }
 
     public void add(Long courseId, LocalTime duration, List<Object> addQuizRequests,
-                    String description, String name, Calendar startAt, Calendar finishAt) {
+                    String description, Long userId, Calendar startAt, Calendar finishAt) {
         Test test = new Test();
         test.setStartTime(startAt);
         test.setEndTime(finishAt);
         test.setCourse(courseService.findCourseById(courseId));
-        User user = userService.loadUserByUsernameProxy(name);
+        User user = userService.loadUserByUserIdProxy(userId);
         test.setDuration(duration);
         test.setDescription(description);
 

@@ -14,7 +14,7 @@ public class UserTestAnswer {
     private Long userAnswerId;
 
     @ManyToOne
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "user_id")
     private User user;
 
     //@OnDelete(action = OnDeleteAction.CASCADE)

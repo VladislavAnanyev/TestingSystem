@@ -3,6 +3,7 @@ package com.example.mywebquizengine.Controller.api;
 import com.example.mywebquizengine.Model.Chat.Message;
 import com.example.mywebquizengine.Model.Projection.Api.MessageForApiViewCustomQuery;
 import com.example.mywebquizengine.Model.Projection.DialogWithUsersViewPaging;
+import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Service.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.simple.parser.ParseException;
@@ -21,16 +22,16 @@ public class ApiChatController {
     private MessageService messageService;
 
     @DeleteMapping(path = "/message/{id}")
-    public void deleteMessage(@PathVariable Long id, @AuthenticationPrincipal Principal principal
+    public void deleteMessage(@PathVariable Long id, @AuthenticationPrincipal User authUser
     ) throws JsonProcessingException, ParseException {
-        messageService.deleteMessage(id, principal.getName());
+        messageService.deleteMessage(id, authUser.getUserId());
     }
 
     @PutMapping(path = "/message/{id}")
     public void editMessage(@RequestBody Message message,
-                            @AuthenticationPrincipal Principal principal
+                            @AuthenticationPrincipal User authUser
     ) throws JsonProcessingException, ParseException {
-        messageService.editMessage(message, principal.getName());
+        messageService.editMessage(message, authUser.getUserId());
     }
 
     @GetMapping(path = "/messages")
@@ -39,17 +40,17 @@ public class ApiChatController {
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "50") Integer pageSize,
             @RequestParam(defaultValue = "timestamp") String sortBy,
-            @AuthenticationPrincipal Principal principal) {
-        return messageService.getMessages(dialogId, page, pageSize, sortBy, principal.getName());
+            @AuthenticationPrincipal User authUser) {
+        return messageService.getMessages(dialogId, page, pageSize, sortBy, authUser.getUserId());
     }
 
     @GetMapping(path = "/dialogs")
-    public ArrayList<MessageForApiViewCustomQuery> getDialogs(@AuthenticationPrincipal Principal principal) {
-        return messageService.getDialogsForApi(principal.getName());
+    public ArrayList<MessageForApiViewCustomQuery> getDialogs(@AuthenticationPrincipal User authUser) {
+        return messageService.getDialogsForApi(authUser.getUserId());
     }
 
     @GetMapping(path = "/getDialogId")
-    public Long checkDialog(@RequestParam String username, @AuthenticationPrincipal Principal principal) {
-        return messageService.checkDialog(username, principal.getName());
+    public Long checkDialog(@RequestParam Long userId, @AuthenticationPrincipal User authUser) {
+        return messageService.checkDialog(userId, authUser.getUserId());
     }
 }

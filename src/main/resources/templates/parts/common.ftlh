@@ -1,3 +1,4 @@
+
 <#macro page>
     <!DOCTYPE html>
     <html lang="ru">
@@ -83,29 +84,11 @@
                         <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
                     </div>
 
-                    <div class="d-flex flex-column h-100 justify-content-center text-center">
+                    <div class="d-flex align-content-end flex-wrap mt-5">
                         <nav aria-label="...">
-                            <ul class="pagination pagination">
+                            <ul class="pagination" style="flex-wrap: wrap">
                                 <#list test_id.quizzes as quiz>
-
-                                    <#--<div id="list-example" class="list-group">
-                                        <a class="list-group-item list-group-item-action" href="#list-item-1">Элемент 1</a>
-                                        <a class="list-group-item list-group-item-action" href="#list-item-2">Элемент 2</a>
-                                        <a class="list-group-item list-group-item-action" href="#list-item-3">Элемент 3</a>
-                                        <a class="list-group-item list-group-item-action" href="#list-item-4">Элемент 4</a>
-                                    </div>-->
-                                    <#--<div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" class="scrollspy-example" tabindex="0">
-                                        <h4 id="list-item-1">Элемент 1</h4>
-                                        <p>...</p>
-                                        <h4 id="list-item-2">Элемент 2</h4>
-                                        <p>...</p>
-                                        <h4 id="list-item-3">Элемент 3</h4>
-                                        <p>...</p>
-                                        <h4 id="list-item-4">Элемент 4</h4>
-                                        <p>...</p>
-                                    </div>-->
-
-                                    <li class="page-item <#--active-->" aria-current="page">
+                                    <li style="width: 35px" class="page-item mx-1 <#--active-->" aria-current="page">
                                         <a class="<#--list-group-item list-group-item-action-->" href="#list-item-${quiz_index + 1}">
                                         <span class="page-link">${quiz_index + 1}</span>
                                         </a>

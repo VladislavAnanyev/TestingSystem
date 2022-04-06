@@ -50,9 +50,9 @@ public class UserAnswerService {
     @Autowired
     private UserService userService;
 
-    public UserTestAnswer findLastUserTestAnswer(JobDataMap jobDataMap) {
+    /*public UserTestAnswer findLastUserTestAnswer(JobDataMap jobDataMap) {
         return userTestAnswerRepository.findLastUserAnswerEager(jobDataMap.getString("username")).get();
-    }
+    }*/
 
     public UserTestAnswer findByUserAnswerId(Long userAnswerId) {
 
@@ -115,16 +115,16 @@ public class UserAnswerService {
     }
 
     public UserTestAnswer checkLastComplete(User user, Long id) {
-
-        if (userTestAnswerRepository.findLastUserTestAnswer(user.getUsername(), id).isPresent()) {
-            return userTestAnswerRepository.findLastUserTestAnswer(user.getUsername(), id).get();
+        Optional<UserTestAnswer> lastUserTestAnswer = userTestAnswerRepository.findLastUserTestAnswer(user.getUserId(), id);
+        if (lastUserTestAnswer.isPresent()) {
+            return lastUserTestAnswer.get();
         } else return null;
 
     }
 
     public boolean checkComplete(Long testId) {
-        Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long countComplete = userTestAnswerRepository.getCountOfCompleteAttempts(principal.getName(), testId);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long countComplete = userTestAnswerRepository.getCountOfCompleteAttempts(user.getUserId(), testId);
         return countComplete >= 1;
     }
 
@@ -132,9 +132,9 @@ public class UserAnswerService {
         return userTestAnswerRepository.getPercentageOfComplete(courseId);
     }
 
-    public boolean isAvailable(Test test, String name) {
+    public boolean isAvailable(Test test, Long userId) {
         boolean available = true;
-        Integer userAttempts = userTestAnswerRepository.getUserAttempts(test.getTestId(), name);
+        Integer userAttempts = userTestAnswerRepository.getUserAttempts(test.getTestId(), userId);
         if (test.getAttempts() != null && userAttempts >= test.getAttempts()) {
             available = false;
         }
@@ -218,7 +218,7 @@ public class UserAnswerService {
         userTestAnswer.setCompletedAt(nowDate);
         saveAnswer(userTestAnswer);
 
-        String destination = "/topic/" + userTestAnswer.getUser().getUsername() + userTestAnswer.getUserAnswerId();
+        String destination = "/topic/" + userTestAnswer.getUser().getUserId() + userTestAnswer.getUserAnswerId();
 
         char[] charsResult = result.toString().toCharArray();
         SendAnswerResponse sendAnswerResponse = new SendAnswerResponse();
@@ -230,9 +230,9 @@ public class UserAnswerService {
         simpMessagingTemplate.convertAndSend(destination, sendAnswerResponse);
     }
 
-    public void updateAnswer(Long quizId, Object answer, String username) {
+    public void updateAnswer(Long quizId, Object answer, Long userId) {
         Quiz quiz = quizService.findQuiz(quizId);
-        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(username).get();
+        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(userId).get();
 
         Long userQuizAnswerId = null;
         for (UserQuizAnswer quizAnswer : lastUserAnswer.getUserQuizAnswers()) {
@@ -279,11 +279,11 @@ public class UserAnswerService {
         userTestAnswerRepository.save(lastUserAnswer);
     }
 
-    public String startAnswer(Long testId, String restore, String name) throws SchedulerException {
+    public String startAnswer(Long testId, String restore, Long userId) throws SchedulerException {
         Test test = testService.findTest(testId);
         UserTestAnswer userTestAnswer;
-        if (isAvailable(test, name)) {
-            UserTestAnswer lastUserTestAnswer = checkLastComplete(userService.loadUserByUsernameProxy(name), testId);
+        if (isAvailable(test, userId)) {
+            UserTestAnswer lastUserTestAnswer = checkLastComplete(userService.loadUserByUserIdProxy(userId), testId);
 
             if (Boolean.parseBoolean(restore) && lastUserTestAnswer != null && lastUserTestAnswer.getCompletedAt() == null) {
                 userTestAnswer = lastUserTestAnswer;
@@ -292,7 +292,7 @@ public class UserAnswerService {
                 Calendar calendar = new GregorianCalendar();
                 userTestAnswer.setStartAt(calendar);
                 userTestAnswer.setTest(testService.findTest(testId));
-                userTestAnswer.setUser(userService.loadUserByUsernameProxy(name));
+                userTestAnswer.setUser(userService.loadUserByUserIdProxy(userId));
                 saveStartAnswer(userTestAnswer);
 
                 if (test.getDuration() != null) {
@@ -307,7 +307,7 @@ public class UserAnswerService {
 
                     JobDetail job = newJob(SimpleJob.class)
                             .withIdentity(UUID.randomUUID().toString(), "group1")
-                            .usingJobData("username", userService.loadUserByUsernameProxy(name).getUsername())
+                            .usingJobData("username", userService.loadUserByUserIdProxy(userId).getUsername())
                             .usingJobData("test", test.getTestId())
                             .usingJobData("answer", userTestAnswer.getUserAnswerId())
                             .build();
