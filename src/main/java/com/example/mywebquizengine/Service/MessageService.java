@@ -6,7 +6,7 @@ import com.example.mywebquizengine.Model.Chat.Message;
 
 //import com.example.mywebquizengine.Model.Projection.MessageForStompView;
 import com.example.mywebquizengine.Model.Chat.MessageStatus;
-import com.example.mywebquizengine.Model.Projection.Api.MessageForApiViewCustomQuery;
+import com.example.mywebquizengine.Model.Projection.Api.LastDialog;
 import com.example.mywebquizengine.Model.Projection.Api.MessageWithDialog;
 import com.example.mywebquizengine.Model.Projection.DialogWithUsersViewPaging;
 import com.example.mywebquizengine.Model.User;
@@ -98,11 +98,11 @@ public class MessageService {
         return messageRepository.getDialogs(username);
     }*/
 
-    public ArrayList<MessageForApiViewCustomQuery> getDialogsForApi(Long userId) {
+    public ArrayList<LastDialog> getDialogsForApi(Long userId) {
 
-        List<MessageForApiViewCustomQuery> messageViews = messageRepository.getDialogsForApi(userId);
+        List<LastDialog> messageViews = messageRepository.getDialogsForApi(userId);
 
-        return (ArrayList<MessageForApiViewCustomQuery>) messageViews;
+        return (ArrayList<LastDialog>) messageViews;
     }
 
 
@@ -188,6 +188,23 @@ public class MessageService {
         }
     }
 
+
+    @Transactional
+    public void addUsersToDialog(Long dialogId, List<User> userIdList) {
+
+        Optional<Dialog> optionalDialog = dialogRepository.findById(dialogId);
+        if (optionalDialog.isPresent()) {
+            Dialog dialog = optionalDialog.get();
+
+            for (User user : userIdList) {
+                if (dialog.getUsers().stream().noneMatch(userInDialog -> userInDialog.getUserId().equals(user.getUserId()))) {
+                    dialog.addUser(user);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Specified user already exist in dialog");
+                }
+            }
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dialog with specified id not found");
+    }
 
 
 

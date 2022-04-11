@@ -91,7 +91,7 @@ public class TestService {
     }
 
     public void add(Long courseId, LocalTime duration, List<Object> addQuizRequests,
-                    String description, Long userId, Calendar startAt, Calendar finishAt) {
+                    String description, Long userId, Calendar startAt, Calendar finishAt, boolean displayAnswers) {
         Test test = new Test();
         test.setStartTime(startAt);
         test.setEndTime(finishAt);
@@ -99,6 +99,7 @@ public class TestService {
         User user = userService.loadUserByUserIdProxy(userId);
         test.setDuration(duration);
         test.setDescription(description);
+        test.setDisplayAnswers(displayAnswers);
 
         List<Quiz> quizzes = new ArrayList<>();
         for (Object objectRequest : addQuizRequests) {

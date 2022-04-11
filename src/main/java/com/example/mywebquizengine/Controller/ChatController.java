@@ -43,18 +43,7 @@ public class ChatController {
     @Autowired
     private MessageService messageService;
 
-
     @GetMapping(path = "/chat")
-    public String chat(Model model, @AuthenticationPrincipal User authUser) {
-
-        User user = userService.loadUserByUserIdProxy(authUser.getUserId());
-        model.addAttribute("myUsername", user);
-        model.addAttribute("lastDialogs", messageService.getDialogsForApi(authUser.getUserId()));
-        model.addAttribute("userList", userService.getUserList());
-        return "chat";
-    }
-
-    @GetMapping(path = "/chat2")
     public String home(Model model, @AuthenticationPrincipal User authUser) {
         User user = userService.loadUserByUserIdProxy(authUser.getUserId());
         model.addAttribute("myUsername", user);
@@ -65,7 +54,7 @@ public class ChatController {
 
     @PostMapping(path = "/checkdialog")
     @ResponseBody
-//    @PreAuthorize(value = "!#principal.name.equals(#user.userId)")
+    @PreAuthorize(value = "!#user.userId.equals(#user.userId)")
     public Long checkDialog(@RequestBody User user, @AuthenticationPrincipal User authUser) {
 
         return messageService.checkDialog(user.getUserId(), authUser.getUserId());
@@ -74,28 +63,27 @@ public class ChatController {
 
     @GetMapping(path = "/chat/{dialog_id}")
     @Transactional
-    public String chatWithUser(Model model, @PathVariable String dialog_id,
+    public String chatWithUser2(Model model, @PathVariable String dialog_id,
                                @RequestParam(required = false,defaultValue = "0") @Min(0) Integer page,
                                @RequestParam(required = false,defaultValue = "50") @Min(1) @Max(100) Integer pageSize,
                                @RequestParam(defaultValue = "timestamp") String sortBy,
                                @AuthenticationPrincipal User authUser) {
 
 
-            DialogWithUsersViewPaging dialog = messageService.getDialogWithPaging(dialog_id, page, pageSize, sortBy);
+        DialogWithUsersViewPaging dialog = messageService.getDialogWithPaging(dialog_id, page, pageSize, sortBy);
 
-            if (dialog.getUsers().stream().anyMatch(o -> o.getUserId()
-                    .equals(authUser.getUserId()))) {
+        if (dialog.getUsers().stream().anyMatch(o -> o.getUserId()
+                .equals(authUser.getUserId()))) {
 
-                model.addAttribute("lastDialogs", messageService.getDialogsForApi(authUser.getUserId()));
-                model.addAttribute("dialog", dialog.getDialogId());
-                model.addAttribute("messages", dialog.getMessages());
-                model.addAttribute("dialogObj", dialog);
-                model.addAttribute("userList", userService.getUserList());
+            model.addAttribute("lastDialogs", messageService.getDialogsForApi(authUser.getUserId()));
+            model.addAttribute("dialog", dialog.getDialogId());
+            model.addAttribute("messages", dialog.getMessages());
+            model.addAttribute("dialogObj", dialog);
+            model.addAttribute("userList", userService.getUserList());
 
-                return "chat";
+            return "chat2";
 
-            } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
 
     }
@@ -123,11 +111,11 @@ public class ChatController {
     @Transactional
     @MessageMapping("/user/{dialogId}")
     public void sendMessage(@Valid @Payload Message message,
-                            @AuthenticationPrincipal User authUser
+                            @AuthenticationPrincipal Principal authUser
     ) throws JsonProcessingException, ParseException {
-        if (message.getSender().getUserId().equals(authUser.getUserId())) {
+//        if (message.getSender().getUserId().equals(authUser.getUserId())) {
             messageService.sendMessage(message, "WEB");
-        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+//        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     @Modifying

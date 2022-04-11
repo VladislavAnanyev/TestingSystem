@@ -1,7 +1,7 @@
 package com.example.mywebquizengine.Controller.api;
 
 import com.example.mywebquizengine.Model.Chat.Message;
-import com.example.mywebquizengine.Model.Projection.Api.MessageForApiViewCustomQuery;
+import com.example.mywebquizengine.Model.Projection.Api.LastDialog;
 import com.example.mywebquizengine.Model.Projection.DialogWithUsersViewPaging;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Service.MessageService;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 
 @RestController
@@ -45,7 +44,7 @@ public class ApiChatController {
     }
 
     @GetMapping(path = "/dialogs")
-    public ArrayList<MessageForApiViewCustomQuery> getDialogs(@AuthenticationPrincipal User authUser) {
+    public ArrayList<LastDialog> getDialogs(@AuthenticationPrincipal User authUser) {
         return messageService.getDialogsForApi(authUser.getUserId());
     }
 

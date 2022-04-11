@@ -3,7 +3,7 @@ package com.example.mywebquizengine.Repos;
 import com.example.mywebquizengine.Model.Chat.Message;
 import com.example.mywebquizengine.Model.Chat.MessageStatus;
 import com.example.mywebquizengine.Model.Projection.Api.MessageWithDialog;
-import com.example.mywebquizengine.Model.Projection.Api.MessageForApiViewCustomQuery;
+import com.example.mywebquizengine.Model.Projection.Api.LastDialog;
 import com.example.mywebquizengine.Model.Projection.MessageView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,7 @@ public interface MessageRepository extends CrudRepository<Message, Long>, Paging
     @Query(value = "SELECT DIALOG_ID FROM USERS_DIALOGS WHERE USER_ID = :username", nativeQuery = true)
     List<Long> getMyDialogsId(String username);
 
-    Page<MessageView> findAllByDialog_DialogIdAndStatusNot(Long dialogId, MessageStatus status, Pageable paging);
+    Page<Message> findAllByDialog_DialogIdAndStatusNot(Long dialogId, MessageStatus status, Pageable paging);
 
     @Query(value = """
             SELECT MESSAGES.id, content, DIALOGS.dialog_id as dialogId,
@@ -42,7 +42,7 @@ public interface MessageRepository extends CrudRepository<Message, Long>, Paging
             GROUP BY MESSAGES.ID
             ORDER BY MESSAGES.TIMESTAMP DESC;
             """, nativeQuery = true)
-    List<MessageForApiViewCustomQuery> getDialogsForApi(Long userId);
+    List<LastDialog> getDialogsForApi(Long userId);
 
     MessageWithDialog findMessageById(Long id);
 

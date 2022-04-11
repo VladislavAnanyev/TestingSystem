@@ -14,19 +14,19 @@ function getTimeRemaining(endtime) {
 }
 
 function initializeClock(id, endtime) {
-    var clock = document.getElementById(id);
-    var daysSpan = clock.querySelector('.days');
-    var hoursSpan = clock.querySelector('.hours');
-    var minutesSpan = clock.querySelector('.minutes');
-    var secondsSpan = clock.querySelector('.seconds');
+    //var clock = document.getElementById(id);
+    var daysSpan = document.getElementById('days');
+    var hoursSpan = document.getElementById('hours');
+    var minutesSpan = document.getElementById('minutes');
+    var secondsSpan = document.getElementById('seconds');
 
     function updateClock() {
         var t = getTimeRemaining(endtime);
 
-        daysSpan.innerHTML = t.days;
-        hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
-        minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
-        secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
+        daysSpan.textContent = t.days;
+        hoursSpan.textContent = ('0' + t.hours).slice(-2);
+        minutesSpan.textContent = ('0' + t.minutes).slice(-2);
+        secondsSpan.textContent = ('0' + t.seconds).slice(-2);
 
         if (t.total <= 0) {
             clearInterval(timeinterval);

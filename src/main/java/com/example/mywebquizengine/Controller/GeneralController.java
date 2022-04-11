@@ -37,6 +37,11 @@ public class GeneralController {
         return "reg";
     }
 
+    @GetMapping("/")
+    public String redirect() {
+        return "redirect:/courses";
+    }
+
     @GetMapping(path = "/test")
     public String test() {
         return "saved_resource";

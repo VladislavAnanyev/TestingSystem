@@ -85,6 +85,14 @@ public class User implements UserDetails, OAuth2User {
         this.status = false;
     }
 
+    public User(Long userId, String firstName, String lastName, String avatar, String email) {
+        this.userId = userId;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.avatar = avatar;
+    }
+
     public User(String username, String firstName, String lastName, String avatar) {
         this.email = username;
         this.firstName = firstName;

@@ -50,70 +50,7 @@
         <aside class="sidebar bg-light">
             <#if test_id??>
 
-                <div class="container h-100">
 
-                    <#if test_id.duration??>
-                        <input type="hidden" id="time" value="${timeout?datetime?string ["MM.dd.yyyy HH:mm:ss"]}">
-                    </#if>
-
-                    <#if test_id.duration??>
-                        <div class="alltime mb-3" id="clock">
-                            <h1 class="countdown-title">Осталось времени</h1>
-                            <div id="countdown" class="countdown">
-                                <div class="countdown-number">
-                                    <span class="days countdown-time"></span>
-                                    <span class="countdown-text">Дни</span>
-                                </div>
-                                <div class="countdown-number">
-                                    <span class="hours countdown-time"></span>
-                                    <span class="countdown-text">Часы</span>
-                                </div>
-                                <div class="countdown-number">
-                                    <span class="minutes countdown-time"></span>
-                                    <span class="countdown-text">Минуты</span>
-                                </div>
-                                <div class="countdown-number">
-                                    <span class="seconds countdown-time"></span>
-                                    <span class="countdown-text">Секунды</span>
-                                </div>
-                            </div>
-                        </div>
-                    </#if>
-
-                    <div class="progress mt-5" style="height: 20px;">
-                        <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-                    </div>
-
-                    <div class="d-flex align-content-end flex-wrap mt-5">
-                        <nav aria-label="...">
-                            <ul class="pagination" style="flex-wrap: wrap">
-                                <#list test_id.quizzes as quiz>
-                                    <li style="width: 35px" class="page-item mx-1 <#--active-->" aria-current="page">
-                                        <a class="<#--list-group-item list-group-item-action-->" href="#list-item-${quiz_index + 1}">
-                                        <span class="page-link">${quiz_index + 1}</span>
-                                        </a>
-                                    </li>
-                                </#list>
-
-                            </ul>
-
-                        </nav>
-
-                    </div>
-
-                    <#if test_id.duration??>
-
-
-                        <script src="/static/downtimer.js"></script>
-
-                    </#if>
-
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-                    <script src="/static/timeover.js"></script>
-<#--                    <script src="/static/subscribe.js"></script>-->
-                    <script>connect()</script>
-                </div>
             </#if>
         </aside>
 

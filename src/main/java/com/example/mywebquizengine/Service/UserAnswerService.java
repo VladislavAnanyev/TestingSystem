@@ -128,8 +128,16 @@ public class UserAnswerService {
         return countComplete >= 1;
     }
 
+    @Autowired
+    private CourseService courseService;
+
     public Integer getPercentageOfComplete(Long courseId) {
-        return userTestAnswerRepository.getPercentageOfComplete(courseId);
+        int size = courseService.findCourseById(courseId).getTests().size();
+        if (size == 0) {
+            return 0;
+        } else {
+            return userTestAnswerRepository.getPercentageOfComplete(courseId);
+        }
     }
 
     public boolean isAvailable(Test test, Long userId) {
@@ -296,11 +304,22 @@ public class UserAnswerService {
                 saveStartAnswer(userTestAnswer);
 
                 if (test.getDuration() != null) {
+
                     Calendar jobCalendar = new GregorianCalendar();
                     jobCalendar.set(Calendar.SECOND, jobCalendar.get(Calendar.SECOND) + test.getDuration().getSecond());
                     jobCalendar.set(Calendar.MINUTE, jobCalendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
                     jobCalendar.set(Calendar.HOUR, jobCalendar.get(Calendar.HOUR) + test.getDuration().getHour());
 
+                    if (test.getEndTime() != null) {
+                        Calendar nowTimePlusDuration = new GregorianCalendar();
+                        nowTimePlusDuration.add(Calendar.SECOND, test.getDuration().getSecond());
+                        nowTimePlusDuration.add(Calendar.MINUTE, test.getDuration().getMinute());
+                        nowTimePlusDuration.add(Calendar.HOUR, test.getDuration().getHour());
+
+                        if (nowTimePlusDuration.after(test.getEndTime())) {
+                            jobCalendar = test.getEndTime();
+                        }
+                    }
 
                     SchedulerFactory sf = new StdSchedulerFactory();
                     Scheduler scheduler = sf.getScheduler();

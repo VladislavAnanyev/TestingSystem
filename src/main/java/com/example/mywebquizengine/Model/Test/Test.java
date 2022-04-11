@@ -43,7 +43,7 @@ public class Test {
     private LocalTime duration;
 
     @ColumnDefault("true")
-    private boolean displayAnswers = true;
+    private boolean displayAnswers;
 
     public Test() {}
 

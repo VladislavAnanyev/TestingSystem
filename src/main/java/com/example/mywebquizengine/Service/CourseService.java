@@ -1,5 +1,8 @@
 package com.example.mywebquizengine.Service;
 
+import com.example.mywebquizengine.Model.Chat.Dialog;
+import com.example.mywebquizengine.Model.Chat.Message;
+import com.example.mywebquizengine.Model.Chat.MessageStatus;
 import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.Projection.CourseView;
 import com.example.mywebquizengine.Model.User;
@@ -12,10 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 public class CourseService {
@@ -35,7 +36,26 @@ public class CourseService {
     public void createCourse(String name, Long userId) {
         Course course = new Course();
         course.setName(name);
-        course.setOwner(userService.loadUserByUserId(userId));
+        course.setImage("https://localhost/img/default.jpg");
+        User user = userService.loadUserByUserId(userId);
+        course.setOwner(user);
+
+
+        Dialog dialog = new Dialog();
+        dialog.addUser(user);
+        dialog.setName(name);
+        dialog.setImage("https://localhost/img/default.jpg");
+
+        course.setDialog(dialog);
+
+        Message message = new Message();
+        message.setSender(user);
+        message.setTimestamp(new Date());
+        message.setDialog(dialog);
+        message.setStatus(MessageStatus.DELIVERED);
+        message.setContent(user.getFirstName() + " " + user.getLastName() + " " + "создал группу \"Базы данных \"");
+
+        dialog.setMessages(Collections.singletonList(message));
         courseRepository.save(course);
     }
 
@@ -49,6 +69,9 @@ public class CourseService {
             return optionalCourse.get();
         } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Course not found");
     }
+
+    @Autowired
+    private MessageService messageService;
 
     @Transactional
     public void addMember(Long courseId, String email, Long userId) {
@@ -74,6 +97,8 @@ public class CourseService {
                 );
             }
             course.addMember(user);
+            messageService.addUsersToDialog(course.getDialog().getDialogId(), Collections.singletonList(user));
+
         } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вы не создатель этого курса");
     }
 

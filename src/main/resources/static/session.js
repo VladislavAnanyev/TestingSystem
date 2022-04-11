@@ -1,5 +1,9 @@
 function session(id, quizId) {
 
+    let progress = document.getElementById("progressbar")
+    let savedProgressValue = progress.getAttribute('aria-valuenow')
+    let reduceValue = 100 / document.getElementById("quizcount").textContent
+    console.log(savedProgressValue)
     let answer = [];
     let answer_values = [];
     let name = "check";
@@ -11,6 +15,20 @@ function session(id, quizId) {
             answer_values.push(Number(answer[j].value))
         }
     }
+    if (answer_values.length === 1) {
+        let nowValue = Number(savedProgressValue) + Number(reduceValue)
+        console.log(nowValue)
+        progress.style.width = nowValue + '%'
+        progress.setAttribute('aria-valuenow', String(nowValue))
+        progress.textContent = nowValue + '%'
+    } else if (answer_values.length === 0) {
+        let nowValue = Number(savedProgressValue - reduceValue)
+
+        progress.style.width = nowValue + '%'
+        progress.setAttribute('aria-valuenow', String(nowValue))
+        progress.textContent = nowValue + '%'
+    }
+
      test =
      {
              answer: answer_values,

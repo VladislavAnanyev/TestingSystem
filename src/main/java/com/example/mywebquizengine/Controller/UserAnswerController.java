@@ -91,6 +91,17 @@ public class UserAnswerController {
                 userTestAnswerFinishAt.set(Calendar.SECOND, userTestAnswerFinishAt.get(Calendar.SECOND) + test.getDuration().getSecond());
                 userTestAnswerFinishAt.set(Calendar.MINUTE, userTestAnswerFinishAt.get(Calendar.MINUTE) + test.getDuration().getMinute());
                 userTestAnswerFinishAt.set(Calendar.HOUR, userTestAnswerFinishAt.get(Calendar.HOUR) + test.getDuration().getHour());
+
+                if (test.getEndTime() != null) {
+                    Calendar nowTimePlusDuration = new GregorianCalendar();
+                    nowTimePlusDuration.add(Calendar.SECOND, test.getDuration().getSecond());
+                    nowTimePlusDuration.add(Calendar.MINUTE, test.getDuration().getMinute());
+                    nowTimePlusDuration.add(Calendar.HOUR, test.getDuration().getHour());
+
+                    if (nowTimePlusDuration.after(test.getEndTime())) {
+                        userTestAnswerFinishAt = test.getEndTime();
+                    }
+                }
                 model.addAttribute("timeout", userTestAnswerFinishAt.getTime());
             }
 

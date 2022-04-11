@@ -50,7 +50,8 @@ public class TestController {
                 request.getDescription(),
                 authUser.getUserId(),
                 request.getStartAt(),
-                request.getFinishAt()
+                request.getFinishAt(),
+                request.isDisplayAnswers()
         );
         return "redirect:/";
     }
@@ -65,7 +66,7 @@ public class TestController {
     }
 
     @DeleteMapping(path = "/quizzes/{id}")
-//    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#principal.name)")
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public void deleteTest(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
         testService.deleteTest(id);
         throw new ResponseStatusException(HttpStatus.OK);
@@ -74,14 +75,14 @@ public class TestController {
 
     @PutMapping(path = "/update/{id}", consumes = {"application/json"})
     @ResponseBody
-//    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public void changeTest(@PathVariable Long id, @Valid @RequestBody Test test,
                            @AuthenticationPrincipal User authUser) throws ResponseStatusException {
         testService.updateTest(id, test);
     }
 
     @GetMapping(path = "/update/{id}")
-//    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal User authUser) {
         Test tempTest = testService.findTest(id);
         model.addAttribute("oldTest", tempTest);
@@ -89,7 +90,7 @@ public class TestController {
     }
 
     @GetMapping(path = "/quizzes/{id}/info/")
-    //@PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public String getInfo(@PathVariable Long id, Model model,
                           @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                           @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,

@@ -1,5 +1,6 @@
 package com.example.mywebquizengine.Model;
 
+import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.Model.Test.Test;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -20,7 +21,18 @@ public class Course {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Test> tests;
+    @OneToOne
+    @JoinColumn(name = "dialog_id")
+    private Dialog dialog;
     private String image;
+
+    public Dialog getDialog() {
+        return dialog;
+    }
+
+    public void setDialog(Dialog dialog) {
+        this.dialog = dialog;
+    }
 
     public String getImage() {
         return image;
