@@ -51,7 +51,8 @@ public class TestController {
                 authUser.getUserId(),
                 request.getStartAt(),
                 request.getFinishAt(),
-                request.isDisplayAnswers()
+                request.isDisplayAnswers(),
+                request.getAttempts()
         );
         return "redirect:/";
     }
@@ -100,7 +101,8 @@ public class TestController {
         Test test = testService.findTest(id);
         model.addAttribute("quizzes", test.getQuizzes());
         model.addAttribute("chart", userAnswerService.getAnswerStats(id));
-        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, page, pageSize, sortBy).getContent());
+        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id));
+        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id));
         return "info";
     }
 }

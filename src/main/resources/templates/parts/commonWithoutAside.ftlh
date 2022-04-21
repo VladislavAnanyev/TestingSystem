@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, shrink-to-fit=no, viewport-fit=cover">
-        <title>Messenger - 2.0.1</title>
+        <title>Система тестирования</title>
 
         <!-- Favicon -->
         <#--    <link rel="shortcut icon" href="./assets/img/favicon/favicon.ico" type="image/x-icon">-->
@@ -17,7 +17,8 @@
 
         <!-- Template CSS -->
         <link rel="stylesheet" href="/static/template.bundle.css">
-        <link rel="stylesheet" href="/static/template.dark.bundle.css" media="(prefers-color-scheme: dark)">
+<#--        <link rel="stylesheet" href="/static/template.dark.bundle.css" media="(prefers-color-scheme: dark)">-->
+<#--        <style>body {position: relative; height: 100%;}</style>-->
     </head>
     <#--<body>-->
     <body>
@@ -46,6 +47,7 @@
 
     <script src="/static/vendor.js"></script>
     <script src="/static/template.js"></script>
+
 
 
     </body>

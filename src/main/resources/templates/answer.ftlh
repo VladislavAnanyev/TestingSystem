@@ -4,9 +4,7 @@
 <@e.page>
     <link type="text/html" rel="stylesheet" href="/static/chart.css">
     <link href="/static/timer.css" type="text/css" rel="stylesheet">
-    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>
-    <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+<#--    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>-->
 
     <title>Ответить</title>
 
@@ -21,7 +19,23 @@
     <aside class="sidebar bg-light">
         <div class="container h-100">
 
-
+            <#--<div id="list-example" class="list-group">
+                <a class="list-group-item list-group-item-action" href="#list-item-1">Элемент 1</a>
+                <a class="list-group-item list-group-item-action" href="#list-item-2">Элемент 2</a>
+                <a class="list-group-item list-group-item-action" href="#list-item-3">Элемент 3</a>
+                <a class="list-group-item list-group-item-action" href="#list-item-4">Элемент 4</a>
+            </div>
+            <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+                <h4 id="list-item-1">Элемент 1</h4>
+                <p>...</p>
+                <h4 id="list-item-2">Элемент 2</h4>
+                <p>...</p>
+                <h4 id="list-item-3">Элемент 3</h4>
+                <p>...</p>
+                <h4 id="list-item-4">Элемент 4</h4>
+                <p>...</p>
+            </div>
+-->
 
             <div class="progress mt-5" style="height: 20px;">
                 <div class="progress-bar" id="progressbar" role="progressbar" style="width: 0%;" aria-valuenow="0"
@@ -30,17 +44,23 @@
                 </div>
             </div>
 
-            <div class="d-flex align-content-end flex-wrap mt-5">
-                <nav aria-label="...">
-                    <ul class="pagination" style="flex-wrap: wrap">
+            <div class="<#--d-flex--> <#--align-content-end--> flex-wrap mt-5">
+                <nav id="navbar-example3" class="navbar navbar-light bg-light px-3" aria-label="...">
+                    <ul class="justify-content-center pagination nav nav-pills" style="flex-wrap: wrap">
+<#--                        <div class="row">-->
+
                         <#list test_id.quizzes as quiz>
-                            <li style="width: 35px" class="page-item mx-1 <#--active-->" aria-current="page">
-                                <a class="<#--list-group-item list-group-item-action-->"
-                                   href="#list-item-${quiz_index + 1}">
-                                    <span class="page-link">${quiz_index + 1}</span>
+<#--                            <div class="col-3 mt-2 &lt;#&ndash;d-flex&ndash;&gt; align-items-stretch">-->
+                            <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->" aria-current="page">
+                                <a style="color: #5376fc" id="${quiz.quizId?c}" class="card-body page-link nav-link text-center"
+                                   href="#list-item-${quiz_index + 1}">${quiz_index + 1}
+<#--                                    <span class="page-link">${quiz_index + 1}</span>-->
                                 </a>
                             </li>
+<#--                            </div>-->
                         </#list>
+
+<#--                        </div>-->
 
                     </ul>
 
@@ -78,7 +98,7 @@
                 </div>
                 <script src="/static/downtimer.js"></script>
 
-                <#else>
+            <#else>
 
                 <div class="card border-4 mt-3">
                     <div class="card-body">
@@ -112,20 +132,20 @@
         </div>
     </aside>
 
-    <main class="main is-visible">
-        <div class="container h-100 mt-2 ml-2 chat-body hide-scrollbar flex-1">
-            <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" class="scrollspy-example"
-                 tabindex="0">
+    <main class="main is-visible" >
+        <div class="container h-100 mt-2 ml-2 chat-body hide-scrollbar flex-1 scrollspy-example" data-bs-offset="225"
+             tabindex="0" data-bs-spy="scroll" data-bs-target="#navbar-example3">
+            <div>
 
                 <#list test_id.quizzes as quiz>
-                    <div id="list-item-${quiz_index + 1}"
+                    <div  id="list-item-${quiz_index + 1}"
                          class="card quiz mt-2 card mb-3 shadow p-3 mb-5 <#--bg-white--> rounded">
                         <b class="mr-4">${quiz_index + 1}.</b>
                         <div class="card-body">
                             <div id="test${quiz_index}">
                                 <#--                        <div><h6>${quiz.title}</h6></div>-->
                                 <div>
-                                    <h5>${quiz.text}</h5>
+                                    <h5 class="user-select-none">${quiz.text}</h5>
                                     <p>Выберите один или несколько ответов</p>
                                 </div>
                                 <#if quiz.class == "class com.example.mywebquizengine.Model.Test.MapAnswerQuiz">
@@ -175,7 +195,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="col">
-                                                            <h5>${options}</h5>
+                                                            <h5 class="user-select-none">${options}</h5>
                                                             <#--                                                    <p>last seen 3 days ago</p>-->
                                                         </div>
                                                         <div class="col-auto">
@@ -230,7 +250,7 @@
                 </#list>
 
 
-                <button type="submit" data-toggle="modal" <#--data-target="#staticBackdrop"-->
+                <button <#--onmouseenter="scrollListener()"--> type="submit" data-toggle="modal" <#--data-target="#staticBackdrop"-->
                         class="btn btn-primary ml-2 mb-2" id="btnAns" onclick="f(${test_id.testId?c})">Ответить
                 </button>
 
@@ -292,7 +312,8 @@
 
                 </div>
 
-
+                <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
                 <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
                 <script src="/static/answer.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
@@ -321,6 +342,47 @@
 
             </div>
         </div>
+
+        <script>
+
+            let previousId = 0;
+            let previousTime = new Date()
+
+            function scrollListener() {
+                let elem = document.getElementsByClassName('active');
+                console.log(previousId)
+                let now = new Date()
+                let finalTime = (now - previousTime) / 1000;
+                console.log(finalTime)
+                previousTime = new Date();
+
+                if (finalTime > 1.0) {
+                    console.log("Запрос")
+                    let answerId = document.getElementById('useranswerid').value
+                    let json = {
+                        answerSessionId: answerId,
+                        quizId: previousId,
+                        duration: finalTime
+                    }
+                    console.log(json)
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/test/answer/duration', false);
+                    xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+                    xhr.onreadystatechange = function () {};
+                    xhr.send(JSON.stringify(json))
+                }
+                previousId = elem[0].getAttribute('id')
+            }
+
+            var firstScrollSpyEl = document.querySelector('[data-bs-spy="scroll"]')
+            firstScrollSpyEl.addEventListener('activate.bs.scrollspy', function () {
+                scrollListener()
+            })
+
+
+        </script>
+
+
     </main>
 
 

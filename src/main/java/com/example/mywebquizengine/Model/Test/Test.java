@@ -20,11 +20,11 @@ public class Test {
     private Long testId;
 
     //@OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<@Valid Quiz> quizzes;
 
     //@OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<UserTestAnswer> userTestAnswers;
 
     @ManyToOne

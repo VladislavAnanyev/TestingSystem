@@ -266,11 +266,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
         private GrantedAuthoritiesMapper userAuthoritiesMapper() {
             return (authorities) -> {
                 Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
-
-
-
-
                 authorities.forEach(authority -> {
                     if (authority instanceof OidcUserAuthority) {
                         OidcUserAuthority oidcUserAuthority = (OidcUserAuthority)authority;

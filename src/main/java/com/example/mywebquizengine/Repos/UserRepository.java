@@ -1,8 +1,8 @@
 package com.example.mywebquizengine.Repos;
 
-import com.example.mywebquizengine.Model.Projection.ProfileView;
 import com.example.mywebquizengine.Model.Projection.UserCommonView;
 import com.example.mywebquizengine.Model.Projection.UserView;
+import com.example.mywebquizengine.Model.Projection.UserViewForCourseInfo;
 import com.example.mywebquizengine.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,7 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.sql.DataSourceDefinitions;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +29,15 @@ public interface UserRepository extends CrudRepository<User, Long>, JpaRepositor
 
 //    ProfileView findUserByUsernameOrderByUsernameAsc(String username);
 
+    @Query(nativeQuery = true, value = """
+            SELECT u.USER_ID as userId, u.EMAIL as email, u.LAST_NAME as lastName, 
+            u.FIRST_NAME as firstName, u.AVATAR as avatar, CM.COURSE_ID as courseId 
+            FROM COURSES JOIN COURSES_MEMBERS CM on COURSES.COURSE_ID = CM.COURSE_ID 
+            join USERS U on U.USER_ID = CM.USER_ID 
+            WHERE COURSES.COURSE_ID =:courseId
+            """)
+    List<UserViewForCourseInfo> findMembersByCourseAndMembers(Long courseId);
+
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "SELECT * FROM USERS")
@@ -46,7 +54,7 @@ public interface UserRepository extends CrudRepository<User, Long>, JpaRepositor
     void setAvatar(String avatarName, Long userId);
 
 
-    @Query(value = "SELECT * FROM USERS WHERE ACTIVATION_CODE = :activationCode",nativeQuery = true )
+    @Query(value = "SELECT * FROM USERS WHERE ACTIVATION_CODE = :activationCode", nativeQuery = true)
     Optional<User> findByActivationCode(String activationCode);
 
     @Modifying
@@ -60,7 +68,7 @@ public interface UserRepository extends CrudRepository<User, Long>, JpaRepositor
     void updateAvatar(String username, String avatar);*/
 
 
-    @Query(value = "SELECT * FROM USERS WHERE CHANGE_PASSWORD_CODE = :changePasswordCode", nativeQuery = true )
+    @Query(value = "SELECT * FROM USERS WHERE CHANGE_PASSWORD_CODE = :changePasswordCode", nativeQuery = true)
     Optional<User> findByChangePasswordCode(String changePasswordCode);
 
 

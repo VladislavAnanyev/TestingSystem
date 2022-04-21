@@ -3,6 +3,7 @@ package com.example.mywebquizengine.Controller;
 import com.example.mywebquizengine.Model.Test.Test;
 import com.example.mywebquizengine.Model.Test.UserTestAnswer;
 import com.example.mywebquizengine.Model.User;
+import com.example.mywebquizengine.Model.dto.input.AnswerDuration;
 import com.example.mywebquizengine.Model.dto.input.UserTestAnswerRequest;
 import com.example.mywebquizengine.Model.dto.output.SendAnswerResponse;
 import com.example.mywebquizengine.Service.TestService;
@@ -112,6 +113,16 @@ public class UserAnswerController {
     @PostMapping(value = "/test/answer/update")
     public void getAnswerSession(@AuthenticationPrincipal User authUser, @Valid @RequestBody UserTestAnswerRequest request) {
         userAnswerService.updateAnswer(request.getQuizId(), request.getAnswer(), authUser.getUserId());
+        throw new ResponseStatusException(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/test/answer/duration")
+    public void updateDuration(@RequestBody AnswerDuration answerDuration) {
+        userAnswerService.updateDuration(
+                answerDuration.getAnswerSessionId(),
+                answerDuration.getQuizId(),
+                answerDuration.getDuration()
+        );
         throw new ResponseStatusException(HttpStatus.OK);
     }
 

@@ -5,6 +5,7 @@ import com.example.mywebquizengine.Model.Chat.Message;
 import com.example.mywebquizengine.Model.Chat.MessageStatus;
 import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.Projection.CourseView;
+import com.example.mywebquizengine.Model.Projection.UserViewForCourseInfo;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Repos.CourseRepository;
 import com.example.mywebquizengine.Repos.UserRepository;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -32,6 +32,8 @@ public class CourseService {
 
     @Value("${hostname}")
     private String hostname;
+    @Autowired
+    private MessageService messageService;
 
     public void createCourse(String name, Long userId) {
         Course course = new Course();
@@ -70,9 +72,6 @@ public class CourseService {
         } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Course not found");
     }
 
-    @Autowired
-    private MessageService messageService;
-
     @Transactional
     public void addMember(Long courseId, String email, Long userId) {
         Course course = findCourseById(courseId);
@@ -104,5 +103,12 @@ public class CourseService {
 
     public List<CourseView> getMyCourses(Long userId) {
         return courseRepository.findCourseByMembers(userId);
+    }
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<UserViewForCourseInfo> findMembersWithInfo(Long courseId) {
+        return userRepository.findMembersByCourseAndMembers(courseId);
     }
 }

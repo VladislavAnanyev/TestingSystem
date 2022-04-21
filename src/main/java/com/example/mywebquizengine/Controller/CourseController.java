@@ -29,11 +29,16 @@ public class CourseController {
     @Autowired
     private TestService testService;
 
-
     @GetMapping("/courses")
     public String getCourses(Model model) {
         model.addAttribute("courses", courseService.getAllCourses());
         return "courses";
+    }
+
+    @GetMapping("/course/{id}/info")
+    public String getInfoAboutCourse(@PathVariable Long id, Model model) {
+        model.addAttribute("members", courseService.findMembersWithInfo(id));
+        return "courseinfo";
     }
 
     @GetMapping("/course/{id}/tests")
@@ -48,29 +53,17 @@ public class CourseController {
         return "courses";
     }
 
-    @GetMapping("/course/create")
-    public String getCreateForm() {
-        return "create-course";
-    }
-
     @PostMapping("/course")
     public String createCourse(@RequestBody CreateCourseRequest courseRequest, @AuthenticationPrincipal User authUser) {
         courseService.createCourse(courseRequest.getCourseName(), authUser.getUserId());
         return "redirect:/courses";
     }
 
-    @GetMapping("/course/{id}/members/add")
-    public String addMemberToCourseView(Model model, @PathVariable Long id) {
-        model.addAttribute("courseId", id);
-        return "add-member";
-    }
-
     @PostMapping("/course/{id}/members/add")
     public void addMemberToCourse(
             @PathVariable Long id,
             @RequestBody AddMemberToCourseRequest request,
-            @AuthenticationPrincipal User authUser
-    ) {
+            @AuthenticationPrincipal User authUser) {
         courseService.addMember(id, request.getEmail(), authUser.getUserId());
         throw new ResponseStatusException(HttpStatus.OK);
     }

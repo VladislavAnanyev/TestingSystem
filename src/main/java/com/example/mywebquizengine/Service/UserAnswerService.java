@@ -1,6 +1,8 @@
 package com.example.mywebquizengine.Service;
 
 
+import com.example.mywebquizengine.Model.Projection.AnswerViewForInfo;
+import com.example.mywebquizengine.Model.Projection.UserTestAnswerView;
 import com.example.mywebquizengine.Model.Test.*;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.output.SendAnswerResponse;
@@ -9,10 +11,6 @@ import com.example.mywebquizengine.Repos.UserTestAnswerRepository;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,9 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.math.BigInteger;
-import java.security.Principal;
 import java.util.Calendar;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
@@ -49,10 +47,9 @@ public class UserAnswerService {
 
     @Autowired
     private UserService userService;
-
-    /*public UserTestAnswer findLastUserTestAnswer(JobDataMap jobDataMap) {
-        return userTestAnswerRepository.findLastUserAnswerEager(jobDataMap.getString("username")).get();
-    }*/
+    
+    @Autowired
+    private CourseService courseService;
 
     public UserTestAnswer findByUserAnswerId(Long userAnswerId) {
 
@@ -69,9 +66,9 @@ public class UserAnswerService {
         lastUserAnswer.setPercent(userTestAnswer.getPercent());
     }
 
-    public Page<UserTestAnswer> getPageAnswersById(Long id, Integer page, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return userTestAnswerRepository.getAnswersOnMyQuiz(id, paging);
+    public List<AnswerViewForInfo> getPageAnswersById(Long id) {
+        //Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
+        return userTestAnswerRepository.getAnswersOnMyQuiz(id);
     }
 
     @Transactional
@@ -84,13 +81,10 @@ public class UserAnswerService {
     public Map<BigInteger, Double> getAnswerStats(Long id) {
 
         Test test = testService.findTest(id);
-        ArrayList<Long> list = new ArrayList<>();
-
-        for (Quiz quiz : test.getQuizzes()) {
-            list.add(quiz.getQuizId());
-        }
+        ArrayList<Long> list = test.getQuizzes().stream().map(Quiz::getQuizId).collect(Collectors.toCollection(ArrayList::new));
 
         List<Object[]> result = userQuizAnswerRepository.getAnswerStat(list);
+        System.out.println(list);
         Map<BigInteger, Double> map = null;
         if (result != null && !result.isEmpty()) {
             map = new HashMap<>();
@@ -100,6 +94,14 @@ public class UserAnswerService {
         }
         return map;
 
+    }
+
+    /*public List<AnswerStat> getAnswerStat(Long id) {
+        return userTestAnswerRepository.getAnswerStat(id);
+    }*/
+
+    public List<UserTestAnswerView> getAnswerStat(Long id) {
+        return userTestAnswerRepository.findAllByTestTestIdAndPercentIsNotNull(id);
     }
 
     public Double getStatistics(Integer id, Integer answer) {
@@ -116,10 +118,7 @@ public class UserAnswerService {
 
     public UserTestAnswer checkLastComplete(User user, Long id) {
         Optional<UserTestAnswer> lastUserTestAnswer = userTestAnswerRepository.findLastUserTestAnswer(user.getUserId(), id);
-        if (lastUserTestAnswer.isPresent()) {
-            return lastUserTestAnswer.get();
-        } else return null;
-
+        return lastUserTestAnswer.orElse(null);
     }
 
     public boolean checkComplete(Long testId) {
@@ -128,15 +127,15 @@ public class UserAnswerService {
         return countComplete >= 1;
     }
 
-    @Autowired
-    private CourseService courseService;
-
-    public Integer getPercentageOfComplete(Long courseId) {
+    public Integer getPercentageOfComplete(Long courseId, Long userId) {
+        if (userId == null) {
+            userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
+        }
         int size = courseService.findCourseById(courseId).getTests().size();
         if (size == 0) {
             return 0;
         } else {
-            return userTestAnswerRepository.getPercentageOfComplete(courseId);
+            return userTestAnswerRepository.getPercentageOfComplete(courseId, userId);
         }
     }
 
@@ -173,19 +172,24 @@ public class UserAnswerService {
         int trueAnswers = 0;
 
         for (int i = 0; i < test.getQuizzes().size(); i++) {
-            UserQuizAnswer quizAnswer = new UserQuizAnswer();
+
+            UserQuizAnswer quizAnswer = null;
+            for (UserQuizAnswer userQuizAnswer : userTestAnswer.getUserQuizAnswers()) {
+                if (userQuizAnswer.getQuiz().getQuizId().equals(test.getQuizzes().get(i).getQuizId())) {
+                    quizAnswer = userQuizAnswer;
+                }
+            }
+
             AnswerChecker answerChecker = new AnswerChecker();
 
             Quiz quiz = quizService.findQuiz(test.getQuizzes().get(i).getQuizId());
             answerChecker.quiz = quiz;
 
             if (quiz instanceof MultipleAnswerQuiz) {
-                quizAnswer = new MultipleUserAnswerQuiz();
                 MultipleUserAnswerQuiz userQuizAnswer = (MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i);
                 answerChecker.checkAnswer(userQuizAnswer);
                 ((MultipleUserAnswerQuiz) quizAnswer).setAnswer(((MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
             } else if (quiz instanceof StringAnswerQuiz) {
-                quizAnswer = new StringUserAnswerQuiz();
                 List<UserQuizAnswer> answers = userTestAnswer.getUserQuizAnswers();
                 if (answers == null) {
                     StringUserAnswerQuiz answerQuiz = new StringUserAnswerQuiz();
@@ -196,7 +200,6 @@ public class UserAnswerService {
                 }
                 ((StringUserAnswerQuiz) quizAnswer).setAnswer(((StringUserAnswerQuiz) answers.get(i)).getAnswer());
             } else if (quiz instanceof MapAnswerQuiz) {
-                quizAnswer = new MapUserAnswerQuiz();
                 MapUserAnswerQuiz mapUserAnswerQuiz = (MapUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i);
                 answerChecker.checkAnswer(mapUserAnswerQuiz);
                 ((MapUserAnswerQuiz) quizAnswer).setAnswer(((MapUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
@@ -249,9 +252,7 @@ public class UserAnswerService {
             }
         }
 
-        UserQuizAnswer userQuizAnswer;
-        if (userQuizAnswerId != null) {
-            userQuizAnswer = userQuizAnswerRepository.findById(userQuizAnswerId).get();
+        UserQuizAnswer userQuizAnswer = userQuizAnswerRepository.findById(userQuizAnswerId).get();
             if (quiz instanceof MultipleAnswerQuiz) {
                 ((MultipleUserAnswerQuiz) userQuizAnswer).setAnswer((List<Integer>) answer);
             } else if (quiz instanceof StringAnswerQuiz) {
@@ -259,30 +260,6 @@ public class UserAnswerService {
             } else if (quiz instanceof MapAnswerQuiz) {
                 ((MapUserAnswerQuiz) userQuizAnswer).setAnswer((HashMap<String, String>) answer);
             }
-        } else {
-            if (quiz instanceof MultipleAnswerQuiz) {
-                MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
-                multipleUserAnswerQuiz.setQuiz(quiz);
-                multipleUserAnswerQuiz.setAnswer((List<Integer>) answer);
-
-                userQuizAnswer = multipleUserAnswerQuiz;
-                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
-            } else if (quiz instanceof StringAnswerQuiz) {
-                StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
-                stringUserAnswerQuiz.setQuiz(quiz);
-                stringUserAnswerQuiz.setAnswer((String) answer);
-
-                userQuizAnswer = stringUserAnswerQuiz;
-                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
-            } else if (quiz instanceof MapAnswerQuiz) {
-                MapUserAnswerQuiz mapUserAnswerQuiz = new MapUserAnswerQuiz();
-                mapUserAnswerQuiz.setQuiz(quiz);
-                mapUserAnswerQuiz.setAnswer((HashMap<String, String>) answer);
-
-                userQuizAnswer = mapUserAnswerQuiz;
-                lastUserAnswer.addUserQuizAnswer(userQuizAnswer);
-            }
-        }
 
         userTestAnswerRepository.save(lastUserAnswer);
     }
@@ -301,6 +278,27 @@ public class UserAnswerService {
                 userTestAnswer.setStartAt(calendar);
                 userTestAnswer.setTest(testService.findTest(testId));
                 userTestAnswer.setUser(userService.loadUserByUserIdProxy(userId));
+                for (Quiz quiz : userTestAnswer.getTest().getQuizzes()) {
+                    UserQuizAnswer userQuizAnswer = new UserQuizAnswer();
+                    userQuizAnswer.setQuiz(quiz);
+                    userQuizAnswer.setDuration(0.0);
+
+                    if (quiz instanceof MultipleAnswerQuiz) {
+                        MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
+                        multipleUserAnswerQuiz.setQuiz(quiz);
+                        userQuizAnswer = multipleUserAnswerQuiz;
+                    } else if (quiz instanceof StringAnswerQuiz) {
+                        StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
+                        stringUserAnswerQuiz.setQuiz(quiz);
+                        userQuizAnswer = stringUserAnswerQuiz;
+                    } else if (quiz instanceof MapAnswerQuiz) {
+                        MapUserAnswerQuiz mapUserAnswerQuiz = new MapUserAnswerQuiz();
+                        mapUserAnswerQuiz.setQuiz(quiz);
+                        userQuizAnswer = mapUserAnswerQuiz;
+                    }
+
+                    userTestAnswer.addUserQuizAnswer(userQuizAnswer);
+                }
                 saveStartAnswer(userTestAnswer);
 
                 if (test.getDuration() != null) {
@@ -352,5 +350,20 @@ public class UserAnswerService {
         } else return "redirect:/courses";
 
         return "redirect:/test/" + test.getTestId() + "/" + userTestAnswer.getUserAnswerId() + "/solve/";
+    }
+
+    @Transactional
+    public void updateDuration(Long answerSessionId, Long quizId, Double duration) {
+
+        Optional<UserTestAnswer> answerOptional = userTestAnswerRepository.findById(answerSessionId);
+        if (answerOptional.isPresent()) {
+            UserTestAnswer userTestAnswer = answerOptional.get();
+            for (UserQuizAnswer userQuizAnswer : userTestAnswer.getUserQuizAnswers()) {
+                if (userQuizAnswer.getQuiz().getQuizId().equals(quizId)) {
+                    userQuizAnswer.addDuration(duration);
+                }
+            }
+
+        }
     }
 }

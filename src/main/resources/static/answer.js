@@ -2,6 +2,9 @@
 
 function f(id) {
     //let answer = $('input[name=check]:checked')
+
+    scrollListener()
+
     let arr2 = [];
 
     let answerId = document.getElementById("useranswerid");

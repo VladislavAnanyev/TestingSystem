@@ -84,7 +84,7 @@ public class Course {
 
     public void addMember(User user) {
         this.members.add(user);
-       // user.getC.add(this);
+        user.getCourses().add(this);
     }
 
 }

@@ -54,7 +54,7 @@ public class ChatController {
 
     @PostMapping(path = "/checkdialog")
     @ResponseBody
-    @PreAuthorize(value = "!#user.userId.equals(#user.userId)")
+    @PreAuthorize(value = "!#user.userId.equals(#authUser.userId)")
     public Long checkDialog(@RequestBody User user, @AuthenticationPrincipal User authUser) {
 
         return messageService.checkDialog(user.getUserId(), authUser.getUserId());

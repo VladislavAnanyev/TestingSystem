@@ -1,5 +1,5 @@
 function addCourse() {
-    let name = document.getElementById("description validationDefault01");
+    let name = document.getElementById("course-name");
     let json = {
         courseName: name.value
     }
@@ -17,36 +17,30 @@ function addCourse() {
 
             div.innerText = 'Успешно!';
 
-            let div2 = document.getElementById("checkForm0");
-            //document.body.append(div);
+            /*let div2 = document.getElementById("checkForm0");
             div2.before(div);
 
             setTimeout(() => $(div).slideUp('slow', function () {
-                    //button.disabled = false;
                     $(this).remove();
-                    //button.disabled = false;
 
                 }
-            ), 3000);
+            ), 3000);*/
 
         } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
-            let div = document.createElement("div");
+            /*let div = document.createElement("div");
             div.setAttribute('class', 'alert alert-danger');
             div.setAttribute('role', 'alert');
 
             div.innerText = 'Ошибка!';
 
             let div2 = document.getElementById("checkForm0");
-            //document.body.append(div);
             div2.before(div);
 
             setTimeout(() => $(div).slideUp('slow', function () {
-                    //button.disabled = false;
                     $(this).remove();
-                    //button.disabled = false;
 
                 }
-            ), 3000);
+            ), 3000);*/
         }
     };
     xhr.send(JSON.stringify(json))

@@ -7,6 +7,6 @@ public interface CourseView {
     String getName();
     String getImage();
     Long getOwnerUserId();
-    @Value("#{@userAnswerService.getPercentageOfComplete(target.courseId)}")
+    @Value("#{@userAnswerService.getPercentageOfComplete(target.courseId, null)}")
     Integer getPercentageOfComplete();
 }

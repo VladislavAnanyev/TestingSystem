@@ -40,9 +40,9 @@
                                                 </div>
                                             </div>
 
-                                            <input type="text" class="form-control form-control-lg ps-0"
-                                                   placeholder="Search messages or users"
-                                                   aria-label="Search for messages or users...">
+                                            <input disabled type="text" class="form-control form-control-lg ps-0"
+                                                   placeholder="Поиск сообщений или пользователей"
+                                                   aria-label="Поиск сообщений или пользователей...">
                                         </div>
                                     </form>
                                 </div>
@@ -214,7 +214,7 @@
                                                     <div class="col-auto">
                                                         <div class="avatar ">
 
-                                                            <img class="avatar-img" src="assets/img/avatars/6.jpg"
+                                                            <img class="avatar-img" <#--src="/6.jpg"-->
                                                                  alt="">
 
 
@@ -250,7 +250,7 @@
                                                     <div class="col-auto">
                                                         <div class="avatar ">
 
-                                                            <img class="avatar-img" src="assets/img/avatars/5.jpg"
+                                                            <img class="avatar-img" <#--src="/6.jpg"-->
                                                                  alt="">
 
 
@@ -315,7 +315,7 @@
                                                     <div class="col-auto">
                                                         <div class="avatar avatar-online">
 
-                                                            <img class="avatar-img" src="assets/img/avatars/8.jpg"
+                                                            <img class="avatar-img" <#--src="/6.jpg"-->
                                                                  alt="">
 
 
@@ -380,7 +380,7 @@
                                                     <div class="col-auto">
                                                         <div class="avatar ">
 
-                                                            <img class="avatar-img" src="assets/img/avatars/11.jpg"
+                                                            <img class="avatar-img" <#--src="/6.jpg"-->
                                                                  alt="">
 
 
@@ -451,7 +451,7 @@
                                                     <div class="col-auto">
                                                         <div class="avatar ">
 
-                                                            <img class="avatar-img" src="assets/img/avatars/4.jpg"
+                                                            <img class="avatar-img" <#--src="/6.jpg"-->
                                                                  alt="">
 
 
@@ -481,7 +481,7 @@
                                                     <div class="col-auto">
                                                         <div class="avatar avatar-online">
 
-                                                            <img class="avatar-img" src="assets/img/avatars/7.jpg"
+                                                            <img class="avatar-img" <#--src="/6.jpg"-->
                                                                  alt="">
 
 
@@ -557,8 +557,8 @@
                                         </div>
 
                                         <input type="text" class="form-control form-control-lg ps-0"
-                                               placeholder="Search messages or users"
-                                               aria-label="Search for messages or users...">
+                                               placeholder="Поиск сообщений или пользователей"
+                                               aria-label="Поиск сообщений или пользователей...">
                                     </div>
                                 </form>
 
@@ -597,7 +597,7 @@
                                             <div class="col-auto">
                                                 <a href="#" class="avatar ">
 
-                                                    <img class="avatar-img" src="assets/img/avatars/6.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                                 </a>
@@ -657,7 +657,7 @@
                                             <div class="col-auto">
                                                 <a href="#" class="avatar ">
 
-                                                    <img class="avatar-img" src="assets/img/avatars/5.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                                 </a>
@@ -771,7 +771,7 @@
                                             <div class="col-auto">
                                                 <a href="#" class="avatar avatar-online">
 
-                                                    <img class="avatar-img" src="assets/img/avatars/8.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                                 </a>
@@ -885,7 +885,7 @@
                                             <div class="col-auto">
                                                 <a href="#" class="avatar ">
 
-                                                    <img class="avatar-img" src="assets/img/avatars/11.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                                 </a>
@@ -1005,7 +1005,7 @@
                                             <div class="col-auto">
                                                 <a href="#" class="avatar ">
 
-                                                    <img class="avatar-img" src="assets/img/avatars/4.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                                 </a>
@@ -1059,7 +1059,7 @@
                                             <div class="col-auto">
                                                 <a href="#" class="avatar avatar-online">
 
-                                                    <img class="avatar-img" src="assets/img/avatars/7.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                                 </a>
@@ -1121,7 +1121,7 @@
                         <div class="container py-8">
                             <!-- Title -->
                             <div class="mb-8">
-                                <h2 class="fw-bold m-0">Chats</h2>
+                                <h2 class="fw-bold m-0">Сообщения</h2>
                             </div>
 
                             <!-- Search -->
@@ -1141,8 +1141,8 @@
                                         </div>
 
                                         <input type="text" class="form-control form-control-lg ps-0"
-                                               placeholder="Search messages or users"
-                                               aria-label="Search for messages or users...">
+                                               placeholder="Поиск сообщений или пользователей"
+                                               aria-label="Поиск сообщений или пользователей...">
                                     </div>
                                 </form>
                             </div>
@@ -1220,8 +1220,8 @@
                                         </div>
 
                                         <input type="text" class="form-control form-control-lg ps-0"
-                                               placeholder="Search messages or users"
-                                               aria-label="Search for messages or users...">
+                                               placeholder="Поиск сообщений или пользователей"
+                                               aria-label="Поиск сообщений или пользователей...">
                                     </div>
                                 </form>
                             </div>
@@ -1244,7 +1244,7 @@
                                             <div class="col-auto">
                                                 <!-- Avatar -->
                                                 <a href="#" class="avatar">
-                                                    <img class="avatar-img" src="assets/img/avatars/11.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
                                                     <div class="badge badge-circle bg-primary border-outline position-absolute bottom-0 end-0">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -1484,7 +1484,7 @@
                                             <div class="col-auto">
                                                 <!-- Avatar -->
                                                 <a href="#" class="avatar">
-                                                    <img class="avatar-img" src="assets/img/avatars/7.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
                                                     <div class="badge badge-circle bg-primary border-outline position-absolute bottom-0 end-0">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -1547,7 +1547,7 @@
                                             <div class="col-auto">
                                                 <!-- Avatar -->
                                                 <a href="#" class="avatar">
-                                                    <img class="avatar-img" src="assets/img/avatars/9.jpg" alt="">
+                                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
                                                     <div class="badge badge-circle bg-primary border-outline position-absolute bottom-0 end-0">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -1705,8 +1705,8 @@
                                         </div>
 
                                         <input type="text" class="form-control form-control-lg ps-0"
-                                               placeholder="Search messages or users"
-                                               aria-label="Search for messages or users...">
+                                               placeholder="Поиск сообщений или пользователей"
+                                               aria-label="Поиск сообщений или пользователей...">
                                     </div>
                                 </form>
                             </div>
@@ -1761,7 +1761,7 @@
                                 </div>
 
                                 <div class="card border-0">
-                                    <img src="assets/img/demos/light.jpg" class="card-img-top" alt="...">
+                                    <img <#--src="/demos/light.jpg"--> class="card-img-top" alt="...">
                                     <div class="card-body">
                                         <div class="row align-items-center gx-0">
                                             <div class="col">
@@ -1785,7 +1785,7 @@
                                 </div>
 
                                 <div class="card border-0">
-                                    <img src="assets/img/demos/dark.jpg" class="card-img-top" alt="...">
+                                    <img <#--src="/demos/dark.jpg"--> class="card-img-top" alt="...">
                                     <div class="card-body">
                                         <div class="row align-items-center gx-0">
                                             <div class="col">
@@ -1942,8 +1942,8 @@
                                         </div>
 
                                         <input type="text" class="form-control form-control-lg ps-0"
-                                               placeholder="Search messages or users"
-                                               aria-label="Search for messages or users...">
+                                               placeholder="Поиск сообщений или пользователей"
+                                               aria-label="Поиск сообщений или пользователей...">
                                     </div>
                                 </form>
                             </div>
@@ -1954,7 +1954,7 @@
                                     <div class="row align-items-center gx-5">
                                         <div class="col-auto">
                                             <div class="avatar">
-                                                <img src="assets/img/avatars/1.jpg" alt="#" class="avatar-img">
+                                                <img <#--src="/6.jpg"--> alt="#" class="avatar-img">
 
                                                 <div class="badge badge-circle bg-secondary border-outline position-absolute bottom-0 end-0">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -2436,6 +2436,7 @@
     <!-- Chat -->
     <main class="main is-visible" data-dropzone-area="">
         <#if messages??>
+            <#if messages[0]??>
             <div class="container h-100">
 
                 <div class="d-flex flex-column h-100 position-relative">
@@ -2849,7 +2850,7 @@
                 </div>
 
             </div>
-
+            </#if>
         <#else >
             <div class="container h-100">
 
@@ -2959,7 +2960,7 @@
                     <div class="row gy-6">
                         <div class="col-12">
                             <div class="avatar avatar-xl mx-auto">
-                                <img src="assets/img/avatars/bootstrap.svg" alt="#" class="avatar-img">
+                                <img src="/bootstrap.svg" alt="#" class="avatar-img">
                             </div>
                         </div>
 
@@ -3007,7 +3008,7 @@
                                     <!-- Avatar -->
                                     <div class="col-auto">
                                         <a href="#" class="avatar avatar-online">
-                                            <img class="avatar-img" src="assets/img/avatars/1.jpg" alt="">
+                                            <img class="avatar-img" <#--src="/6.jpg"--> alt="">
                                         </a>
                                     </div>
                                     <!-- Avatar -->
@@ -3106,7 +3107,7 @@
                                     <!-- Avatar -->
                                     <div class="col-auto">
                                         <a href="#" class="avatar avatar-online">
-                                            <img class="avatar-img" src="assets/img/avatars/11.jpg" alt="">
+                                            <img class="avatar-img" <#--src="/6.jpg"--> alt="">
                                         </a>
                                     </div>
                                     <!-- Avatar -->
@@ -3199,7 +3200,7 @@
                                     <!-- Avatar -->
                                     <div class="col-auto">
                                         <a href="#" class="avatar">
-                                            <img class="avatar-img" src="assets/img/avatars/6.jpg" alt="">
+                                            <img class="avatar-img" <#--src="/6.jpg"--> alt="">
                                         </a>
                                     </div>
                                     <!-- Avatar -->
@@ -3292,7 +3293,7 @@
                                     <!-- Avatar -->
                                     <div class="col-auto">
                                         <a href="#" class="avatar">
-                                            <img class="avatar-img" src="assets/img/avatars/8.jpg" alt="">
+                                            <img class="avatar-img" <#--src="/6.jpg"--> alt="">
                                         </a>
                                     </div>
                                     <!-- Avatar -->
@@ -3481,64 +3482,64 @@
                         <div class="row row-cols-3 g-3 py-6">
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-1.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/1.jpg" alt="">
+                                  >
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-2.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/2.jpg" alt="">
+                                   data-theme-img-url="/media-2.jpg">
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-3.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/3.jpg" alt="">
+                                   data-theme-img-url="/media-3.jpg">
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-1.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/4.jpg" alt="">
+                                   >
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-2.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/5.jpg" alt="">
+                                   data-theme-img-url="/media-2.jpg">
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-3.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/6.jpg" alt="">
+                                   data-theme-img-url="/media-3.jpg">
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-1.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/7.jpg" alt="">
+                                   >
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-2.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/8.jpg" alt="">
+                                   data-theme-img-url="/media-2.jpg">
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
 
                             <div class="col">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modal-media-preview"
-                                   data-theme-img-url="assets/img/chat/media-3.jpg">
-                                    <img class="img-fluid rounded" src="assets/img/chat/9.jpg" alt="">
+                                   data-theme-img-url="/media-3.jpg">
+                                    <img class="img-fluid rounded" <#--src="/6.jpg"--> alt="">
                                 </a>
                             </div>
                         </div>
@@ -3556,7 +3557,7 @@
                                     <div class="col-auto">
                                         <div class="avatar-group">
                                             <a href="#" class="avatar avatar-sm">
-                                                <img src="assets/img/avatars/6.jpg" class="avatar-img" alt="#">
+                                                <img <#--src="/6.jpg"--> class="avatar-img" alt="#">
                                             </a>
 
                                             <a href="#" class="avatar avatar-sm">
@@ -3681,7 +3682,7 @@
                                     <div class="col-auto">
                                         <div class="avatar-group">
                                             <a href="#" class="avatar avatar-sm">
-                                                <img class="avatar-img" src="assets/img/avatars/6.jpg" alt="#">
+                                                <img class="avatar-img" <#--src="/6.jpg"--> alt="#">
                                             </a>
 
                                             <a href="#" class="avatar avatar-sm">
@@ -3814,7 +3815,7 @@
                                     <div class="col-auto">
                                         <div class="avatar-group">
                                             <a href="#" class="avatar avatar-sm">
-                                                <img class="avatar-img" src="assets/img/avatars/5.jpg" alt="#">
+                                                <img class="avatar-img" <#--src="/6.jpg"--> alt="#">
                                             </a>
 
                                             <a href="#" class="avatar avatar-sm">
@@ -3939,7 +3940,7 @@
                                     <div class="col-auto">
                                         <div class="avatar-group">
                                             <a href="#" class="avatar avatar-sm">
-                                                <img class="avatar-img" src="assets/img/avatars/11.jpg" alt="#">
+                                                <img class="avatar-img" <#--src="/6.jpg"--> alt="#">
                                             </a>
 
                                             <a href="#" class="avatar avatar-sm">
@@ -4072,7 +4073,7 @@
                                     <div class="col-auto">
                                         <div class="avatar-group">
                                             <a href="#" class="avatar avatar-sm">
-                                                <img class="avatar-img" src="assets/img/avatars/3.jpg" alt="#">
+                                                <img class="avatar-img" <#--src="/6.jpg"--> alt="#">
                                             </a>
 
                                             <a href="#" class="avatar avatar-sm">
@@ -4265,7 +4266,7 @@
                             <div class="col-auto">
                                 <div class="avatar ">
 
-                                    <img class="avatar-img" src="assets/img/avatars/6.jpg" alt="">
+                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                 </div>
@@ -4293,7 +4294,7 @@
                             <div class="col-auto">
                                 <div class="avatar ">
 
-                                    <img class="avatar-img" src="assets/img/avatars/5.jpg" alt="">
+                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                 </div>
@@ -4345,7 +4346,7 @@
                             <div class="col-auto">
                                 <div class="avatar avatar-online">
 
-                                    <img class="avatar-img" src="assets/img/avatars/8.jpg" alt="">
+                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                 </div>
@@ -4373,7 +4374,7 @@
                             <div class="col-auto">
                                 <div class="avatar ">
 
-                                    <img class="avatar-img" src="assets/img/avatars/11.jpg" alt="">
+                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                 </div>
@@ -4477,7 +4478,7 @@
                             <div class="col-auto">
                                 <div class="avatar ">
 
-                                    <img class="avatar-img" src="assets/img/avatars/4.jpg" alt="">
+                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                 </div>
@@ -4501,7 +4502,7 @@
                             <div class="col-auto">
                                 <div class="avatar avatar-online">
 
-                                    <img class="avatar-img" src="assets/img/avatars/7.jpg" alt="">
+                                    <img class="avatar-img" <#--src="/6.jpg"--> alt="">
 
 
                                 </div>
@@ -4707,7 +4708,7 @@
 
                         <div class="profile-body">
                             <div class="avatar avatar-xl">
-                                <img class="avatar-img" src="./assets/img/avatars/1.jpg" alt="#">
+                                <img class="avatar-img" <#--src=""--> alt="#">
                             </div>
 
                             <h4 class="mb-1">William Wright</h4>
@@ -4867,7 +4868,7 @@
 
                         <div class="profile-body">
                             <div class="avatar avatar-xl">
-                                <img class="avatar-img" src="./assets/img/avatars/9.jpg" alt="#">
+                                <img class="avatar-img" <#--src=".//9.jpg"--> alt="#">
 
                                 <a href="#"
                                    class="badge badge-lg badge-circle bg-primary text-white border-outline position-absolute bottom-0 end-0">

@@ -31,7 +31,7 @@ public class Quiz {
     @JoinColumn(name = "test_id")
     private Test test;
 
-    @OneToMany(mappedBy = "quiz", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserQuizAnswer> userQuizAnswers;
 
     public Quiz() {}

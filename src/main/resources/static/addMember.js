@@ -1,12 +1,13 @@
 function addMember() {
     let xhr = new XMLHttpRequest();
     let courseId = document.getElementById("courseId").value
-    let email = document.getElementById("exampleInputEmail1").value
+    let email = document.getElementById("invite-email").value
     let json = {
         courseId: courseId,
         email: email
     }
 
+    console.log(json)
     xhr.open('POST', '/course/' + courseId + "/members/add");
     xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
     xhr.onreadystatechange = function () {

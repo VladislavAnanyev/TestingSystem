@@ -31,6 +31,8 @@ public interface UserQuizAnswerRepository extends CrudRepository<UserQuizAnswer,
     List<Object[]> getAnswerStat(ArrayList<Long> quizzes);
 
 
+
+
     String query = """
                SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB"
                WHERE "CITY" = 'INDIANAPOLIS'

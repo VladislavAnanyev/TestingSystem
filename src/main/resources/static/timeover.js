@@ -64,7 +64,7 @@ function onError(error) {
     connectingElement.style.color = 'red';*/
     console.log("fail")
 
-    //connect()
+    connect()
     console.log("try")
 }
 

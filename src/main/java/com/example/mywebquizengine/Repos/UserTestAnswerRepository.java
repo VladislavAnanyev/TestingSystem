@@ -1,8 +1,8 @@
 package com.example.mywebquizengine.Repos;
 
+import com.example.mywebquizengine.Model.Projection.UserTestAnswerView;
+import com.example.mywebquizengine.Model.Projection.AnswerViewForInfo;
 import com.example.mywebquizengine.Model.Test.UserTestAnswer;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -17,8 +17,12 @@ public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer,
         PagingAndSortingRepository<UserTestAnswer, Long>, JpaRepository<UserTestAnswer, Long> {
 
 
-    @Query(value = "SELECT * FROM USER_TEST_ANSWERS u WHERE TEST_ID = :id and COMPLETED_AT is not null", nativeQuery = true)
-    Page<UserTestAnswer> getAnswersOnMyQuiz(Long id, Pageable paging);
+    @Query(value = "select u.EMAIL, u.FIRST_NAME as firstName, u.LAST_NAME as lastName, A.USER_ANSWER_ID as userAnswerId, A.COMPLETED_AT as completedAt, A.PERCENT, A.START_AT as startAt, A.TEST_ID, A.USER_ID as userId \n" +
+            "from USERS u join USER_TEST_ANSWERS A on (select top 1 uta.USER_ANSWER_ID\n" +
+            "                                             from USER_TEST_ANSWERS uta\n" +
+            "                                             where uta.USER_ID = U.USER_ID and TEST_ID = :id order by PERCENT desc)\n" +
+            "                                             = A.USER_ANSWER_ID", nativeQuery = true)
+    List<AnswerViewForInfo> getAnswersOnMyQuiz(Long id);
 
     @Query(value = "SELECT USER_ANSWER_ID FROM USER_TEST_ANSWERS u WHERE TEST_ID = :id", nativeQuery = true)
     List<Long> getUserAnswersById(Long id);
@@ -46,13 +50,27 @@ public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer,
                                      FROM USER_TEST_ANSWERS
                                               JOIN TESTS T on T.TEST_ID = USER_TEST_ANSWERS.TEST_ID
                                               JOIN COURSES C on C.COURSE_ID = T.COURSE_ID
-                                     WHERE PERCENT >= 80) as success) / CAST (COUNT(*) + 0.001 as float) * 100)
+                                     WHERE PERCENT >= 80 and c.OWNER_USER_ID =:userId) as success) / CAST (COUNT(*) + 0.001 as float) * 100)
             FROM TESTS WHERE COURSE_ID =:courseId
             """)
-    Integer getPercentageOfComplete(Long courseId);
+    Integer getPercentageOfComplete(Long courseId, Long userId);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(*) FROM USER_TEST_ANSWERS WHERE TEST_ID =:testId AND USER_ID =:userId
             """)
     Integer getUserAttempts(Long testId, Long userId);
+
+    @Query(nativeQuery = true, value = """
+SELECT FIRST_NAME as firstName, LAST_NAME as lastName, UQA.STATUS,
+       PERCENT, USER_TEST_ANSWERS.USER_ANSWER_ID as answerId
+FROM USER_TEST_ANSWERS
+JOIN USER_QUIZ_ANSWERS UQA on USER_TEST_ANSWERS.USER_ANSWER_ID = UQA.USER_ANSWER_ID
+JOIN USERS U on U.USER_ID = USER_TEST_ANSWERS.USER_ID
+WHERE PERCENT IS NOT NULL and TEST_ID =:testId
+
+""")
+    List<UserTestAnswerView> getAnswerStat(Long testId);
+
+    List<UserTestAnswerView> findAllByTestTestIdAndPercentIsNotNull(Long testId);
+
 }

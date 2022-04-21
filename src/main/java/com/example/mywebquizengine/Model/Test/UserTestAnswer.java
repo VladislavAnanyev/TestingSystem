@@ -1,8 +1,11 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.example.mywebquizengine.Model.User;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -17,10 +20,9 @@ public class UserTestAnswer {
     @JoinColumn(name = "user_id")
     private User user;
 
-    //@OnDelete(action = OnDeleteAction.CASCADE)
     @OrderBy(value = "quiz.quizId")
-    @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<UserQuizAnswer> userQuizAnswers;
+    @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "test_id")

@@ -4974,7 +4974,7 @@ textarea.form-control-lg {
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
     color: #293951;
-    background-color: #fff
+    background-color: #ffffff
 }
 
 .nav-fill .nav-item, .nav-fill > .nav-link {
@@ -21023,7 +21023,7 @@ textarea.form-control-lg {
 
 .nav-pills .nav-link.active {
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .05)
+    box-shadow: 0 1px 7px rgb(37, 76, 205)
 }
 
 body {

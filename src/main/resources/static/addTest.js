@@ -69,6 +69,9 @@ function addTest() {
             }
 
             let quiz
+            console.log(i)
+            console.log(String(Number(i+1) +'optionstest'))
+            console.log(document.getElementById(String(Number(i+1) +'optionstest')))
             if (document.getElementById(String(Number(i+1) +'optionstest')).hidden === false) {
                 quiz = {
                     type: "MULTIPLE",
