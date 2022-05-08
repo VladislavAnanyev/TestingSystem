@@ -47,7 +47,6 @@ public class ApiUserControllerTest {
     @Autowired
     private JWTUtil jwtUtil;
 
-
     @After
     public void resetDb() {
         repository.deleteAll();

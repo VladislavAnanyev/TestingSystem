@@ -39,6 +39,8 @@ public class User implements UserDetails, OAuth2User {
     @NotNull
     private String lastName;
 
+    private String groupName;
+
     @Size(min = 5)
     private String password;
     private String avatar;
@@ -98,6 +100,14 @@ public class User implements UserDetails, OAuth2User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String group) {
+        this.groupName = group;
     }
 
     public Long getUserId() {

@@ -2,9 +2,12 @@ function addMember() {
     let xhr = new XMLHttpRequest();
     let courseId = document.getElementById("courseId").value
     let email = document.getElementById("invite-email").value
+    let group = document.getElementById("invite-message").value
+
     let json = {
         courseId: courseId,
-        email: email
+        email: email,
+        group: group
     }
 
     console.log(json)

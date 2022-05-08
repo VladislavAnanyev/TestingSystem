@@ -5,7 +5,7 @@ import com.example.mywebquizengine.Model.Projection.UserCommonView;
 import java.util.Date;
 
 public interface MessageWithDialog {
-    Integer getId();
+    Integer getMessageId();
     String getContent();
     UserCommonView getSender();
     Date getTimestamp();

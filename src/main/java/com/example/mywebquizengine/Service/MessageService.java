@@ -114,7 +114,7 @@ public class MessageService {
             if (message.getSender().getUserId().equals(userId)) {
                 message.setStatus(MessageStatus.DELETED);
 
-                MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
+                MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
                 JSONObject jsonObject = (JSONObject) JSONValue
                         .parseWithException(objectMapper.writeValueAsString(messageDto));
                 jsonObject.put("type", "DELETE-MESSAGE");
@@ -160,14 +160,14 @@ public class MessageService {
 
     @Transactional
     public void editMessage(Message newMessage, Long userId) throws JsonProcessingException, ParseException {
-        Optional<Message> optionalMessage = messageRepository.findById(newMessage.getId());
+        Optional<Message> optionalMessage = messageRepository.findById(newMessage.getMessageId());
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
             if (message.getSender().getUserId().equals(userId)) {
                 message.setContent(newMessage.getContent());
                 message.setStatus(MessageStatus.EDIT);
 
-                MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
+                MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
                 JSONObject jsonObject = (JSONObject) JSONValue
                         .parseWithException(objectMapper.writeValueAsString(messageDto));
                 jsonObject.put("type", "EDIT-MESSAGE");
@@ -223,7 +223,7 @@ public class MessageService {
 
         Hibernate.initialize(dialog.getUsers());
 
-        MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
+        MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
 
         rabbitTemplate.setExchange("message-exchange");
 

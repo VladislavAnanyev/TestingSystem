@@ -12,18 +12,6 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
 
-    <link rel="stylesheet" type="text/css"
-          href="https://eduport.webestica.com/assets/vendor/font-awesome/css/all.min.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://eduport.webestica.com/assets/vendor/bootstrap-icons/bootstrap-icons.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://eduport.webestica.com/assets/vendor/choices/css/choices.min.css">
-    <link rel="stylesheet" type="text/css" href="https://eduport.webestica.com/assets/vendor/aos/aos.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://eduport.webestica.com/assets/vendor/glightbox/css/glightbox.css">
-    <link rel="stylesheet" type="text/css" href="https://eduport.webestica.com/assets/vendor/quill/css/quill.snow.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://eduport.webestica.com/assets/vendor/stepper/css/bs-stepper.min.css">
 
 
     <aside class="sidebar bg-light">
@@ -81,19 +69,6 @@
             <#--            </div>-->
         </div>
     </aside>
-
-    <!-- Bootstrap JS -->
-    <script src="https://eduport.webestica.com/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Vendors -->
-    <script src="https://eduport.webestica.com/assets/vendor/choices/js/choices.min.js"></script>
-    <script src="https://eduport.webestica.com/assets/vendor/aos/aos.js"></script>
-    <script src="https://eduport.webestica.com/assets/vendor/glightbox/js/glightbox.js"></script>
-    <script src="https://eduport.webestica.com/assets/vendor/quill/js/quill.min.js"></script>
-    <script src="https://eduport.webestica.com/assets/vendor/stepper/js/bs-stepper.min.js"></script>
-
-    <!-- Template Functions -->
-    <script src="https://eduport.webestica.com/assets/js/functions.js"></script>
 
     <main class="main is-visible">
         <div class="container h-100 mt-2 ml-2 chat-body hide-scrollbar flex-1">
@@ -196,12 +171,32 @@
                                     <label class="form-check-label" for="flexRadioDefault8">
                                         Ограничено
                                     </label>
-                                    <input type="text" id="attempts">
+                                    <input type="number" id="attempts">
                                 </div>
                                 <div>
 
                                 </div>
                             </div>
+
+                            <#--<section class="w-100 p-4 pb-4">
+                                <label class="form-label" for="customRange1">Example range</label>
+                                <div class="range">
+                                    <input type="range" class="form-range" id="customRange1">
+                                    <span class="thumb" style="left: calc(50% + 0.5px);"><span class="thumb-value">50</span></span></div>
+                            </section>-->
+
+                            <#--                            <div class="container">-->
+
+                            <div class="form-group mt-2">
+                                <label for="formControlRange">Проходной балл:
+                                    <span id="rangeval">50<!-- Default value --></span>
+                                </label>
+                                <input type="range" class="form-range" id="formControlRange"
+                                       onInput="$('#rangeval').html($(this).val())">
+
+                            </div>
+
+                            <#--                            </div>-->
 
                             <div class="mt-2">Отображать ответы пользователям
                                 <div class="form-check ml-4">
@@ -235,6 +230,7 @@
                 </div>
             </div>
 
+
             <#--<div class="chat-body hide-scrollbar flex-1 h-100">-->
 
             <div id="list-item-1" class="card mt-2 card mb-3 shadow p-3 mb-5  rounded">
@@ -243,7 +239,6 @@
 
                     <div id="1Id" class="quiz">
                         <form id="checkForm1" class="checkFormCl">
-
 
                             <div class="form-group">
                                 <label for="exampleFormControlInput1 validationDefault01">Тема</label>
@@ -259,6 +254,11 @@
                                           placeholder="Напишите здесь ваш вопрос" name="question"></textarea>
                             </div>
 
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1 validationDefault01">Файл</label>
+                                <input class="form-control" type="file" name="file1">
+
+                            </div>
 
                             <div id="chooseType1">
                                 <label for="exampleFormControlInput1 validationDefault01">Выберите тип вопроса</label>

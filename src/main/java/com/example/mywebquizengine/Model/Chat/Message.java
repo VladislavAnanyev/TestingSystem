@@ -12,7 +12,7 @@ public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private Long messageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User sender;
@@ -31,12 +31,13 @@ public class Message {
 
     @ElementCollection
     @CollectionTable(
-            name="MESSAGES_PHOTOS",
-            joinColumns=@JoinColumn(name="ID")
+            name="MESSAGES_FILES",
+            joinColumns=@JoinColumn(name="MESSAGE_ID")
     )
-    private List<MessagePhoto> photos;
+    private List<MessageFile> files;
 
     @OneToMany
+    @Column(name = "FORWARD_MESSAGE")
     private List<Message> forwardedMessages;
 
     @Transient
@@ -76,12 +77,12 @@ public class Message {
         this.status = status;
     }
 
-    public Long getId() {
-        return id;
+    public Long getMessageId() {
+        return messageId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setMessageId(Long id) {
+        this.messageId = id;
     }
 
     public Dialog getDialog() {
@@ -108,11 +109,11 @@ public class Message {
         this.uniqueCode = uniqueCode;
     }
 
-    public List<MessagePhoto> getPhotos() {
-        return photos;
+    public List<MessageFile> getFiles() {
+        return files;
     }
 
-    public void setPhotos(List<MessagePhoto> photos) {
-        this.photos = photos;
+    public void setFiles(List<MessageFile> photos) {
+        this.files = photos;
     }
 }

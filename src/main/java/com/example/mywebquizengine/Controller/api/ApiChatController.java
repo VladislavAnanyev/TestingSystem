@@ -33,14 +33,14 @@ public class ApiChatController {
         messageService.editMessage(message, authUser.getUserId());
     }
 
-    @GetMapping(path = "/messages")
+    @GetMapping(path = "/dialog/{id}")
     public DialogWithUsersViewPaging getMessages(
-            @RequestParam Long dialogId,
+            @PathVariable Long id,
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "50") Integer pageSize,
             @RequestParam(defaultValue = "timestamp") String sortBy,
             @AuthenticationPrincipal User authUser) {
-        return messageService.getMessages(dialogId, page, pageSize, sortBy, authUser.getUserId());
+        return messageService.getMessages(id, page, pageSize, sortBy, authUser.getUserId());
     }
 
     @GetMapping(path = "/dialogs")
@@ -48,7 +48,7 @@ public class ApiChatController {
         return messageService.getDialogsForApi(authUser.getUserId());
     }
 
-    @GetMapping(path = "/getDialogId")
+    @PostMapping(path = "/dialog/create")
     public Long checkDialog(@RequestParam Long userId, @AuthenticationPrincipal User authUser) {
         return messageService.checkDialog(userId, authUser.getUserId());
     }

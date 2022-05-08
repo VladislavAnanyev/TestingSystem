@@ -1,47 +1,30 @@
-package com.example.mywebquizengine.Controller;
+package com.example.mywebquizengine.Controller.api;
 
 import com.example.mywebquizengine.Model.Test.Test;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.input.CreateTestRequest;
 import com.example.mywebquizengine.Service.TestService;
-import com.example.mywebquizengine.Service.UserAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.Principal;
-import java.util.*;
+import java.util.List;
 
-@Validated
-@Controller
-@Service
-public class TestController {
+@RestController
+@RequestMapping(path = "/api")
+public class ApiTestController {
 
     @Autowired
     private TestService testService;
 
-    @GetMapping(path = "/course/{courseId}/test/create")
-    public String addTest(@PathVariable Long courseId, Model model) {
-        model.addAttribute("courseId", courseId);
-        return "addQuiz";
-    }
-
     @PostMapping(path = "/test/create", consumes = {"application/json"})
-    @ResponseBody
     public void addTest(
             @RequestBody CreateTestRequest request,
             @AuthenticationPrincipal User authUser) throws ResponseStatusException {
@@ -61,12 +44,10 @@ public class TestController {
     }
 
     @GetMapping(path = "/quizzes")
-    public String getQuizzes(Model model, @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
-                             @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(10) Integer pageSize,
-                             @RequestParam(defaultValue = "id") String sortBy) {
-        Page<Test> quizzes = testService.getAllQuizzes(page, pageSize, sortBy);
-        model.addAttribute("test", quizzes.getContent());
-        return "getAllQuiz";
+    public List<Test> getQuizzes(@RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
+                                 @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(10) Integer pageSize,
+                                 @RequestParam(defaultValue = "id") String sortBy) {
+        return testService.getAllQuizzes(page, pageSize, sortBy).getContent();
     }
 
     @DeleteMapping(path = "/quizzes/{id}")
@@ -92,6 +73,4 @@ public class TestController {
         model.addAttribute("oldTest", tempTest);
         return "updateQuiz";
     }
-
-
 }

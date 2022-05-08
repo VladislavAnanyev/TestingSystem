@@ -10,6 +10,7 @@ import com.example.mywebquizengine.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,8 @@ public class CourseController {
 
     @GetMapping("/courses")
     public String getCourses(Model model) {
-        model.addAttribute("courses", courseService.getAllCourses());
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("courses", courseService.getMyCourses(principal.getUserId()));
         return "courses";
     }
 
@@ -64,7 +66,7 @@ public class CourseController {
             @PathVariable Long id,
             @RequestBody AddMemberToCourseRequest request,
             @AuthenticationPrincipal User authUser) {
-        courseService.addMember(id, request.getEmail(), authUser.getUserId());
+        courseService.addMember(id, request.getEmail(), authUser.getUserId(), request.getGroup());
         throw new ResponseStatusException(HttpStatus.OK);
     }
 

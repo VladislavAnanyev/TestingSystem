@@ -62,10 +62,10 @@ public class ApiUserController {
     }*/
 
 
-    @PostMapping(path = "/upload")
+    /*@PostMapping(path = "/upload")
     public void uploadPhoto(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal User authUser) {
         userService.uploadPhoto(file, authUser.getUserId());
-    }
+    }*/
 
 
     @PutMapping(path = "/user", consumes={"application/json"})

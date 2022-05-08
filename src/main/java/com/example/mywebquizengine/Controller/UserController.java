@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.*;
 
@@ -24,12 +25,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ActiveUserStore activeUserStore;
-
-    @GetMapping("/reg")
+    @GetMapping("/signup")
     public String login() {
-        return "reg";
+        return "signup";
     }
 
     @GetMapping(path = "/authuser")
@@ -39,8 +37,14 @@ public class UserController {
     }
 
     @PostMapping(path = "/signup")
-    public String checkIn(RegistrationRequest request) {
-        userService.processCheckIn(request.getActivationCode(), request.getFirstName(), request.getLastName(), request.getPassword());
+    public String checkIn(@Valid RegistrationRequest request) {
+        userService.processCheckIn(request.getActivationCode(), null, request.getFirstName(), request.getLastName(), request.getPassword());
+        return "redirect:/signin";
+    }
+
+    @PostMapping(path = "/signup/admin")
+    public String signUpAdmin(@Valid AdminRegistrationRequest request) {
+        userService.processCheckIn(null, request.getEmail(), request.getFirstName(), request.getLastName(), request.getPassword());
         return "redirect:/signin";
     }
 

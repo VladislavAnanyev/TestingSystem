@@ -207,6 +207,11 @@ public class UserAnswerService {
 
             quizAnswer.setQuiz(quiz);
             quizAnswer.setStatus(answerChecker.isSuccess());
+
+            if (quizAnswer.getDuration() == null) {
+                quizAnswer.setDuration(0.0);
+            }
+
             userQuizAnswers.add(quizAnswer);
 
 
@@ -264,7 +269,7 @@ public class UserAnswerService {
         userTestAnswerRepository.save(lastUserAnswer);
     }
 
-    public String startAnswer(Long testId, String restore, Long userId) throws SchedulerException {
+    public Long startAnswer(Long testId, String restore, Long userId) throws SchedulerException {
         Test test = testService.findTest(testId);
         UserTestAnswer userTestAnswer;
         if (isAvailable(test, userId)) {
@@ -347,9 +352,9 @@ public class UserAnswerService {
                     scheduler.start();
                 }
             }
-        } else return "redirect:/courses";
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
-        return "redirect:/test/" + test.getTestId() + "/" + userTestAnswer.getUserAnswerId() + "/solve/";
+        return userTestAnswer.getUserAnswerId();
     }
 
     @Transactional

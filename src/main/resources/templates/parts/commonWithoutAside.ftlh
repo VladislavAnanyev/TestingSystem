@@ -17,8 +17,8 @@
 
         <!-- Template CSS -->
         <link rel="stylesheet" href="/static/template.bundle.css">
-<#--        <link rel="stylesheet" href="/static/template.dark.bundle.css" media="(prefers-color-scheme: dark)">-->
-<#--        <style>body {position: relative; height: 100%;}</style>-->
+        <#--        <link rel="stylesheet" href="/static/template.dark.bundle.css" media="(prefers-color-scheme: dark)">-->
+        <#--        <style>body {position: relative; height: 100%;}</style>-->
     </head>
     <#--<body>-->
     <body>
@@ -47,8 +47,8 @@
 
     <script src="/static/vendor.js"></script>
     <script src="/static/template.js"></script>
-
-
+    <input type="file" multiple="multiple" class="dz-hidden-input" tabindex="-1"
+           style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
 
     </body>
 

@@ -1,5 +1,7 @@
 package com.example.mywebquizengine.Model.dto.input;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.List;
@@ -7,19 +9,40 @@ import java.util.List;
 public class CreateTestRequest {
     private String description;
     private LocalTime duration;
-    private List<Object> quizzes;
+    private List<AddQuizRequest> quizzes;
     private Long courseId;
     private Integer attempts;
     private Calendar startAt;
     private Calendar finishAt;
     private boolean displayAnswers;
+    private Integer percent;
+
+    public Integer getPercent() {
+        return percent;
+    }
+
+    public void setPercent(Integer percent) {
+        this.percent = percent;
+    }
+
+    public LocalTime getDuration() {
+        return duration;
+    }
+
+    public Calendar getStartAt() {
+        return startAt;
+    }
 
     public Calendar getFinishAt() {
         return finishAt;
     }
 
-    public Calendar getStartAt() {
-        return startAt;
+    public Integer getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(Integer attempts) {
+        this.attempts = attempts;
     }
 
     public void setFinishAt(Calendar finishAt) {
@@ -30,20 +53,16 @@ public class CreateTestRequest {
         this.startAt = startAt;
     }
 
+    public void setDuration(LocalTime duration) {
+        this.duration = duration;
+    }
+
     public boolean isDisplayAnswers() {
         return displayAnswers;
     }
 
     public void setDisplayAnswers(boolean displayAnswers) {
         this.displayAnswers = displayAnswers;
-    }
-
-    public Integer getAttempts() {
-        return attempts;
-    }
-
-    public void setAttempts(Integer attempts) {
-        this.attempts = attempts;
     }
 
     public Long getCourseId() {
@@ -58,23 +77,15 @@ public class CreateTestRequest {
         return description;
     }
 
-    public LocalTime getDuration() {
-        return duration;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setDuration(LocalTime duration) {
-        this.duration = duration;
-    }
-
-    public List<Object> getQuizzes() {
+    public List<AddQuizRequest> getQuizzes() {
         return quizzes;
     }
 
-    public void setQuizzes(List<Object> quizzes) {
+    public void setQuizzes(List<AddQuizRequest> quizzes) {
         this.quizzes = quizzes;
     }
 }

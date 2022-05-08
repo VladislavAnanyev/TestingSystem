@@ -1,8 +1,6 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.example.mywebquizengine.Model.Course;
-import com.example.mywebquizengine.Model.User;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
@@ -40,12 +38,32 @@ public class Test {
 
     private String description;
 
+    private String fileUrl;
+
     private LocalTime duration;
+
+    private Integer passingScore;
 
     @ColumnDefault("true")
     private boolean displayAnswers;
 
     public Test() {}
+
+    public Integer getPassingScore() {
+        return passingScore;
+    }
+
+    public void setPassingScore(Integer percent) {
+        this.passingScore = percent;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
 
     public Calendar getEndTime() {
         return endTime;

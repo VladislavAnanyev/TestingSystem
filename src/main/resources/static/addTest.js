@@ -1,6 +1,6 @@
 
 
-function addTest() {
+async function addTest() {
     let quizzes_mas = [];
     let name = document.getElementById("description validationDefault01");
     let courseId = document.getElementById("courseId");
@@ -46,8 +46,11 @@ function addTest() {
             endDate = document.getElementById('endDate').value
         }
 
+
+
         for (let i = 0; i < countOfQuiz; i++) {
-            let options = document.getElementsByName(String(Number(i+1) + "options"));
+            const fileObject = document.querySelector('[name=file' + Number(i+1) + ']').files
+            let options = document.getElementsByName(String(Number(i + 1) + "options"));
             let opt_values = [];
             let answer_values = [];
             for (let j = 0; j < options.length; j++) {
@@ -62,7 +65,7 @@ function addTest() {
             console.log(answers.length)
 
             for (let i = 0; i < answers.length; i++) {
-                if(answers[i].checked) {
+                if (answers[i].checked) {
                     console.log(answers[i].value)
                     answer_values.push(answers[i].value)
                 }
@@ -70,30 +73,52 @@ function addTest() {
 
             let quiz
             console.log(i)
-            console.log(String(Number(i+1) +'optionstest'))
-            console.log(document.getElementById(String(Number(i+1) +'optionstest')))
-            if (document.getElementById(String(Number(i+1) +'optionstest')).hidden === false) {
+            console.log(String(Number(i + 1) + 'optionstest'))
+            console.log(document.getElementById(String(Number(i + 1) + 'optionstest')))
+            // let file = document.getElementsByName("file" + Number(i + 1))
+
+
+
+            let file
+            if (fileObject.length === 0) {
+                file = null
+            } else {
+
+                let bytes = String(await toBase64(fileObject[0])).replace('data:', '')
+                    .replace(/^.+,/, '');
+
+                file = {
+                    bytes: bytes,
+                    filename: fileObject[0].name
+                }
+            }
+
+
+
+            if (document.getElementById(String(Number(i + 1) + 'optionstest')).hidden === false) {
                 quiz = {
                     type: "MULTIPLE",
                     title: title[i].value,
                     text: text[i].value,
-                    options:opt_values,
+                    file: file,
+                    options: opt_values,
                     answer: answer_values
                 }
-            } else if (document.getElementById(String(Number(i+1) +'inputAnswer')).hidden === false) {
+            } else if (document.getElementById(String(Number(i + 1) + 'inputAnswer')).hidden === false) {
                 let stringAnswer = document.getElementById('stringAnswer' + Number(i + 1))
 
                 quiz = {
                     type: "STRING",
                     title: title[i].value,
                     text: text[i].value,
+                    file: file,
                     answer: stringAnswer.value
                 }
-            } else if (document.getElementById(String(Number(i+1) +'mapAnswer')).hidden === false) {
+            } else if (document.getElementById(String(Number(i + 1) + 'mapAnswer')).hidden === false) {
                 let map = new Map()
 
-                let map_keys = document.getElementsByClassName('mapkey' + Number(i+1))
-                let map_values = document.getElementsByClassName('mapvalue' + Number(i+1))
+                let map_keys = document.getElementsByClassName('mapkey' + Number(i + 1))
+                let map_values = document.getElementsByClassName('mapvalue' + Number(i + 1))
                 for (let i = 0; i < map_values.length; i++) {
                     map.set(map_keys[i].value, map_values[i].value)
                 }
@@ -104,14 +129,15 @@ function addTest() {
 
                 quiz = {
                     type: "MAP",
+                    file: file,
                     title: title[i].value,
                     text: text[i].value,
                     answer: obj
                 }
             }
 
-            console.log(String(Number(i+1) +'optionstest'))
-            console.log(document.getElementById(String(Number(i+1) +'optionstest')))
+            console.log(String(Number(i + 1) + 'optionstest'))
+            console.log(document.getElementById(String(Number(i + 1) + 'optionstest')))
 
             quizzes_mas.push(quiz)
         }
@@ -126,13 +152,31 @@ function addTest() {
             startAt: startDate,
             finishAt: endDate,
             attempts: attempts,
-            displayAnswers: viewAnswers
+            displayAnswers: viewAnswers,
+            percent: document.getElementById("rangeval").textContent
         }
 
+       /* var blob = new Blob([JSON.stringify(quizzes_mas)]);
+
+        const formData = new FormData();
+        formData.append('description', name.value)
+        formData.append('quizzes', quizzes_mas)
+        formData.append('duration', time)
+        formData.append('courseId', courseId.value)
+        formData.append('startAt', startDate)
+        formData.append('finishAt', endDate)
+        formData.append('attempts', attempts)
+        formData.append('displayAnswers', viewAnswers)
+        formData.append('image', file[0])
+
+
+        console.log(await toBase64(file[0]));
+
+        console.log(formData)*/
         console.log(json)
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', '/test/create',true);
-        xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+        xhr.open('POST', '/test/create', true);
+         xhr.setRequestHeader('Content-type','application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 
@@ -180,3 +224,10 @@ function addTest() {
     }
 
 }
+
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});

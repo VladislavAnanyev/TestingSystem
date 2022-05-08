@@ -2464,14 +2464,16 @@
                                         <div class="row align-items-center gx-5">
                                             <div class="col-auto">
                                                 <div class="avatar d-none d-xl-inline-block">
-                                                    <img class="avatar-img" src="${messages[0].sender.avatar}"
+                                                    <img class="avatar-img" src="${dialogObj.imagegf}"
                                                          alt="">
                                                 </div>
                                             </div>
 
                                             <div class="col overflow-hidden">
-                                                <h5 class="text-truncate">${messages[0].sender.firstName} ${messages[0].sender.lastName}</h5>
-                                                <p class="text-truncate">В сети</p>
+<#--                                                <h5 class="text-truncate">${messages[0].sender.firstName} ${messages[0].sender.lastName}</h5>-->
+<#--                                                <p class="text-truncate">В сети</p>-->
+                                                    <h5 class="text-truncate">Список сообщений</h5>
+
                                             </div>
                                         </div>
                                     </div>
@@ -2812,7 +2814,7 @@
 
                                 <div class="col">
                                     <div class="input-group">
-                                        <textarea id="inputtextarea" class="form-control px-0" placeholder="Type your message..." rows="1"
+                                        <textarea id="inputtextarea" class="form-control px-0" placeholder="Введите сообщение" rows="1"
                                                   data-emoji-input="" data-autosize="true"></textarea>
 
                                         <a href="#" class="input-group-text text-body pe-0" data-emoji-btn="">
@@ -2864,7 +2866,7 @@
                             </span>
                     </div>
 
-                    <p class="text-muted">Pick a person from left menu, <br> and start your conversation.</p>
+                    <p class="text-muted">Выберите чат из меню слева<br> для дальнейшего взаимодействия</p>
                 </div>
 
             </div>

@@ -11,20 +11,20 @@
                         <div class="row g-6">
                             <div class="col-12">
                                 <div class="text-center">
-                                    <h3 class="fw-bold mb-2">Password Reset</h3>
-                                    <p>Enter your email to reset password</p>
+                                    <h3 class="fw-bold mb-2">Восстановление пароля</h3>
+                                    <p>Введите ваш адрес электронной почты для восстановления</p>
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <div class="form-floating">
                                     <input type="email" name="email" class="form-control" id="resetpassword-email" placeholder="Email">
-                                    <label for="resetpassword-email">Email</label>
+                                    <label for="resetpassword-email">Почта</label>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <button onclick="sendEmailMsgWithoutAuth()" class="btn btn-block btn-lg btn-primary w-100" type="submit">Send Reset Link</button>
+                                <button onclick="sendEmailMsgWithoutAuth()" class="btn btn-block btn-lg btn-primary w-100" type="submit">Отправить ссылку на почту</button>
                             </div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
 
                 <!-- Text -->
                 <div class="text-center mt-8">
-                    <p>Already have an account? <a href="/signin">Sign in</a></p>
+                    <p>Уже есть аккаунт? <a href="/signin">Войти</a></p>
                 </div>
             </div>
         </div> <!-- / .row -->

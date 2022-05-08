@@ -3,6 +3,14 @@
 
 <@e.page>
 
+    <div>Автор ограничил возможность просмотра результатов после окончания тестирования</div>
+
+
+    <a onclick="checkAnswerSession(${testId?c})"
+       class="btn btn-primary">
+        Пройти снова
+    </a>
+
     <div class="modal fade" id="staticBackdrop"
                                                    data-backdrop="static"
                                                    data-keyboard="false" tabindex="-1"
@@ -61,6 +69,7 @@
     </div>
 
 
+
     <link type="text/html" rel="stylesheet" href="/static/chart.css">
     <link href="/static/timer.css" type="text/css" rel="stylesheet">
     <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>
@@ -68,6 +77,9 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
     <script src="/static/answer.js"></script>
+    <script src="/static/checkAnswerSession.js"></script>
+
+
 
     <script>
 
@@ -83,6 +95,40 @@
 
 
     </script>
+
+
+    <div class="modal fade" id="staticBackdrop${testId?c}" data-backdrop="static"
+            <#--data-keyboard="false"--> <#--tabindex="-1"--> aria-labelledby="staticBackdropLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Предупреждение</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        У вас есть незаконченная сессия. Восстановить её?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form method="get" action="/test/answer/${testId?c}/start">
+                        <button type="submit" <#--onclick="restoreSession(false, ${testList.id?c})"-->
+                                class="btn btn-secondary" <#--data-dismiss="modal"-->>Нет
+                        </button>
+                    </form>
+                    <form method="get" action="/test/answer/${testId?c}/start">
+                        <input type="hidden" name="restore" value="true"/>
+                        <button type="submit" <#--onclick="restoreSession(true, ${testList.id?c})"-->
+                                class="btn btn-primary">Да
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </@e.page>

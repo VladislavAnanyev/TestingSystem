@@ -1,14 +1,8 @@
 package com.example.mywebquizengine.Model.Projection;
 
-import com.example.mywebquizengine.Model.Chat.MessagePhoto;
+import com.example.mywebquizengine.Model.Chat.MessageFile;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 public interface MessageView {
@@ -19,6 +13,6 @@ public interface MessageView {
     Date getTimestamp();
     List<MessageView> getForwardedMessages();
 
-    List<MessagePhoto> getPhotos();
+    List<MessageFile> getPhotos();
     //DialogWithUsersView getDialog();
 }

@@ -26,7 +26,7 @@ public interface MessageRepository extends CrudRepository<Message, Long>, Paging
     Page<Message> findAllByDialog_DialogIdAndStatusNot(Long dialogId, MessageStatus status, Pageable paging);
 
     @Query(value = """
-            SELECT MESSAGES.id, content, DIALOGS.dialog_id as dialogId,
+            SELECT MESSAGES.MESSAGE_ID, content, DIALOGS.dialog_id as dialogId,
                    MESSAGES.SENDER_USER_ID as username, activation_code,
                    change_password_code, email, first_name as firstName,
                    last_name as lastName, password, MESSAGES.status, image, name ,
@@ -39,13 +39,13 @@ public interface MessageRepository extends CrudRepository<Message, Long>, Paging
             WHERE MESSAGES.TIMESTAMP IN (SELECT MAX(MESSAGES.TIMESTAMP)
                                          FROM MESSAGES WHERE MESSAGES.STATUS != 'DELETED' GROUP BY MESSAGES.DIALOG_ID ) and MESSAGES.DIALOG_ID IN (SELECT USERS_DIALOGS.DIALOG_ID
                                                                                                                FROM USERS_DIALOGS WHERE USERS_DIALOGS.USER_ID = :userId)
-            GROUP BY MESSAGES.ID
+            GROUP BY MESSAGES.MESSAGE_ID
             ORDER BY MESSAGES.TIMESTAMP DESC;
             """, nativeQuery = true)
     List<LastDialog> getDialogsForApi(Long userId);
 
-    MessageWithDialog findMessageById(Long id);
+    MessageWithDialog findMessageByMessageId(Long id);
 
-    Message getById(Integer id);
+    Message getByMessageId(Long id);
 
 }

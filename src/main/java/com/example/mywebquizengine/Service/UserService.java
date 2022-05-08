@@ -43,8 +43,6 @@ public class UserService implements UserDetailsService {
     private static final HttpTransport transport = new NetHttpTransport();
     private static final JsonFactory jsonFactory = new JacksonFactory();
 
-    @Value("${androidGoogleClientId}")
-    private String CLIENT_ID;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -354,8 +352,16 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public void processCheckIn(String activationCode, String firstName, String lastName, String password) {
-        User user = findUserByActivationCode(activationCode);
+    public void processCheckIn(String activationCode, String email, String firstName, String lastName, String password) {
+
+        User user;
+        if (activationCode == null) {
+            user = new User();
+            user.setEmail(email);
+        } else {
+            user = findUserByActivationCode(activationCode);
+        }
+
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPassword(passwordEncoder.encode(password));

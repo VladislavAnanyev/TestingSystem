@@ -25,6 +25,11 @@ function addQuiz() {
         "        <label for=\"exampleFormControlInput1\">Вопрос</label>\n" +
         "        <input type=\"text\" class=\"form-control\" required id=\"questionID\" placeholder=\"Напишите здесь ваш вопрос\"  name=\"question\">\n" +
         "    </div>\n" +
+        "<div class=\"form-group\">\n" +
+        "                                <label for=\"exampleFormControlInput1 validationDefault01\">Файл</label>\n" +
+        "                                <input class=\"form-control\" type=\"file\" name='file" + allTest + "'>\n" +
+        "\n" +
+        "                            </div>" +
         "\n" +
         "<div id='chooseType" + allTest + "'>\n" +
         "                    <label for=\"exampleFormControlInput1 validationDefault01\">Выберите тип вопроса</label>\n" +

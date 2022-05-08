@@ -1,8 +1,8 @@
 package com.example.mywebquizengine.Service;
 
+import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.Projection.TestView;
 import com.example.mywebquizengine.Model.Test.*;
-import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.input.AddQuizRequest;
 import com.example.mywebquizengine.Model.dto.input.MapAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.input.MultipleAnswerQuizRequest;
@@ -10,6 +10,7 @@ import com.example.mywebquizengine.Model.dto.input.StringAnswerQuizRequest;
 import com.example.mywebquizengine.Repos.TestRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TestService {
@@ -34,7 +34,10 @@ public class TestService {
     private TestRepository testRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private FileSystemStorageService fileStorageService;
+
+    @Value("${hostname}")
+    private String hostname;
 
     public List<TestView> findTestsInCourseByName(Long courseId, Long userId) {
         return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_UserId(courseId, userId);
@@ -43,10 +46,6 @@ public class TestService {
     public Page<Test> getAllQuizzes(Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
         return testRepository.findAll(paging);
-    }
-
-    public void saveTest(Test test) {
-        testRepository.save(test);
     }
 
     public Test findTest(Long id) {
@@ -72,57 +71,69 @@ public class TestService {
         return testRepository.findTestsByCourse_CourseId(id);
     }
 
-    public void add(Long courseId, LocalTime duration, List<Object> addQuizRequests,
+    public void add(Long courseId, LocalTime duration, List<AddQuizRequest> addQuizRequests,
                     String description, Long userId, Calendar startAt, Calendar finishAt,
-                    boolean displayAnswers, Integer attempts) {
-        Test test = new Test();
-        test.setStartTime(startAt);
-        test.setEndTime(finishAt);
-        test.setCourse(courseService.findCourseById(courseId));
-        test.setDuration(duration);
-        test.setDescription(description);
-        test.setDisplayAnswers(displayAnswers);
-        test.setAttempts(attempts);
-        List<Quiz> quizzes = new ArrayList<>();
-        for (Object objectRequest : addQuizRequests) {
-            AddQuizRequest addQuizRequest = objectMapper.convertValue(objectRequest, AddQuizRequest.class);
-            switch (addQuizRequest.getType()) {
-                case "MULTIPLE" -> {
-                    MultipleAnswerQuizRequest addQuizReq =
-                            objectMapper.convertValue(objectRequest, MultipleAnswerQuizRequest.class);
-                    MultipleAnswerQuiz quiz = new MultipleAnswerQuiz();
-                    quiz.setAnswer(addQuizReq.getAnswer());
-                    quiz.setOptions(addQuizReq.getOptions());
-                    quiz.setText(addQuizReq.getText());
-                    quiz.setTitle(addQuizReq.getTitle());
-                    quizzes.add(quiz);
+                    boolean displayAnswers, Integer attempts, Integer percent) {
+
+        Course course = courseService.findCourseById(courseId);
+        if (userId.equals(course.getOwner().getUserId())) {
+            Test test = new Test();
+            test.setStartTime(startAt);
+            test.setEndTime(finishAt);
+            test.setCourse(course);
+            test.setDuration(duration);
+            test.setDescription(description);
+            test.setDisplayAnswers(displayAnswers);
+            test.setAttempts(attempts);
+            test.setPassingScore(percent);
+
+            List<Quiz> quizzes = new ArrayList<>();
+
+            for (AddQuizRequest addQuizRequest : addQuizRequests) {
+
+                Quiz quiz;
+                if (addQuizRequest instanceof MultipleAnswerQuizRequest quizRequest) {
+                    quiz = new MultipleAnswerQuiz();
+                    ((MultipleAnswerQuiz) quiz).setAnswer(quizRequest.getAnswer());
+                    ((MultipleAnswerQuiz) quiz).setOptions(quizRequest.getOptions());
+                } else if (addQuizRequest instanceof StringAnswerQuizRequest quizRequest) {
+                    quiz = new StringAnswerQuiz();
+                    ((StringAnswerQuiz) quiz).setAnswer(Collections.singletonList(quizRequest.getAnswer()));
+                } else if (addQuizRequest instanceof MapAnswerQuizRequest quizRequest) {
+                    quiz = new MapAnswerQuiz();
+                    ((MapAnswerQuiz) quiz).setAnswer(quizRequest.getAnswer());
+                } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+
+                String uniqueFilename;
+                if (addQuizRequest.getFile() != null) {
+                    byte[] decodedBytes = Base64.getMimeDecoder().decode(addQuizRequest.getFile().getBytes());
+                    try {
+                        uniqueFilename = fileStorageService.store(
+                                new ByteArrayInputStream(decodedBytes),
+                                addQuizRequest.getFile().getFilename()
+                        );
+
+                        if (uniqueFilename.substring(uniqueFilename.lastIndexOf(".")).contains("jp")) {
+                            quiz.setFileUrl("https://" + hostname + "/img/" + uniqueFilename);
+                        } else {
+                            quiz.setFileUrl("https://" + hostname + "/download/" + uniqueFilename);
+                        }
+
+                    } catch (IOException e) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                    }
                 }
-                case "STRING" -> {
-                    StringAnswerQuizRequest stringAnswerQuizRequest =
-                            objectMapper.convertValue(objectRequest, StringAnswerQuizRequest.class);
-                    StringAnswerQuiz quiz = new StringAnswerQuiz();
-                    quiz.setAnswer(Collections.singletonList(stringAnswerQuizRequest.getAnswer()));
-                    quiz.setText(stringAnswerQuizRequest.getText());
-                    quiz.setTitle(stringAnswerQuizRequest.getTitle());
-                    quizzes.add(quiz);
-                }
-                case "MAP" -> {
-                    MapAnswerQuizRequest mapAnswerQuizRequest =
-                            objectMapper.convertValue(objectRequest, MapAnswerQuizRequest.class);
-                    MapAnswerQuiz mapAnswerQuiz = new MapAnswerQuiz();
-                    mapAnswerQuiz.setAnswer(mapAnswerQuizRequest.getAnswer());
-                    mapAnswerQuiz.setText(mapAnswerQuizRequest.getText());
-                    mapAnswerQuiz.setTitle(mapAnswerQuizRequest.getTitle());
-                    quizzes.add(mapAnswerQuiz);
-                }
+
+                quiz.setText(addQuizRequest.getText());
+                quiz.setTitle(addQuizRequest.getTitle());
+                quiz.setTest(test);
+
+                quizzes.add(quiz);
             }
-        }
 
-        test.setQuizzes(quizzes);
-
-        for (int i = 0; i < addQuizRequests.size(); i++) {
-            test.getQuizzes().get(i).setTest(test);
-        }
-        saveTest(test);
+            test.setQuizzes(quizzes);
+            testRepository.save(test);
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 }

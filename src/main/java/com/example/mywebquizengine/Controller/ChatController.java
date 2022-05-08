@@ -64,11 +64,10 @@ public class ChatController {
     @GetMapping(path = "/chat/{dialog_id}")
     @Transactional
     public String chatWithUser2(Model model, @PathVariable String dialog_id,
-                               @RequestParam(required = false,defaultValue = "0") @Min(0) Integer page,
-                               @RequestParam(required = false,defaultValue = "50") @Min(1) @Max(100) Integer pageSize,
-                               @RequestParam(defaultValue = "timestamp") String sortBy,
-                               @AuthenticationPrincipal User authUser) {
-
+                                @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
+                                @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(100) Integer pageSize,
+                                @RequestParam(defaultValue = "timestamp") String sortBy,
+                                @AuthenticationPrincipal User authUser) {
 
         DialogWithUsersViewPaging dialog = messageService.getDialogWithPaging(dialog_id, page, pageSize, sortBy);
 
@@ -92,20 +91,12 @@ public class ChatController {
     @Transactional
     @ResponseBody
     public DialogWithUsersViewPaging chatWithUserPages(@RequestParam String dialog_id,
-                               @RequestParam(required = false,defaultValue = "0") @Min(0) Integer page,
-                               @RequestParam(required = false,defaultValue = "50") @Min(1) @Max(100) Integer pageSize,
-                               @RequestParam(defaultValue = "timestamp") String sortBy,
-                               @AuthenticationPrincipal User authUser) {
+                                                       @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
+                                                       @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(100) Integer pageSize,
+                                                       @RequestParam(defaultValue = "timestamp") String sortBy,
+                                                       @AuthenticationPrincipal User authUser) {
         return messageService.getMessages(Long.valueOf(dialog_id), page, pageSize, sortBy, authUser.getUserId());
     }
-
-   /* @PostMapping(path = "/createGroup")
-    @ResponseBody
-    public Long createGroup(@Valid @RequestBody Dialog newDialog,
-                            @AuthenticationPrincipal User authUser
-    ) throws JsonProcessingException, ParseException {
-        return messageService.createGroup(newDialog, authUser.getUserId());
-    }*/
 
     @Modifying
     @Transactional
@@ -113,9 +104,7 @@ public class ChatController {
     public void sendMessage(@Valid @Payload Message message,
                             @AuthenticationPrincipal Principal authUser
     ) throws JsonProcessingException, ParseException {
-//        if (message.getSender().getUserId().equals(authUser.getUserId())) {
-            messageService.sendMessage(message, "WEB");
-//        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        messageService.sendMessage(message, "WEB");
     }
 
     @Modifying

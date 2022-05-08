@@ -12,6 +12,7 @@ import com.example.mywebquizengine.Repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,6 +42,9 @@ public class CourseService {
         course.setImage("https://localhost/img/default.jpg");
         User user = userService.loadUserByUserId(userId);
         course.setOwner(user);
+
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        course.addMember(principal);
 
 
         Dialog dialog = new Dialog();
@@ -73,7 +77,7 @@ public class CourseService {
     }
 
     @Transactional
-    public void addMember(Long courseId, String email, Long userId) {
+    public void addMember(Long courseId, String email, Long userId, String group) {
         Course course = findCourseById(courseId);
         if (course.getOwner().getUserId().equals(userId)) {
             User user = new User();
@@ -95,6 +99,7 @@ public class CourseService {
                         "Для регистрации перейдите по ссылке: " + hostname + "/start/" + uuid
                 );
             }
+            user.setGroupName(group);
             course.addMember(user);
             messageService.addUsersToDialog(course.getDialog().getDialogId(), Collections.singletonList(user));
 

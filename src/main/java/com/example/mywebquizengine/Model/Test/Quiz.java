@@ -25,7 +25,7 @@ public class Quiz {
     @NotNull
     private String text;
 
-    private String image;
+    private String fileUrl;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "test_id")
@@ -41,12 +41,12 @@ public class Quiz {
         this.text = text;
     }
 
-    public String getImage() {
-        return image;
+    public String getFileUrl() {
+        return fileUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setFileUrl(String image) {
+        this.fileUrl = image;
     }
 
     public String getTitle() {

@@ -172,7 +172,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
             http
 
                     .authorizeRequests()
-                    .antMatchers( "/googlee45a32e3d6f7edf4.html", "/signup", "/activate/*",
+                    .antMatchers( "/googlee45a32e3d6f7edf4.html", "/signup", "/signup/admin", "/activate/*",
                             "/quizzes", "/reg",  "/androidSign", "/ws/**", "/add", "/about/**",
                             "/signin", "/checkyandex", "/h2-console/**", "/.well-known/pki-validation/**",
                             "/update/userinfo/pswrdwithoutauth", "/updatepass/**", "/testm", "/pass/**",
@@ -188,11 +188,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
                         .successHandler(myAuthenticationSuccessHandler)
 
 
-                    .and()
+                    /*.and()
                     .oauth2Login().userInfoEndpoint()
                         .oidcUserService(this.oidcUserService()).userService(this.oAuth2UserService())
                         .userAuthoritiesMapper(this.userAuthoritiesMapper()).and()
-                        .defaultSuccessUrl("/loginSuccess").successHandler(myAuthenticationSuccessHandler).permitAll()/*.and().rememberMe().rememberMeParameter("remember-me")
+                        .defaultSuccessUrl("/loginSuccess").successHandler(myAuthenticationSuccessHandler).permitAll()*//*.and().rememberMe().rememberMeParameter("remember-me")
                     //.and().key("secretkey").alwaysRemember(true).rememberMeServices(rememberMeServices())*/
 
                     .and()

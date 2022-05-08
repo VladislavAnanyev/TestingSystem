@@ -39,9 +39,12 @@
             <script src='/static/restoreSession.js'></script>
             <script src="/static/page.js"></script>
             <script src="/static/pageSize.js"></script>
+            <script src="/static/getAnswerSessionId.js"></script>
+
 
 
             <div class="row">
+
                 <#list tests as test>
                     <div class="col-sm-6">
                         <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
@@ -120,7 +123,7 @@
 
 
                             <div class="modal fade" id="staticBackdrop${test.testId?c}" data-backdrop="static"
-                                 data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                 <#--data-keyboard="false"--> <#--tabindex="-1"--> aria-labelledby="staticBackdropLabel"
                                  aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
@@ -136,17 +139,12 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <form method="get" action="/test/answer/${test.testId?c}/start">
-                                                <button type="submit" <#--onclick="restoreSession(false, ${testList.id?c})"-->
+                                                <button onclick="getAnswerSessionId(${test.testId?c}, false)" type="submit" <#--onclick="restoreSession(false, ${testList.id?c})"-->
                                                         class="btn btn-secondary" <#--data-dismiss="modal"-->>Нет
                                                 </button>
-                                            </form>
-                                            <form method="get" action="/test/answer/${test.testId?c}/start">
-                                                <input type="hidden" name="restore" value="true"/>
-                                                <button type="submit" <#--onclick="restoreSession(true, ${testList.id?c})"-->
+                                                <button onclick="getAnswerSessionId(${test.testId?c}, true)" type="submit" <#--onclick="restoreSession(true, ${testList.id?c})"-->
                                                         class="btn btn-primary">Да
                                                 </button>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -156,6 +154,32 @@
                 <#else>
                     Здесь пока ничего нет
                 </#list>
+
+                <div class="modal fade" id="staticBackdropForbidden" data-backdrop="static"
+                        <#--data-keyboard="false"--> <#--tabindex="-1"--> aria-labelledby="staticBackdropLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">Доступ ограничен</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    Доступ к этому тесту ограничен. Условия не выполнены.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button data-dismiss="modal" type="submit"
+                                        class="btn btn-primary">Понятно
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <#--<div class="row">

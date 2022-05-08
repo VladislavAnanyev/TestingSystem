@@ -1,4 +1,4 @@
-package com.example.mywebquizengine.Controller;
+package com.example.mywebquizengine.Controller.api;
 
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Service.FileSystemStorageService;
@@ -8,16 +8,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
-
-
-@Controller
-public class FileUploadController {
+@RestController
+@RequestMapping(path = "/api")
+public class ApiFileUploadController {
 
     @Autowired
     private UserService userService;
@@ -26,14 +23,10 @@ public class FileUploadController {
     private FileSystemStorageService fileStorageService;
 
     @PostMapping(path = "/upload")
-    public String handleFileUpload(Model model, @RequestParam("file") MultipartFile file,
+    public void handleFileUpload(@RequestParam("file") MultipartFile file,
                                    @AuthenticationPrincipal User authUser) {
         userService.uploadPhoto(file, authUser.getUserId());
-        User userLogin = userService.loadUserByUserIdProxy(authUser.getUserId());
-        model.addAttribute("user", userLogin);
-        return "profile";
     }
-
 
     @GetMapping("/download/{filename}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {

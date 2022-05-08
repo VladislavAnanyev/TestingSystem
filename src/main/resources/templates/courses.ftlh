@@ -61,10 +61,10 @@
                                             ${course.percentageOfComplete?c}%
                                         </div>
                                     </div>
-
+                                    <#if course.ownerUserId = nameId>
                                     <div class="row text-center">
 
-                                        <#if course.ownerUserId = nameId>
+
 
                                             <div class="col">
                                                 <a href="/course/${course.courseId?c}/manage"
@@ -80,7 +80,7 @@
                                                 </a>
                                             </div>
 
-                                        </#if>
+
 
                                         <div class="col">
                                             <a href="/course/${course.courseId?c}/tests"
@@ -96,6 +96,27 @@
                                         </div>
 
                                     </div>
+
+                                        <#else >
+                                            <div class="row ">
+
+                                                <div class="col text-center">
+
+                                                    <a href="/course/${course.courseId?c}/tests"
+                                                       class="btn btn-icon btn-primary rounded-circle">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                             stroke-width="2"
+                                                             stroke-linecap="round" stroke-linejoin="round"
+                                                             class="feather feather-chevron-right">
+                                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+
+                                            </div>
+
+                                    </#if>
 
                                 </div>
 
@@ -163,8 +184,8 @@
                                     </span>
                             </div>
 
-                            <h4 class="fw-bold mb-1">Invite your friends</h4>
-                            <p style="font-size: 16px;">Send invitation links to your friends</p>
+                            <h4 class="fw-bold mb-1">Создать курс</h4>
+                            <p style="font-size: 16px;">Введите название курса</p>
                         </div>
                     </div>
                     <!-- Header -->
@@ -177,7 +198,7 @@
                             <div class="col-12">
                                 <label for="invite-email" class="form-label text-muted">Название курса</label>
                                 <input type="email" class="form-control form-control-lg" id="course-name"
-                                       placeholder="name@example.com">
+                                       placeholder="Математический анализ">
                             </div>
 
                             <#--<div class="col-12">
@@ -194,7 +215,7 @@
                     <div data-bs-dismiss="modal" aria-label="Close" onclick="addCourse()" class="modal-py">
                         <a href="#" class="btn btn-lg btn-primary w-100 d-flex align-items-center"
                            data-bs-toggle="modal" data-bs-target="#invite-modal">
-                            Send
+                            Создать
 
                             <span class="icon ms-auto">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"

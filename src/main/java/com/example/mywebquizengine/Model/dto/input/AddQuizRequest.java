@@ -1,12 +1,28 @@
 package com.example.mywebquizengine.Model.dto.input;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = MultipleAnswerQuizRequest.class, name = "MULTIPLE"),
+        @JsonSubTypes.Type(value = StringAnswerQuizRequest.class, name = "STRING"),
+        @JsonSubTypes.Type(value = MapAnswerQuizRequest.class, name = "MAP")
+})
 public class AddQuizRequest {
 
     private String text;
     private String title;
     private String type;
+    private FileUploadDTO file;
+
+    public FileUploadDTO getFile() {
+        return file;
+    }
+
+    public void setFile(FileUploadDTO file) {
+        this.file = file;
+    }
 
     public String getType() {
         return type;

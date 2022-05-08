@@ -1,4 +1,4 @@
-package com.example.mywebquizengine.Controller;
+package com.example.mywebquizengine.Controller.api;
 
 import com.example.mywebquizengine.Model.Test.Test;
 import com.example.mywebquizengine.Model.Test.UserTestAnswer;
@@ -11,35 +11,66 @@ import com.example.mywebquizengine.Service.UserAnswerService;
 import com.example.mywebquizengine.Service.UserService;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.math.BigInteger;
-import java.security.Principal;
 import java.util.*;
 
-@Controller
-@Validated
-public class UserAnswerController {
-
-    @Autowired
-    private TestService testService;
+@RestController
+@RequestMapping(path = "/api")
+public class ApiUserAnswerController {
 
     @Autowired
     private UserAnswerService userAnswerService;
 
     @Autowired
+    private TestService testService;
+
+    @Autowired
     private UserService userService;
+
+    @GetMapping(path = "/quizzes/{id}/info")
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
+    public String getInfo(@PathVariable Long id, Model model,
+                          @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
+                          @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
+                          @RequestParam(defaultValue = "completed_at") String sortBy,
+                          @AuthenticationPrincipal User authUser) {
+
+        Map<BigInteger, Double> answerStats = userAnswerService.getAnswerStats(id);
+        if (answerStats != null) {
+            double min = answerStats.values().stream().min(Double::compareTo).get();
+            double max = answerStats.values().stream().max(Double::compareTo).get();
+
+            int minQuestionIndex = 0;
+            int maxQuestionIndex = 0;
+
+            List<Double> values = new ArrayList<>(answerStats.values());
+            for (int i = 0; i < values.size(); i++) {
+                Double aDouble = values.get(i);
+                if (aDouble.intValue() == min) {
+                    minQuestionIndex = i;
+                }
+                if (aDouble.intValue() == max) {
+                    maxQuestionIndex = i;
+                }
+            }
+
+            model.addAttribute("min", minQuestionIndex + 1);
+            model.addAttribute("max", maxQuestionIndex + 1);
+        }
+        model.addAttribute("chart", userAnswerService.getAnswerStats(id));
+        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id));
+        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id));
+        return "info";
+    }
 
     @GetMapping(path = "/checklastanswer/{id}")
     @ResponseBody
@@ -63,11 +94,10 @@ public class UserAnswerController {
         userAnswerService.checkAnswer(userTestAnswerId);
     }
 
-    @PostMapping(path = "/test/answer/{testId}/start")
-    @ResponseBody
+    @GetMapping(path = "/test/answer/{testId}/start")
     public Long passTest(@PathVariable Long testId,
-                           @RequestParam(required = false, defaultValue = "false") String restore,
-                           @AuthenticationPrincipal User authUser) throws SchedulerException {
+                         @RequestParam(required = false, defaultValue = "false") String restore,
+                         @AuthenticationPrincipal User authUser) throws SchedulerException {
         return userAnswerService.startAnswer(testId, restore, authUser.getUserId());
     }
 
@@ -117,7 +147,6 @@ public class UserAnswerController {
     @PostMapping(value = "/test/answer/update")
     public void getAnswerSession(@AuthenticationPrincipal User authUser, @Valid @RequestBody UserTestAnswerRequest request) {
         userAnswerService.updateAnswer(request.getQuizId(), request.getAnswer(), authUser.getUserId());
-        throw new ResponseStatusException(HttpStatus.OK);
     }
 
     @PostMapping(value = "/test/answer/duration")
@@ -127,46 +156,6 @@ public class UserAnswerController {
                 answerDuration.getQuizId(),
                 answerDuration.getDuration()
         );
-        throw new ResponseStatusException(HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/quizzes/{id}/info")
-    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
-    public String getInfo(@PathVariable Long id, Model model,
-                          @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
-                          @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
-                          @RequestParam(defaultValue = "completed_at") String sortBy,
-                          @AuthenticationPrincipal User authUser) {
-
-        Test test = testService.findTest(id);
-        model.addAttribute("test_id", test);
-        model.addAttribute("quizzes", test.getQuizzes());
-        Map<BigInteger, Double> answerStats = userAnswerService.getAnswerStats(id);
-        if (answerStats != null) {
-            double min = answerStats.values().stream().min(Double::compareTo).get();
-            double max = answerStats.values().stream().max(Double::compareTo).get();
-
-            int minQuestionIndex = 0;
-            int maxQuestionIndex = 0;
-
-            List<Double> values = new ArrayList<>(answerStats.values());
-            for (int i = 0; i < values.size(); i++) {
-                Double aDouble = values.get(i);
-                if (aDouble.intValue() == min) {
-                    minQuestionIndex = i;
-                }
-                if (aDouble.intValue() == max) {
-                    maxQuestionIndex = i;
-                }
-            }
-
-            model.addAttribute("min", minQuestionIndex + 1);
-            model.addAttribute("max", maxQuestionIndex + 1);
-        }
-        model.addAttribute("chart", userAnswerService.getAnswerStats(id));
-        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id));
-        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id));
-        return "info";
     }
 
 }
