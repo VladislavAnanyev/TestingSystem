@@ -1,5 +1,7 @@
 package com.example.mywebquizengine.Model.Projection;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,5 +14,6 @@ public interface AnswerViewForInfo {
     String getFirstName();
     String getLastName();
     String getEmail();
+    String getGroupName();
     Long getUserId();
 }

@@ -1,4 +1,4 @@
-package com.example.mywebquizengine.Controller;
+package com.example.mywebquizengine.Controller.web;
 
 import com.example.mywebquizengine.Model.Projection.TestView;
 import com.example.mywebquizengine.Model.User;

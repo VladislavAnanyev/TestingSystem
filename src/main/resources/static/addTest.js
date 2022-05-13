@@ -180,7 +180,10 @@ async function addTest() {
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 
-                document.location.href = "#"
+                var successModal = new bootstrap.Modal(document.getElementById('staticBackdropAdd'))
+                successModal.toggle()
+
+                /*document.location.href = "#"
                 let div = document.createElement("div");
                 div.setAttribute('class', 'alert alert-success');
                 div.setAttribute('role', 'alert');
@@ -197,7 +200,7 @@ async function addTest() {
                         //button.disabled = false;
 
                     }
-                ), 3000);
+                ), 3000);*/
 
             } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
                 let div = document.createElement("div");

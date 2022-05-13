@@ -1,12 +1,15 @@
 package com.example.mywebquizengine.Service;
 
 import com.example.mywebquizengine.Model.Course;
+import com.example.mywebquizengine.Model.Group;
+import com.example.mywebquizengine.Model.Projection.GroupView;
 import com.example.mywebquizengine.Model.Projection.TestView;
 import com.example.mywebquizengine.Model.Test.*;
 import com.example.mywebquizengine.Model.dto.input.AddQuizRequest;
 import com.example.mywebquizengine.Model.dto.input.MapAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.input.MultipleAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.input.StringAnswerQuizRequest;
+import com.example.mywebquizengine.Repos.GroupRepository;
 import com.example.mywebquizengine.Repos.TestRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ public class TestService {
 
     @Autowired
     private TestRepository testRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     @Autowired
     private FileSystemStorageService fileStorageService;
@@ -135,5 +141,9 @@ public class TestService {
             test.setQuizzes(quizzes);
             testRepository.save(test);
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+
+    public List<GroupView> getGroupsInCourse(Long courseId) {
+        return groupRepository.findGroupsByCourseId(courseId);
     }
 }

@@ -66,9 +66,13 @@ public class UserAnswerService {
         lastUserAnswer.setPercent(userTestAnswer.getPercent());
     }
 
-    public List<AnswerViewForInfo> getPageAnswersById(Long id) {
+    public List<AnswerViewForInfo> getPageAnswersById(Long id, Long groupId) {
         //Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return userTestAnswerRepository.getAnswersOnMyQuiz(id);
+        if (groupId == null) {
+            return userTestAnswerRepository.getAnswersOnMyQuiz(id);
+        } else {
+            return userTestAnswerRepository.getAnswersOnMyQuiz(id, groupId);
+        }
     }
 
     @Transactional
@@ -78,12 +82,40 @@ public class UserAnswerService {
     }
 
     @Transactional
-    public Map<BigInteger, Double> getAnswerStats(Long id) {
+    public Map<BigInteger, Double> getAnswerStats(Long id, Long groupId) {
 
         Test test = testService.findTest(id);
         ArrayList<Long> list = test.getQuizzes().stream().map(Quiz::getQuizId).collect(Collectors.toCollection(ArrayList::new));
 
-        List<Object[]> result = userQuizAnswerRepository.getAnswerStat(list);
+        List<Object[]> result;
+        if (groupId == null) {
+            result = userQuizAnswerRepository.getAnswerStat(list);
+        } else {
+            result = userQuizAnswerRepository.getAnswerStat(list, groupId);
+        }
+        System.out.println(list);
+        Map<BigInteger, Double> map = null;
+        if (result != null && !result.isEmpty()) {
+            map = new HashMap<>();
+            for (Object[] object : result) {
+                map.put(((BigInteger) object[0]), (Double) object[1]);
+            }
+        }
+        return map;
+    }
+
+    @Transactional
+    public Map<BigInteger, Double> getTimeAnswerStats(Long id, Long groupId) {
+
+        Test test = testService.findTest(id);
+        ArrayList<Long> list = test.getQuizzes().stream().map(Quiz::getQuizId).collect(Collectors.toCollection(ArrayList::new));
+
+        List<Object[]> result;
+        if (groupId == null) {
+            result = userQuizAnswerRepository.getTimeAnswerStat(list);
+        } else {
+            result = userQuizAnswerRepository.getTimeAnswerStat(list, groupId);
+        }
         System.out.println(list);
         Map<BigInteger, Double> map = null;
         if (result != null && !result.isEmpty()) {
@@ -96,12 +128,12 @@ public class UserAnswerService {
 
     }
 
-    /*public List<AnswerStat> getAnswerStat(Long id) {
-        return userTestAnswerRepository.getAnswerStat(id);
-    }*/
-
-    public List<UserTestAnswerView> getAnswerStat(Long id) {
-        return userTestAnswerRepository.findAllByTestTestIdAndPercentIsNotNull(id);
+    public List<UserTestAnswerView> getAnswerStat(Long id, Long groupId) {
+        if (groupId == null) {
+            return userTestAnswerRepository.findAllByTestTestIdAndPercentIsNotNull(id);
+        } else {
+            return userTestAnswerRepository.findAllByTestTestIdAndPercentIsNotNullAndUserGroupGroupId(id, groupId);
+        }
     }
 
     public Double getStatistics(Integer id, Integer answer) {

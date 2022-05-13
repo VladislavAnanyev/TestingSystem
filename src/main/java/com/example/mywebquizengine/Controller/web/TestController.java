@@ -1,4 +1,4 @@
-package com.example.mywebquizengine.Controller;
+package com.example.mywebquizengine.Controller.web;
 
 import com.example.mywebquizengine.Model.Test.Test;
 import com.example.mywebquizengine.Model.User;
@@ -92,6 +92,8 @@ public class TestController {
         model.addAttribute("oldTest", tempTest);
         return "updateQuiz";
     }
+
+
 
 
 }

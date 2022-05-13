@@ -39,12 +39,13 @@ public class ApiUserAnswerController {
     @GetMapping(path = "/quizzes/{id}/info")
     @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public String getInfo(@PathVariable Long id, Model model,
+                          @RequestParam(required = false) Long groupId,
                           @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                           @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
                           @RequestParam(defaultValue = "completed_at") String sortBy,
                           @AuthenticationPrincipal User authUser) {
 
-        Map<BigInteger, Double> answerStats = userAnswerService.getAnswerStats(id);
+        Map<BigInteger, Double> answerStats = userAnswerService.getAnswerStats(id, groupId);
         if (answerStats != null) {
             double min = answerStats.values().stream().min(Double::compareTo).get();
             double max = answerStats.values().stream().max(Double::compareTo).get();
@@ -66,9 +67,9 @@ public class ApiUserAnswerController {
             model.addAttribute("min", minQuestionIndex + 1);
             model.addAttribute("max", maxQuestionIndex + 1);
         }
-        model.addAttribute("chart", userAnswerService.getAnswerStats(id));
-        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id));
-        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id));
+        model.addAttribute("chart", answerStats);
+        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, groupId));
+        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id, groupId));
         return "info";
     }
 

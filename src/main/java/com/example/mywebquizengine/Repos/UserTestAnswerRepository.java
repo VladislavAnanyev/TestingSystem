@@ -17,12 +17,28 @@ public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer,
         PagingAndSortingRepository<UserTestAnswer, Long>, JpaRepository<UserTestAnswer, Long> {
 
 
-    @Query(value = "select u.EMAIL, u.FIRST_NAME as firstName, u.LAST_NAME as lastName, A.USER_ANSWER_ID as userAnswerId, A.COMPLETED_AT as completedAt, A.PERCENT, A.START_AT as startAt, A.TEST_ID, A.USER_ID as userId \n" +
-            "from USERS u join USER_TEST_ANSWERS A on (select top 1 uta.USER_ANSWER_ID\n" +
-            "                                             from USER_TEST_ANSWERS uta\n" +
-            "                                             where uta.USER_ID = U.USER_ID and TEST_ID = :id order by PERCENT desc)\n" +
-            "                                             = A.USER_ANSWER_ID", nativeQuery = true)
+    @Query(value = """
+            select G.GROUP_NAME as groupName,  u.EMAIL, u.FIRST_NAME as firstName, u.LAST_NAME as lastName,
+                   A.USER_ANSWER_ID as userAnswerId, A.COMPLETED_AT as completedAt, A.PERCENT, A.START_AT as startAt,
+                   A.TEST_ID, A.USER_ID as userId
+                        from  USERS u join USER_TEST_ANSWERS A on (select top 1 uta.USER_ANSWER_ID
+                                                                    from USER_TEST_ANSWERS uta
+                                                                     where uta.USER_ID = U.USER_ID and TEST_ID = :id order by PERCENT desc)
+                                                                     = A.USER_ANSWER_ID join GROUPS G on G.GROUP_ID = u.GROUP_ID
+            """, nativeQuery = true)
     List<AnswerViewForInfo> getAnswersOnMyQuiz(Long id);
+
+    @Query(value = """
+            select G.GROUP_NAME as groupName,  u.EMAIL, u.FIRST_NAME as firstName, u.LAST_NAME as lastName,
+                   A.USER_ANSWER_ID as userAnswerId, A.COMPLETED_AT as completedAt, A.PERCENT, A.START_AT as startAt,
+                   A.TEST_ID, A.USER_ID as userId
+                        from  USERS u join USER_TEST_ANSWERS A on (select top 1 uta.USER_ANSWER_ID
+                                                                    from USER_TEST_ANSWERS uta
+                                                                     where uta.USER_ID = U.USER_ID and TEST_ID = :id order by PERCENT desc)
+                                                                     = A.USER_ANSWER_ID join GROUPS G on G.GROUP_ID = u.GROUP_ID 
+                                                                     where G.GROUP_ID =:groupId
+            """, nativeQuery = true)
+    List<AnswerViewForInfo> getAnswersOnMyQuiz(Long id, Long groupId);
 
     @Query(value = "SELECT USER_ANSWER_ID FROM USER_TEST_ANSWERS u WHERE TEST_ID = :id", nativeQuery = true)
     List<Long> getUserAnswersById(Long id);
@@ -71,6 +87,7 @@ public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer,
             """)
     List<UserTestAnswerView> getAnswerStat(Long testId);
 
-    List<UserTestAnswerView> findAllByTestTestIdAndPercentIsNotNull(Long testId);
+    List<UserTestAnswerView> findAllByTestTestIdAndPercentIsNotNullAndUserGroupGroupId(Long testId, Long groupId);
 
+    List<UserTestAnswerView> findAllByTestTestIdAndPercentIsNotNull(Long testId);
 }

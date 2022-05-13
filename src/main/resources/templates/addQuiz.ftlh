@@ -2,15 +2,14 @@
 <#include "parts/security.ftlh">
 <@c.page>
     <title>Добавить викторину</title>
-    <script src="/static/addTest.js"></script>
-    <script src="/static/addOptions.js"></script>
-    <script src="/static/addQuiz.js"></script>
-    <script src="/static/deletereq.js"></script>
 
+
+<#--
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
+-->
 
 
 
@@ -501,8 +500,8 @@
                                     </div>
 
                                     <div>
-                                        <button onclick="addOptions(1)" class="btn btn-primary mt-2">Добавить
-                                            вариант
+                                        <button onclick="addOptions(1)" class="btn btn-primary mt-2">
+                                            Добавить вариант
                                         </button>
                                     </div>
 
@@ -628,27 +627,72 @@
 
             <#if nowUser??>
 
-                <div id="addQuiz">
-                    <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
-                </div>
+                <div class="row mb-5">
+                    <div id="addQuiz" class="col">
+                        <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
+                    </div>
 
-                <button onclick="addTest()" type="submit" id="createTestBtn" class="btn btn-primary mb-2 mt-2">Создать
-                    тест
-                </button>
+                    <div class="col text-end">
+                        <button onclick="addTest()" type="submit" id="createTestBtn"
+                                class="btn btn-primary mb-2 mt-2">
+                            Создать
+                            тест
+                        </button>
+                    </div>
+                </div>
             <#else >
 
                 <div id="addQuiz">
                     <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
                 </div>
 
-                <button onclick="location.href='/signin'" id="createTestBtn" type="submit"
-                        class="btn btn-primary mb-2 mt-2">
-                    Создать
-                    тест
-                </button>
+                <div>
+                    <button onclick="location.href='/signin'" id="createTestBtn" type="submit"
+                            class="btn btn-primary mb-2 mt-2">
+                        Создать
+                        тест
+                    </button>
+                </div>
 
             </#if>
         </div>
+
+        <div class="modal fade" id="staticBackdropAdd" data-backdrop="static"
+                <#--data-keyboard="false"--> <#--tabindex="-1"--> aria-labelledby="staticBackdropLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Уведомление</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            Тест успешно создан
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit"
+                                onclick="location.href='/course/${courseId?c}/test/create'" <#--onclick="restoreSession(false, ${testList.id?c})"-->
+                                class="btn btn-secondary" <#--data-dismiss="modal"-->>Создать новый
+                        </button>
+                        <button type="submit"
+                                onclick="location.href='/course/${courseId?c}/tests'" <#--onclick="restoreSession(true, ${testList.id?c})"-->
+                                class="btn btn-primary">К списку тестов
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/addTest.js"></script>
+        <script src="/static/addOptions.js"></script>
+        <script src="/static/addQuiz.js"></script>
+        <script src="/static/deletereq.js"></script>
+        <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
 
     </main>
 

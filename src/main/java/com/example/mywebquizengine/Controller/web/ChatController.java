@@ -1,23 +1,14 @@
-package com.example.mywebquizengine.Controller;
+package com.example.mywebquizengine.Controller.web;
 
 
-import com.example.mywebquizengine.Model.Chat.Message;
 import com.example.mywebquizengine.Model.Projection.DialogWithUsersViewPaging;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Service.MessageService;
 import com.example.mywebquizengine.Service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.json.simple.parser.ParseException;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -25,15 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.security.Principal;
 
 
 @Controller
-@EnableRabbit
-@Component
 @Validated
 public class ChatController {
 
@@ -83,8 +70,6 @@ public class ChatController {
             return "chat2";
 
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
-
     }
 
     @GetMapping(path = "/chat/nextPages")
@@ -96,22 +81,6 @@ public class ChatController {
                                                        @RequestParam(defaultValue = "timestamp") String sortBy,
                                                        @AuthenticationPrincipal User authUser) {
         return messageService.getMessages(Long.valueOf(dialog_id), page, pageSize, sortBy, authUser.getUserId());
-    }
-
-    @Modifying
-    @Transactional
-    @MessageMapping("/user/{dialogId}")
-    public void sendMessage(@Valid @Payload Message message,
-                            @AuthenticationPrincipal Principal authUser
-    ) throws JsonProcessingException, ParseException {
-        messageService.sendMessage(message, "WEB");
-    }
-
-    @Modifying
-    @Transactional
-    @RabbitListener(queues = "incoming-messages")
-    public void getMessageFromAndroid(@Valid Message message) throws JsonProcessingException, ParseException {
-        messageService.sendMessage(message, "ANDROID");
     }
 
     @GetMapping(path = "/error")

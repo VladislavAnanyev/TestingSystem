@@ -23,7 +23,7 @@ public class ServerConfig {
         return bean;
     }*/
 
-    @Bean
+    /*@Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
             @Override
@@ -38,14 +38,14 @@ public class ServerConfig {
         };
         tomcat.addAdditionalTomcatConnectors(getHttpConnector());
         return tomcat;
-    }
+    }*/
 
-    private Connector getHttpConnector() {
+    /*private Connector getHttpConnector() {
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setScheme("http");
         connector.setPort(80);
         connector.setSecure(false);
         connector.setRedirectPort(443);
         return connector;
-    }
+    }*/
 }

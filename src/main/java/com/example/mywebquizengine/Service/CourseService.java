@@ -4,10 +4,12 @@ import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.Model.Chat.Message;
 import com.example.mywebquizengine.Model.Chat.MessageStatus;
 import com.example.mywebquizengine.Model.Course;
+import com.example.mywebquizengine.Model.Group;
 import com.example.mywebquizengine.Model.Projection.CourseView;
 import com.example.mywebquizengine.Model.Projection.UserViewForCourseInfo;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Repos.CourseRepository;
+import com.example.mywebquizengine.Repos.GroupRepository;
 import com.example.mywebquizengine.Repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,9 @@ public class CourseService {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     @Autowired
     private UserService userService;
@@ -77,7 +82,7 @@ public class CourseService {
     }
 
     @Transactional
-    public void addMember(Long courseId, String email, Long userId, String group) {
+    public void addMember(Long courseId, String email, Long userId, String groupName) {
         Course course = findCourseById(courseId);
         if (course.getOwner().getUserId().equals(userId)) {
             User user = new User();
@@ -99,7 +104,16 @@ public class CourseService {
                         "Для регистрации перейдите по ссылке: " + hostname + "/start/" + uuid
                 );
             }
-            user.setGroupName(group);
+
+            Optional<Group> optionalGroup = groupRepository.findByGroupName(groupName);
+            if (optionalGroup.isPresent()) {
+                user.setGroup(optionalGroup.get());
+            } else {
+                Group group = new Group();
+                group.setGroupName(groupName);
+                user.setGroup(group);
+            }
+
             course.addMember(user);
             messageService.addUsersToDialog(course.getDialog().getDialogId(), Collections.singletonList(user));
 

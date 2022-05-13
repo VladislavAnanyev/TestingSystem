@@ -3,6 +3,41 @@
 
     <aside class="sidebar bg-light">
         <div class="container h-100">
+
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1 dropdown">Информация:
+                                <#if !RequestParameters.groupId??>по всем группам
+
+                                <#else>
+                                    группа №${selectedGroup.groupName}
+                                </#if>
+
+                            </h4>
+
+                        </div>
+                        <div class="col-auto">
+                            <a class="btn btn-sm btn-icon btn-primary rounded-circle dropdown" data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-edit-2">
+                                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                </svg>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <#list groups as group>
+                                    <li><a class="dropdown-item"
+                                           href="?groupId=${group.groupId?c}">Группа №: ${group.groupName}</a></li>
+                                </#list>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card border-4 mt-3">
                 <div class="card-body">
                     <div class="row align-items-center gx-0">
@@ -13,10 +48,9 @@
                             <a class="btn btn-sm btn-icon btn-primary rounded-circle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-layers">
-                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                    <polyline points="2 17 12 22 22 17"></polyline>
-                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                     stroke-linejoin="round" class="feather feather-trending-down">
+                                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                                    <polyline points="17 18 23 18 23 12"></polyline>
                                 </svg>
                             </a>
                         </div>
@@ -34,10 +68,9 @@
                             <a class="btn btn-sm btn-icon btn-primary rounded-circle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-layers">
-                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                    <polyline points="2 17 12 22 22 17"></polyline>
-                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                     stroke-linejoin="round" class="feather feather-trending-up">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
                                 </svg>
                             </a>
                         </div>
@@ -56,10 +89,11 @@
                                class="btn btn-sm btn-icon btn-primary rounded-circle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-layers">
-                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                    <polyline points="2 17 12 22 22 17"></polyline>
-                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                     stroke-linejoin="round" class="feather feather-zoom-in">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    <line x1="11" y1="8" x2="11" y2="14"></line>
+                                    <line x1="8" y1="11" x2="14" y2="11"></line>
                                 </svg>
                             </a>
                         </div>
@@ -84,7 +118,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col"></div>
+                <div class="col">
+                    <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
+                        <div class="card-body">
+
+                            <div id="top_time_div" style="/*height: 278px*/" class="table-responsive"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <script type="text/javascript">
@@ -127,6 +168,49 @@
 
             </script>
 
+            <script>
+                google.charts.load('current', {'packages': ['bar']});
+                google.charts.setOnLoadCallback(drawStuff);
+
+                //console.log("")
+                function drawStuff() {
+                    var data = new google.visualization.arrayToDataTable([
+                        ['№ вопроса', 'Время в секундах'],
+                        <#if timeChart??>
+                        <#list timeChart?values as chartTime>
+                        <#if chartTime??>
+                        ['${chartTime_index + 1}' + "", ${chartTime?c}],
+                        <#else >
+                        ['${chartTime_index + 1}' + "", 0],
+                        </#if>
+                        </#list>
+                        </#if>
+                        /*["Knight to King 3 (Nf3)", 12],
+                        ["Queen's bishop pawn (c4)", 10],
+                        ['Other', 3]*/
+                    ]);
+
+                    var options = {
+                        width: 300,
+                        legend: {position: 'none'},
+                        chart: {
+                            title: 'Среднее время прохождения ',
+                            subtitle: 'По каждому из вопросов'
+                        },
+                        axes: {
+                            x: {
+                                0: {side: 'top', label: 'Вопросы'} // Top x-axis.
+                            }
+                        },
+                        bar: {groupWidth: "90%"}
+                    };
+
+                    var chart = new google.charts.Bar(document.getElementById('top_time_div'));
+                    // Convert the Classic options to Material options.
+                    chart.draw(data, google.charts.Bar.convertOptions(options));
+                };
+            </script>
+
 
             <!-- Content here -->
 
@@ -134,254 +218,299 @@
             <title>Статистика</title>
             <#--    <div>${stat}%</div>-->
 
-            <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover mr-5 table-sm align-middle text-center">
+            <div id="accordionBest">
+                <div class="card">
+                    <div class="card-header" id="headingBest">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseBest"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                Лучшие попытки каждого пользователя
+                            </button>
+                        </h5>
+                    </div>
 
-                            <thead>
-                            <tr>
-                                <th scope="col">№</th>
-                                <th scope="col">Имя</th>
-                                <th scope="col">Фамилия</th>
-                                <th scope="col">Логин</th>
-                                <th scope="col">Завершён в</th>
-                                <th scope="col">Процент</th>
-                                <th scope="col">Действие</th>
-                            </tr>
-                            </thead>
-                            <tbody>
+                    <div id="collapseBest" class="collapse" aria-labelledby="headingBest"
+                         data-parent="#accordionBest">
+                        <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mr-5 table-sm align-middle text-center">
 
-
-                            <#list answersOnQuiz as answer>
-
-                                <tr>
-                                    <th scope="row">${answer_index + 1}</th>
-                                    <td>${answer.firstName}</td>
-                                    <td>${answer.lastName}</td>
-                                    <#--            <td>${answer.completedAt.time?datetime}</td>-->
-                                    <td><a href="/about/${answer.email}">${answer.email}</a></td>
-                                    <td>
-                                        <#if answer.completedAt??>
-                                            ${answer.completedAt?datetime?string ["dd.MM.yyyy HH:mm:ss"]}
-                                        <#else>
-                                            -
-                                        </#if>
-
-                                    </td>
-                                    <#--            <td>${answer.status?c}</td>&ndash;&gt;-->
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">№</th>
+                                            <th scope="col">Имя</th>
+                                            <th scope="col">Фамилия</th>
+                                            <th scope="col">Группа</th>
+                                            <th scope="col">Логин</th>
+                                            <th scope="col">Завершён в</th>
+                                            <th scope="col">Процент</th>
+                                            <th scope="col">Действие</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
 
 
-                                    <td>
-                                        <#if answer.percent??>
-                                            <div class="progress" style="height: 20px;">
-                                                <div class="progress-bar" role="progressbar"
-                                                     style="width: ${answer.percent}%;"
-                                                     aria-valuenow="${answer.percent}" aria-valuemin="-1"
-                                                     aria-valuemax="100">
-                                                    ${answer.percent}%
-                                                </div>
-                                            </div>
+                                        <#list answersOnQuiz as answer>
 
-                                        <#else>
-                                            -
-                                        </#if>
-                                    </td>
+                                            <tr>
+                                                <th scope="row">${answer_index + 1}</th>
+                                                <td>${answer.firstName}</td>
+                                                <td>${answer.lastName}</td>
+                                                <#--            <td>${answer.completedAt.time?datetime}</td>-->
+                                                <td>${answer.groupName}</td>
+                                                <td><a href="/about/${answer.email}">${answer.email}</a></td>
+                                                <td>
+                                                    <#if answer.completedAt??>
+                                                        ${answer.completedAt?datetime?string ["dd.MM.yyyy HH:mm:ss"]}
+                                                    <#else>
+                                                        -
+                                                    </#if>
 
-                                    <td>
-                                        <a onclick="writeMsg('${answer.userId?c}')"
-                                           class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24"
-                                                 fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round"
-                                                 stroke-linejoin="round" class="feather feather-mail">
-                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                                <polyline points="22,6 12,13 2,6"></polyline>
-                                            </svg>
-                                        </a>
-                                    </td>
+                                                </td>
+                                                <#--            <td>${answer.status?c}</td>&ndash;&gt;-->
 
 
-                                </tr>
+                                                <td>
+                                                    <#if answer.percent??>
+                                                        <a
+                                                                class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                                            ${answer.percent}%
+                                                        </a>
+                                                    <#else>
+                                                        -
+                                                    </#if>
+                                                </td>
+
+                                                <td>
+                                                    <a onclick="writeMsg('${answer.userId?c}')"
+                                                       class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                             viewBox="0 0 24 24"
+                                                             fill="none" stroke="currentColor" stroke-width="2"
+                                                             stroke-linecap="round"
+                                                             stroke-linejoin="round" class="feather feather-mail">
+                                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                                        </svg>
+                                                    </a>
+                                                </td>
 
 
-                            </#list>
+                                            </tr>
 
-                            </tbody>
-                        </table>
+
+                                        </#list>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
 
-            <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
-                <div class="card-body table-responsive">
-                    <table class="table table-hover mr-5 table-sm align-middle text-center">
-                        <caption>Ответы пользователей по каждому из вопросов</caption>
-                        <thead>
-                        <tr>
-                            <th scope="col">№</th>
-                            <th scope="col">Имя</th>
-                            <th scope="col">Фамилия</th>
-                            <#list quizzes as quiz>
-                                <th scope="col">${quiz_index + 1}</th>
-                            </#list>
-                            <th scope="col">Процент</th>
-                            <th scope="col">Действие</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+            <div id="accordionStat">
+                <div class="card">
+                    <div class="card-header" id="headingStat">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseStat"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                Оценивание ответов пользователей по каждому вопросу
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseStat" class="collapse" aria-labelledby="headingStat"
+                         data-parent="#accordionStat">
+                        <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
+                            <div class="card-body table-responsive">
+                                <table class="table table-hover mr-5 table-sm align-middle text-center">
+                                    <caption>Ответы пользователей по каждому из вопросов</caption>
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">№</th>
+                                        <th scope="col">Имя</th>
+                                        <th scope="col">Фамилия</th>
+                                        <#list quizzes as quiz>
+                                            <th scope="col">${quiz_index + 1}</th>
+                                        </#list>
+                                        <th scope="col">Процент</th>
+                                        <th scope="col">Действие</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
 
 
-                        <#list moreAnswers as answer>
+                                    <#list moreAnswers as answer>
 
-                            <tr>
-                                <th scope="row">${answer_index + 1}</th>
-                                <td>${answer.firstName}</td>
-                                <td>${answer.lastName}</td>
-                                <#--            <td>${answer.completedAt.time?datetime}</td>-->
+                                        <tr>
+                                            <th scope="row">${answer_index + 1}</th>
+                                            <td>${answer.firstName}</td>
+                                            <td>${answer.lastName}</td>
+                                            <#--            <td>${answer.completedAt.time?datetime}</td>-->
 
-                                <#list answer.userQuizAnswers as x>
-                                    <td>
-                                        <#if x.status>
-                                            <svg style="color: #008000" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round"
-                                                 class="feather feather-check">
-                                                <polyline points="20 6 9 17 4 12"></polyline>
-                                            </svg>
+                                            <#list answer.userQuizAnswers as x>
+                                                <td>
+                                                    <#if x.status>
+                                                        <svg style="color: #008000" xmlns="http://www.w3.org/2000/svg"
+                                                             width="20"
+                                                             height="20"
+                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                             stroke-width="2"
+                                                             stroke-linecap="round" stroke-linejoin="round"
+                                                             class="feather feather-check">
+                                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                                        </svg>
 
-                                        <#else>
+                                                    <#else>
 
-                                            <svg style="color: red" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round"
-                                                 class="feather feather-x">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
+                                                        <svg style="color: red" xmlns="http://www.w3.org/2000/svg"
+                                                             width="20"
+                                                             height="20"
+                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                             stroke-width="2"
+                                                             stroke-linecap="round" stroke-linejoin="round"
+                                                             class="feather feather-x">
+                                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        </svg>
 
-                                        </#if>
-<#--                                        ${x.status?string('1', '0')}-->
-                                    </td>
-                                </#list>
+                                                    </#if>
+                                                    <#--                                        ${x.status?string('1', '0')}-->
+                                                </td>
+                                            </#list>
 
-                                <td>
-                                    <#if answer.percent??>
-                                        <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar" role="progressbar"
-                                                 style="width: ${answer.percent}%;"
-                                                 aria-valuenow="${answer.percent}" aria-valuemin="-1"
-                                                 aria-valuemax="100">
-                                                ${answer.percent}%
-                                            </div>
-                                        </div>
-
-                                    <#else>
-                                        -
-                                    </#if>
-                                </td>
-
-
-                                <td>
-                                    <a onclick="writeMsg('${answer.userId?c}')"
-                                       class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24"
-                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                             stroke-linejoin="round" class="feather feather-mail">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
-                                    </a>
-                                </td>
+                                            <td>
+                                                <#if answer.percent??>
+                                                    <a
+                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                                        ${answer.percent}%
+                                                    </a>
+                                                <#else>
+                                                    -
+                                                </#if>
+                                            </td>
 
 
-                            </tr>
+                                            <td>
+                                                <a onclick="writeMsg('${answer.userId?c}')"
+                                                   class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                         viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2"
+                                                         stroke-linecap="round"
+                                                         stroke-linejoin="round" class="feather feather-mail">
+                                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                                    </svg>
+                                                </a>
+                                            </td>
 
-                        </#list>
 
-                        </tbody>
-                    </table>
+                                        </tr>
+
+                                    </#list>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
-                <div class="card-body table-responsive">
-                    <table class="table table-hover mr-5 table-sm align-middle text-center">
-                        <caption>Время затраченное на выполнение каждого вопроса в секундах</caption>
-                        <thead>
-                        <tr>
-                            <th scope="col">№</th>
-                            <th scope="col">Имя</th>
-                            <th scope="col">Фамилия</th>
-                            <#list quizzes as quiz>
-                                <th scope="col">${quiz_index + 1}</th>
-                            </#list>
-                            <th scope="col">Процент</th>
-                            <th scope="col">Действие</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+            <div id="accordionTime" class="mb-15">
+                <div class="card">
+                    <div class="card-header" id="headingTime">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTime"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                Временная статистика по каждому вопросу
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseTime" class="collapse" aria-labelledby="headingTime"
+                         data-parent="#accordionTime">
+                        <div class="card mb-3 shadow p-3 mb-5 bg-white rounded">
+                            <div class="card-body table-responsive">
+                                <table class="table table-hover mr-5 table-sm align-middle text-center">
+                                    <caption>Время затраченное на выполнение каждого вопроса в секундах</caption>
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">№</th>
+                                        <th scope="col">Имя</th>
+                                        <th scope="col">Фамилия</th>
+                                        <#list quizzes as quiz>
+                                            <th scope="col">${quiz_index + 1}</th>
+                                        </#list>
+                                        <th scope="col">Процент</th>
+                                        <th scope="col">Действие</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
 
 
-                        <#list moreAnswers as answer>
+                                    <#list moreAnswers as answer>
 
-                            <tr>
-                                <th scope="row">${answer_index + 1}</th>
-                                <td>${answer.firstName}</td>
-                                <td>${answer.lastName}</td>
-                                <#--            <td>${answer.completedAt.time?datetime}</td>-->
+                                        <tr>
+                                            <th scope="row">${answer_index + 1}</th>
+                                            <td>${answer.firstName}</td>
+                                            <td>${answer.lastName}</td>
+                                            <#--            <td>${answer.completedAt.time?datetime}</td>-->
 
-                                <#list answer.userQuizAnswers as x>
+                                            <#list answer.userQuizAnswers as x>
 
-                                    <td>
-                                        ${x.duration?string["0.#"]}
-                                    </td>
-                                </#list>
+                                                <td>
+                                                    ${x.duration?string["0.#"]}
+                                                </td>
+                                            </#list>
 
-                                <td>
-                                    <#if answer.percent??>
-                                        <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar" role="progressbar"
-                                                 style="width: ${answer.percent}%;"
-                                                 aria-valuenow="${answer.percent}" aria-valuemin="-1"
-                                                 aria-valuemax="100">
-                                                ${answer.percent}%
-                                            </div>
-                                        </div>
-
-                                    <#else>
-                                        -
-                                    </#if>
-                                </td>
+                                            <td>
+                                                <#if answer.percent??>
+                                                    <a
+                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                                        ${answer.percent}%
+                                                    </a>
+                                                <#else>
+                                                    -
+                                                </#if>
+                                            </td>
 
 
-                                <td>
-                                    <a onclick="writeMsg('${answer.userId?c}')"
-                                       class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24"
-                                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                             stroke-linejoin="round" class="feather feather-mail">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
-                                    </a>
-                                </td>
+                                            <td>
+                                                <a onclick="writeMsg('${answer.userId?c}')"
+                                                   class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                         viewBox="0 0 24 24"
+                                                         fill="none" stroke="currentColor" stroke-width="2"
+                                                         stroke-linecap="round"
+                                                         stroke-linejoin="round" class="feather feather-mail">
+                                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                                    </svg>
+                                                </a>
+                                            </td>
 
 
-                            </tr>
+                                        </tr>
 
-                        </#list>
+                                    </#list>
 
-                        </tbody>
-                    </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
+
+
     </main>
 
     <script src="/static/newActiveDialog.js"></script>
@@ -507,6 +636,9 @@
             </div>
         </div>
     </div>
+
+    <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
 
 
 </@c.page>

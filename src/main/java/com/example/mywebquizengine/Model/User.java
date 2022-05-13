@@ -38,9 +38,6 @@ public class User implements UserDetails, OAuth2User {
     @NotBlank
     @NotNull
     private String lastName;
-
-    private String groupName;
-
     @Size(min = 5)
     private String password;
     private String avatar;
@@ -58,6 +55,11 @@ public class User implements UserDetails, OAuth2User {
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     private List<Course> courses = new ArrayList<>();
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "GROUP_ID")
+    private Group group;
+
     @Transient
     private boolean accountNonExpired;
     @Transient
@@ -100,14 +102,6 @@ public class User implements UserDetails, OAuth2User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String group) {
-        this.groupName = group;
     }
 
     public Long getUserId() {
@@ -206,6 +200,14 @@ public class User implements UserDetails, OAuth2User {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public void setPassword(String password) {
