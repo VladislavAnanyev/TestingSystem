@@ -121,7 +121,7 @@
              tabindex="0" data-bs-spy="scroll" data-bs-target="#navbar-example3">
             <div>
 
-                <#list test_id.quizzes as quiz>
+                <#list quizzes as quiz>
                     <div id="list-item-${quiz_index + 1}"
                          class="card quiz mt-2 card mb-3 shadow p-3 mb-5 <#--bg-white--> rounded">
                         <b class="mr-4">${quiz_index + 1}.</b>

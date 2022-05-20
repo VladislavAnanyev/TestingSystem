@@ -60,14 +60,6 @@ public class TestController {
         );
     }
 
-    @GetMapping(path = "/quizzes")
-    public String getQuizzes(Model model, @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
-                             @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(10) Integer pageSize,
-                             @RequestParam(defaultValue = "id") String sortBy) {
-        Page<Test> quizzes = testService.getAllQuizzes(page, pageSize, sortBy);
-        model.addAttribute("test", quizzes.getContent());
-        return "getAllQuiz";
-    }
 
     @DeleteMapping(path = "/quizzes/{id}")
     @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
@@ -75,25 +67,5 @@ public class TestController {
         testService.deleteTest(id);
         throw new ResponseStatusException(HttpStatus.OK);
     }
-
-
-    @PutMapping(path = "/update/{id}", consumes = {"application/json"})
-    @ResponseBody
-    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
-    public void changeTest(@PathVariable Long id, @Valid @RequestBody Test test,
-                           @AuthenticationPrincipal User authUser) throws ResponseStatusException {
-        testService.updateTest(id, test);
-    }
-
-    @GetMapping(path = "/update/{id}")
-    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
-    public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal User authUser) {
-        Test tempTest = testService.findTest(id);
-        model.addAttribute("oldTest", tempTest);
-        return "updateQuiz";
-    }
-
-
-
 
 }

@@ -1,6 +1,11 @@
 package com.example.mywebquizengine.Model.dto.input;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class CreateCourseRequest {
+    @NotNull
+    @NotBlank
     private String courseName;
 
     public String getCourseName() {

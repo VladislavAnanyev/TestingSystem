@@ -39,13 +39,11 @@ public class ChatController {
         return "chat2";
     }
 
-    @PostMapping(path = "/checkdialog")
+    @PostMapping(path = "/dialog/create")
     @ResponseBody
     @PreAuthorize(value = "!#user.userId.equals(#authUser.userId)")
     public Long checkDialog(@RequestBody User user, @AuthenticationPrincipal User authUser) {
-
         return messageService.checkDialog(user.getUserId(), authUser.getUserId());
-
     }
 
     @GetMapping(path = "/chat/{dialog_id}")

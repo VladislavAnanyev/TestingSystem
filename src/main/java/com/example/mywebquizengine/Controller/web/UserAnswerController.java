@@ -1,6 +1,7 @@
 package com.example.mywebquizengine.Controller.web;
 
 import com.example.mywebquizengine.Model.Projection.GroupView;
+import com.example.mywebquizengine.Model.Test.Quiz;
 import com.example.mywebquizengine.Model.Test.Test;
 import com.example.mywebquizengine.Model.Test.UserTestAnswer;
 import com.example.mywebquizengine.Model.User;
@@ -42,7 +43,7 @@ public class UserAnswerController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(path = "/checklastanswer/{id}")
+    @GetMapping(path = "/test/{id}/answer/check")
     @ResponseBody
     public Boolean checkLastAnswer(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
         UserTestAnswer userTestAnswer = userAnswerService.checkLastComplete(
@@ -57,19 +58,19 @@ public class UserAnswerController {
         }
     }
 
-    @PostMapping(path = "/test/answer/{userTestAnswerId}/send")
+    @PostMapping(path = "/test/answer/{id}/send")
     @ResponseBody
     @Transactional
-    public void sendAnswer(@PathVariable Long userTestAnswerId) {
-        userAnswerService.checkAnswer(userTestAnswerId);
+    public void sendAnswer(@PathVariable Long id) {
+        userAnswerService.checkAnswer(id);
     }
 
-    @PostMapping(path = "/test/answer/{testId}/start")
+    @PostMapping(path = "/test/answer/{id}/start")
     @ResponseBody
-    public Long passTest(@PathVariable Long testId,
+    public Long passTest(@PathVariable Long id,
                            @RequestParam(required = false, defaultValue = "false") String restore,
                            @AuthenticationPrincipal User authUser) throws SchedulerException {
-        return userAnswerService.startAnswer(testId, restore, authUser.getUserId());
+        return userAnswerService.startAnswer(id, restore, authUser.getUserId());
     }
 
     @GetMapping(value = "/test/{testId}/{userTestAnswerId}/solve")
@@ -89,6 +90,9 @@ public class UserAnswerController {
         } else {
             model.addAttribute("lastAnswer", userTestAnswer);
             model.addAttribute("test_id", test);
+            List<Quiz> quizzes = test.getQuizzes();
+            Collections.shuffle(quizzes);
+            model.addAttribute("quizzes", quizzes);
 
             if (test.getDuration() != null) {
                 Calendar userTestAnswerStartAt = userTestAnswer.getStartAt();
@@ -116,7 +120,7 @@ public class UserAnswerController {
     }
 
     @PostMapping(value = "/test/answer/update")
-    public void getAnswerSession(@AuthenticationPrincipal User authUser, @Valid @RequestBody UserTestAnswerRequest request) {
+    public void updateAnswer(@AuthenticationPrincipal User authUser, @Valid @RequestBody UserTestAnswerRequest request) {
         userAnswerService.updateAnswer(request.getQuizId(), request.getAnswer(), authUser.getUserId());
         throw new ResponseStatusException(HttpStatus.OK);
     }
@@ -131,13 +135,10 @@ public class UserAnswerController {
         throw new ResponseStatusException(HttpStatus.OK);
     }
 
-    @GetMapping(path = "/quizzes/{id}/info")
+    @GetMapping(path = "/test/{id}/info")
     @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public String getInfo(@PathVariable Long id, Model model,
                           @RequestParam(required = false) Long groupId,
-                          @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
-                          @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
-                          @RequestParam(defaultValue = "completed_at") String sortBy,
                           @AuthenticationPrincipal User authUser) {
 
         Test test = testService.findTest(id);

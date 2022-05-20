@@ -20,6 +20,6 @@ public interface DialogWithUsersViewPaging {
 
     //@Named(value = "messages")
     //@JsonProperty(value = "messages")
-    @Value("#{T(com.google.common.collect.Lists).reverse(@messageRepository.findAllByDialog_DialogIdAndStatusNot(target.dialogId, T(com.example.mywebquizengine.Model.Chat.MessageStatus).DELETED, target.paging ).content)}")
+    @Value("#{T(com.google.common.collect.Lists).reverse(@messageRepository.findAllByDialog_DialogId(target.dialogId, target.paging ).content)}")
     List<MessageView> getMessages();
 }

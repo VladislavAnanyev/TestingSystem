@@ -19,9 +19,17 @@ public class RegistrationRequest {
     @Size(min = 5)
     private String password;
 
-    @NotNull
-    @NotBlank
+    private String email;
+
     private String activationCode;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getActivationCode() {
         return activationCode;

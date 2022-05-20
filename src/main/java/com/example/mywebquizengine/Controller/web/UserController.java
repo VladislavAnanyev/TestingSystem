@@ -1,12 +1,10 @@
 package com.example.mywebquizengine.Controller.web;
 
-import com.example.mywebquizengine.Model.*;
-import com.example.mywebquizengine.Model.Projection.UserView;
-import com.example.mywebquizengine.Security.ActiveUserStore;
+import com.example.mywebquizengine.Model.RegistrationRequest;
+import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.security.Principal;
-import java.util.*;
 
 
 @Controller
@@ -38,28 +34,11 @@ public class UserController {
 
     @PostMapping(path = "/signup")
     public String checkIn(@Valid RegistrationRequest request) {
-        userService.processCheckIn(request.getActivationCode(), null, request.getFirstName(), request.getLastName(), request.getPassword());
+        userService.processCheckIn(request.getActivationCode(), request.getEmail(), request.getFirstName(), request.getLastName(), request.getPassword());
         return "redirect:/signin";
     }
 
-    @PostMapping(path = "/signup/admin")
-    public String signUpAdmin(@Valid AdminRegistrationRequest request) {
-        userService.processCheckIn(null, request.getEmail(), request.getFirstName(), request.getLastName(), request.getPassword());
-        return "redirect:/signin";
-    }
-
-    @PostMapping(path = "/update/userinfo/password", consumes ={"application/json"} )
-    public void tryToChangePassWithAuth(@AuthenticationPrincipal User authUser) {
-        userService.sendCodeForChangePassword(authUser.getUserId());
-    }
-
-    /*@GetMapping("/loggedUsers")
-    @ResponseBody
-    public ArrayList<String> getLoggedUsers(Locale locale, Model model) {
-        return (ArrayList<String>) activeUserStore.getUsers();
-    }*/
-
-    @PostMapping(path = "/update/userinfo/pswrdwithoutauth", consumes ={"application/json"} )
+    @PostMapping(path = "/update/userinfo/pswrdwithoutauth", consumes = {"application/json"})
     public void tryToChangePassWithoutAuth(@RequestBody User in) {
         userService.sendCodeForChangePassword(in.getUserId());
         throw new ResponseStatusException(HttpStatus.OK);
@@ -76,14 +55,14 @@ public class UserController {
         return "singin";
     }
 
-    @PutMapping(path = "/updatepass/{changePasswordCode}", consumes ={"application/json"})
+    @PutMapping(path = "/updatepass/{changePasswordCode}", consumes = {"application/json"})
     public String changePasswordUsingCode(@RequestBody String password, @PathVariable String changePasswordCode) {
         userService.updatePassword(password, changePasswordCode);
         return "changePassword";
     }
 
     @Transactional
-    @PutMapping(path = "/update/user/{userId}", consumes={"application/json"})
+    @PutMapping(path = "/update/user/{userId}", consumes = {"application/json"})
 //    @PreAuthorize(value = "#principal.name.equals(#userId)")
     public void changeUser(@PathVariable Long userId, @RequestBody User user, @AuthenticationPrincipal User authUser) {
         userService.updateUser(user.getLastName(), user.getFirstName(), userId);
@@ -103,12 +82,6 @@ public class UserController {
     @GetMapping(path = "/password/forget")
     public String getForgetPasswordPage() {
         return "forgetPassword";
-    }
-
-    @GetMapping(path = "/getUserList")
-    @ResponseBody
-    public ArrayList<User> getUserList() {
-        return userService.getUserList();
     }
 
     @GetMapping(path = "/testConnection")

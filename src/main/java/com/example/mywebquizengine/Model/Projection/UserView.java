@@ -12,6 +12,4 @@ public interface UserView {
     String getLastName();
     String getAvatar();
     Role getRole();
-    boolean isStatus();
-    String getOnline();
 }

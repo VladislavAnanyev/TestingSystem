@@ -365,18 +365,12 @@ public class UserService implements UserDetailsService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPassword(passwordEncoder.encode(password));
-        user.setStatus(true);
         user.setActivationCode(UUID.randomUUID().toString());
 
         user.setAvatar("https://" + hostname + "/img/default.jpg");
-        user.setOnline(false);
         user.setEnabled(true);
         user.grantAuthority(Role.ROLE_USER);
         rabbitInitialize(user.getUsername());
-        saveUser(user);
-    }
-
-    public void saveUser(User user) {
         userRepository.save(user);
     }
 

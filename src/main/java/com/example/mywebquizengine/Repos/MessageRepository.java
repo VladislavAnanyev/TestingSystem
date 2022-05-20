@@ -23,13 +23,13 @@ public interface MessageRepository extends CrudRepository<Message, Long>, Paging
     @Query(value = "SELECT DIALOG_ID FROM USERS_DIALOGS WHERE USER_ID = :username", nativeQuery = true)
     List<Long> getMyDialogsId(String username);
 
-    Page<Message> findAllByDialog_DialogIdAndStatusNot(Long dialogId, MessageStatus status, Pageable paging);
+    Page<Message> findAllByDialog_DialogId(Long dialogId, Pageable paging);
 
     @Query(value = """
             SELECT MESSAGES.MESSAGE_ID, content, DIALOGS.dialog_id as dialogId,
                    MESSAGES.SENDER_USER_ID as username, activation_code,
                    change_password_code, email, first_name as firstName,
-                   last_name as lastName, password, MESSAGES.status, image, name ,
+                   last_name as lastName, password, image, name ,
                    timestamp as timestamp, AVATAR
             FROM MESSAGES
                      LEFT OUTER JOIN USERS U
@@ -37,7 +37,7 @@ public interface MessageRepository extends CrudRepository<Message, Long>, Paging
                      LEFT OUTER JOIN DIALOGS
                                      on DIALOGS.DIALOG_ID = MESSAGES.DIALOG_ID
             WHERE MESSAGES.TIMESTAMP IN (SELECT MAX(MESSAGES.TIMESTAMP)
-                                         FROM MESSAGES WHERE MESSAGES.STATUS != 'DELETED' GROUP BY MESSAGES.DIALOG_ID ) and MESSAGES.DIALOG_ID IN (SELECT USERS_DIALOGS.DIALOG_ID
+                                         FROM MESSAGES GROUP BY MESSAGES.DIALOG_ID ) and MESSAGES.DIALOG_ID IN (SELECT USERS_DIALOGS.DIALOG_ID
                                                                                                                FROM USERS_DIALOGS WHERE USERS_DIALOGS.USER_ID = :userId)
             GROUP BY MESSAGES.MESSAGE_ID
             ORDER BY MESSAGES.TIMESTAMP DESC;

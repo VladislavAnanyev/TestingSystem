@@ -6,7 +6,10 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "COURSES")
 public class Course {
@@ -17,11 +20,11 @@ public class Course {
     @ManyToOne
     private User owner;
     @ManyToMany(mappedBy = "courses", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<User> members;
+    private Set<User> members = new HashSet<>();
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Test> tests;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "dialog_id")
     private Dialog dialog;
     private String image;
@@ -54,7 +57,7 @@ public class Course {
         return tests;
     }
 
-    public List<User> getMembers() {
+    public Set<User> getMembers() {
         return members;
     }
 
@@ -70,7 +73,7 @@ public class Course {
         this.courseId = id;
     }
 
-    public void setMembers(List<User> members) {
+    public void setMembers(Set<User> members) {
         this.members = members;
     }
 
@@ -85,6 +88,11 @@ public class Course {
     public void addMember(User user) {
         this.members.add(user);
         user.getCourses().add(this);
+    }
+
+    public void removeMember(User user) {
+        this.members.remove(user);
+        user.getCourses().remove(this);
     }
 
 }

@@ -22,23 +22,9 @@ public class Message {
 
     private Date timestamp;
 
-    @Enumerated(EnumType.STRING)
-    private MessageStatus status;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dialog_id")
     private Dialog dialog;
-
-    @ElementCollection
-    @CollectionTable(
-            name="MESSAGES_FILES",
-            joinColumns=@JoinColumn(name="MESSAGE_ID")
-    )
-    private List<MessageFile> files;
-
-    @OneToMany
-    @Column(name = "FORWARD_MESSAGE")
-    private List<Message> forwardedMessages;
 
     @Transient
     private Integer uniqueCode;
@@ -69,14 +55,6 @@ public class Message {
         this.timestamp = timestamp;
     }
 
-    public MessageStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(MessageStatus status) {
-        this.status = status;
-    }
-
     public Long getMessageId() {
         return messageId;
     }
@@ -93,14 +71,6 @@ public class Message {
         this.dialog = dialog;
     }
 
-    public List<Message> getForwardedMessages() {
-        return forwardedMessages;
-    }
-
-    public void setForwardedMessages(List<Message> forwardedMessages) {
-        this.forwardedMessages = forwardedMessages;
-    }
-
     public Integer getUniqueCode() {
         return uniqueCode;
     }
@@ -109,11 +79,4 @@ public class Message {
         this.uniqueCode = uniqueCode;
     }
 
-    public List<MessageFile> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<MessageFile> photos) {
-        this.files = photos;
-    }
 }

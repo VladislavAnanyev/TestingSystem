@@ -43,7 +43,7 @@
 
                     <#if course??>
 
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 mb-10">
 
 
                             <div class="card mb-3 shadow p-3 mb-5 bg-white rounded" style="width: 15rem;">
@@ -126,7 +126,19 @@
                         </div>
 
                     <#else>
-                        Здесь пока ничего нет
+                        <div class="d-flex flex-column h-100 justify-content-center">
+                            <div class="text-center mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                     class="feather feather-monitor">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                                </svg>
+                            </div>
+
+                            <p class="text-center text-muted">Курсов пока нет<br> создайте из меню слева</p>
+                        </div>
                     </#if>
                 </#list>
             </div>

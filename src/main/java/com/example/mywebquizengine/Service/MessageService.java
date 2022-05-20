@@ -92,12 +92,6 @@ public class MessageService {
 
     }
 
-
-
-    /*public List<Message> getDialogs(String username) {
-        return messageRepository.getDialogs(username);
-    }*/
-
     public ArrayList<LastDialog> getDialogsForApi(Long userId) {
 
         List<LastDialog> messageViews = messageRepository.getDialogsForApi(userId);
@@ -112,7 +106,6 @@ public class MessageService {
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
             if (message.getSender().getUserId().equals(userId)) {
-                message.setStatus(MessageStatus.DELETED);
 
                 MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
                 JSONObject jsonObject = (JSONObject) JSONValue
@@ -165,7 +158,6 @@ public class MessageService {
             Message message = optionalMessage.get();
             if (message.getSender().getUserId().equals(userId)) {
                 message.setContent(newMessage.getContent());
-                message.setStatus(MessageStatus.EDIT);
 
                 MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
                 JSONObject jsonObject = (JSONObject) JSONValue
@@ -215,8 +207,7 @@ public class MessageService {
         message.setSender(sender);
         message.setDialog(dialogRepository.findById(message.getDialog().getDialogId()).get());
         message.setTimestamp(new Date());
-        message.setStatus(MessageStatus.DELIVERED);
-        
+
         messageRepository.save(message);
 
         Dialog dialog = dialogRepository.findById(message.getDialog().getDialogId()).get();
@@ -250,59 +241,6 @@ public class MessageService {
         }
 
     }
-
-
-    /*public Long createGroup(Dialog newDialog, String username) throws JsonProcessingException, ParseException {
-
-        User authUser = new User();
-
-        authUser.setUsername(username);
-
-        newDialog.addUser(authUser);
-
-        if (newDialog.getUsers().stream().anyMatch(o -> o.getUsername()
-                .equals(username))) {
-
-            Dialog dialog = new Dialog();
-
-            newDialog.getUsers().forEach(user -> dialog.addUser(userService.loadUserByUsername(user.getUsername())));
-
-            Message message = new Message();
-            message.setContent("Группа создана");
-            message.setSender(userService.loadUserByUsername(username));
-            message.setStatus(MessageStatus.DELIVERED);
-            message.setTimestamp(new Date());
-            message.setDialog(dialog);
-
-            dialog.setMessages(new ArrayList<>());
-            dialog.getMessages().add(message);
-
-
-
-            if (newDialog.getName() == null || newDialog.getName().equals("")) {
-                dialog.setName("Конференция");
-            } else {
-                dialog.setName(newDialog.getName());
-            }
-
-            //group.setCreator(userService.getAuthUser(SecurityContextHolder.getContext().getAuthentication()));
-            dialog.setImage("https://" + hostname + "/img/default.jpg");
-            dialogRepository.save(dialog);
-
-            MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
-            JSONObject jsonObject = (JSONObject) JSONValue
-                    .parseWithException(objectMapper.writeValueAsString(messageDto));
-            jsonObject.put("type", "MESSAGE");
-            for (User user : dialog.getUsers()) {
-                simpMessagingTemplate.convertAndSend("/topic/" + user.getUsername(),
-                        jsonObject);
-            }
-
-
-            return dialog.getDialogId();
-
-        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-    }*/
 
     public DialogWithUsersViewPaging getDialogWithPaging(String dialog_id, Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());

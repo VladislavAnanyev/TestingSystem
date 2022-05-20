@@ -22,14 +22,14 @@ public class Dialog {
 
     private String image;
 
-    @ManyToMany(mappedBy = "dialogs", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy = "dialogs", cascade = {CascadeType.ALL})
     private Set<User> users = new HashSet<>();
 
     @Transient
     @JsonIgnore
     private Pageable paging;
 
-    @OneToMany(mappedBy = "dialog", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "dialog", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     private List<Message> messages;
 
     public Dialog() {}
@@ -78,6 +78,11 @@ public class Dialog {
     public void addUser(User user) {
         this.users.add(user);
         user.getDialogs().add(this);
+    }
+
+    public void removeUser(User user) {
+        this.users.remove(user);
+        user.getDialogs().remove(this);
     }
 
     public String getName() {

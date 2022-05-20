@@ -25,13 +25,12 @@ import java.util.*;
 public class CourseService {
 
     @Autowired
-    private CourseRepository courseRepository;
-
-    @Autowired
     private GroupRepository groupRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
+
+
 
     @Autowired
     private MailSender mailSender;
@@ -41,18 +40,28 @@ public class CourseService {
     @Autowired
     private MessageService messageService;
 
-    public void createCourse(String name, Long userId) {
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
+    public Long createCourse(String name, Long userId) {
         Course course = new Course();
         course.setName(name);
-        course.setImage("https://localhost/img/default.jpg");
+        course.setImage(hostname + "/img/default.jpg");
         User user = userService.loadUserByUserId(userId);
         course.setOwner(user);
+        course.addMember(user);
 
-        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        course.addMember(principal);
+        // другая бизнес-логика
+        // в данном случае по созданию групповой конференции
 
+        courseRepository.save(course);
+        return course.getCourseId();
+    }
 
-        Dialog dialog = new Dialog();
+        /*Dialog dialog = new Dialog();
         dialog.addUser(user);
         dialog.setName(name);
         dialog.setImage("https://localhost/img/default.jpg");
@@ -68,7 +77,7 @@ public class CourseService {
 
         dialog.setMessages(Collections.singletonList(message));
         courseRepository.save(course);
-    }
+    }*/
 
     public List<CourseView> getAllCourses() {
         return courseRepository.findAllCourses();
@@ -92,11 +101,10 @@ public class CourseService {
                 String uuid = UUID.randomUUID().toString();
                 user.setEmail(email);
                 user.setActivationCode(uuid);
-                user.setStatus(false);
                 user.setEnabled(false);
                 user.setFirstName(email);
                 user.setLastName(email);
-                userService.saveUser(user);
+                userRepository.save(user);
 
                 mailSender.send(
                         email,
@@ -124,10 +132,18 @@ public class CourseService {
         return courseRepository.findCourseByMembers(userId);
     }
 
-    @Autowired
-    private UserRepository userRepository;
-
     public List<UserViewForCourseInfo> findMembersWithInfo(Long courseId) {
         return userRepository.findMembersByCourseAndMembers(courseId);
+    }
+
+    @Transactional
+    public void deleteCourse(Long id) {
+        Optional<Course> optionalCourse = courseRepository.findById(id);
+        if (optionalCourse.isPresent()) {
+            Course course = optionalCourse.get();
+            course.getMembers().forEach(course::removeMember);
+            course.getDialog().getUsers().forEach(user -> course.getDialog().removeUser(user));
+            courseRepository.deleteById(id);
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }

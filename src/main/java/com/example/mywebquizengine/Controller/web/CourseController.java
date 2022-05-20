@@ -4,6 +4,7 @@ import com.example.mywebquizengine.Model.Projection.TestView;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Model.dto.input.CreateCourseRequest;
 import com.example.mywebquizengine.Model.AddMemberToCourseRequest;
+import com.example.mywebquizengine.Model.dto.output.CreateCourseResponse;
 import com.example.mywebquizengine.Service.CourseService;
 import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserService;
@@ -13,15 +14,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.security.Principal;
 import java.util.List;
 
 @Controller
+@Validated
 public class CourseController {
 
     @Autowired
@@ -49,16 +53,19 @@ public class CourseController {
         return "getAllQuiz";
     }
 
-    @GetMapping("/courses/my")
-    public String getMyCourses(Model model, @AuthenticationPrincipal User authUser) {
-        model.addAttribute("courses", courseService.getMyCourses(authUser.getUserId()));
-        return "courses";
-    }
-
     @PostMapping("/course")
-    public String createCourse(@RequestBody CreateCourseRequest courseRequest, @AuthenticationPrincipal User authUser) {
-        courseService.createCourse(courseRequest.getCourseName(), authUser.getUserId());
-        return "redirect:/courses";
+    @ResponseBody
+    public CreateCourseResponse createCourse(@Valid @RequestBody CreateCourseRequest courseRequest,
+                                             @AuthenticationPrincipal User authUser) {
+        //authUser - аутентифицированный пользователь, определяется по cookie
+
+        //создание курса и получение его идентификатора
+        Long courseId = courseService.createCourse(courseRequest.getCourseName(), authUser.getUserId());
+
+        //подготовка и возврат ответа
+        CreateCourseResponse response = new CreateCourseResponse();
+        response.setCourseId(courseId);
+        return response;
     }
 
     @PostMapping("/course/{id}/members/add")
@@ -69,7 +76,7 @@ public class CourseController {
         courseService.addMember(id, request.getEmail(), authUser.getUserId(), request.getGroup());
         throw new ResponseStatusException(HttpStatus.OK);
     }
-
+    
     @GetMapping("/course/{id}/manage")
     public String getMyCourses(Model model, @AuthenticationPrincipal User authUser, @PathVariable Long id,
                                @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
@@ -79,6 +86,12 @@ public class CourseController {
         model.addAttribute("myquiz", pageObject);
         model.addAttribute("courseId", id);
         return "myquiz";
+    }
+
+    @DeleteMapping("/course/{id}")
+    @ResponseBody
+    public void deleteCourse(@PathVariable Long id) {
+        courseService.deleteCourse(id);
     }
 
 }

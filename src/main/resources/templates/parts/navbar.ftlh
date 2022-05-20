@@ -200,7 +200,6 @@
                             </div>
 
                             <h4 class="mb-1">${nowUser.principal.firstName} ${nowUser.principal.lastName}</h4>
-                            <p>Онлайн</p>
                         </div>
                     </div>
                     <!-- Header -->

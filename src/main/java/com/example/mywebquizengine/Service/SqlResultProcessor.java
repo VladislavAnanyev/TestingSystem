@@ -78,18 +78,9 @@ public class SqlResultProcessor {
     @Transactional
     public List<MessageView> getListOfMessages(Long dialogId, Pageable paging) {
 
-        Long authName = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserId();
-
         List<Message> messages = messageRepository
-                .findAllByDialog_DialogIdAndStatusNot(dialogId, MessageStatus.DELETED, paging)
+                .findAllByDialog_DialogId(dialogId, paging)
                 .getContent();
-
-        for (Message message : messages) {
-            if (message.getStatus().equals(MessageStatus.DELIVERED)
-                    && !message.getSender().getUserId().equals(authName)) {
-                message.setStatus(MessageStatus.RECEIVED);
-            }
-        }
 
         List<MessageView> messageViews = ProjectionUtil.parseToProjectionList(messages, MessageView.class);
         Collections.reverse(messageViews);

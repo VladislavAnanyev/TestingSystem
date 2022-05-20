@@ -156,52 +156,15 @@ async function addTest() {
             percent: document.getElementById("rangeval").textContent
         }
 
-       /* var blob = new Blob([JSON.stringify(quizzes_mas)]);
 
-        const formData = new FormData();
-        formData.append('description', name.value)
-        formData.append('quizzes', quizzes_mas)
-        formData.append('duration', time)
-        formData.append('courseId', courseId.value)
-        formData.append('startAt', startDate)
-        formData.append('finishAt', endDate)
-        formData.append('attempts', attempts)
-        formData.append('displayAnswers', viewAnswers)
-        formData.append('image', file[0])
-
-
-        console.log(await toBase64(file[0]));
-
-        console.log(formData)*/
         console.log(json)
         let xhr = new XMLHttpRequest();
         xhr.open('POST', '/test/create', true);
-         xhr.setRequestHeader('Content-type','application/json');
+        xhr.setRequestHeader('Content-type','application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-
                 var successModal = new bootstrap.Modal(document.getElementById('staticBackdropAdd'))
                 successModal.toggle()
-
-                /*document.location.href = "#"
-                let div = document.createElement("div");
-                div.setAttribute('class', 'alert alert-success');
-                div.setAttribute('role', 'alert');
-
-                div.innerText = 'Успешно!';
-
-                let div2 = document.getElementById("checkForm0");
-                //document.body.append(div);
-                div2.before(div);
-
-                setTimeout(() => $(div).slideUp('slow', function () {
-                        //button.disabled = false;
-                        $(this).remove();
-                        //button.disabled = false;
-
-                    }
-                ), 3000);*/
-
             } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 400) {
                 let div = document.createElement("div");
                 div.setAttribute('class', 'alert alert-danger');
@@ -210,16 +173,37 @@ async function addTest() {
                 div.innerText = 'Ошибка!';
 
                 let div2 = document.getElementById("checkForm0");
-                //document.body.append(div);
                 div2.before(div);
 
                 setTimeout(() => $(div).slideUp('slow', function () {
-                        //button.disabled = false;
                         $(this).remove();
-                        //button.disabled = false;
-
                     }
                 ), 3000);
+            } else if (xhr.status === 405) {
+                let xhrFix = new XMLHttpRequest();
+                xhrFix.open('POST', '/test/create', true);
+                xhrFix.setRequestHeader('Content-type','application/json');
+                xhrFix.onreadystatechange = function () {
+                    if (xhrFix.readyState === XMLHttpRequest.DONE && xhrFix.status === 200) {
+                        var successModal = new bootstrap.Modal(document.getElementById('staticBackdropAdd'))
+                        successModal.toggle()
+                    } else if (xhrFix.readyState === XMLHttpRequest.DONE && xhrFix.status === 400) {
+                        let div = document.createElement("div");
+                        div.setAttribute('class', 'alert alert-danger');
+                        div.setAttribute('role', 'alert');
+
+                        div.innerText = 'Ошибка!';
+
+                        let div2 = document.getElementById("checkForm0");
+                        div2.before(div);
+
+                        setTimeout(() => $(div).slideUp('slow', function () {
+                                $(this).remove();
+                            }
+                        ), 3000);
+                    }
+                };
+                xhrFix.send(JSON.stringify(json))
             }
         };
         xhr.send(JSON.stringify(json))

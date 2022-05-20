@@ -1,7 +1,7 @@
 <#import "parts/signinCommon.ftlh" as c>
 <@c.page>
 
-    <form action="/signup/admin" method="post">
+    <form action="/signup" method="post">
         <div class="container">
             <div class="row align-items-center justify-content-center min-vh-100 gx-0">
 

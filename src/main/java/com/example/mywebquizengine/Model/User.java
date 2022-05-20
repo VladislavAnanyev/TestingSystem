@@ -13,9 +13,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity(name = "USERS")
 public class User implements UserDetails, OAuth2User {
@@ -54,7 +52,7 @@ public class User implements UserDetails, OAuth2User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
-    private List<Course> courses = new ArrayList<>();
+    private Set<Course> courses = new HashSet<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "GROUP_ID")
@@ -68,11 +66,9 @@ public class User implements UserDetails, OAuth2User {
     private boolean credentialsNonExpired;
     @Transient
     private boolean enabled;
-    private boolean status;
 
     @Enumerated(EnumType.STRING)
     private Role role;
-    private boolean online;
 
     public User() {
         this.accountNonExpired = true;
@@ -86,7 +82,6 @@ public class User implements UserDetails, OAuth2User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.status = false;
     }
 
     public User(Long userId, String firstName, String lastName, String avatar, String email) {
@@ -120,14 +115,6 @@ public class User implements UserDetails, OAuth2User {
         this.dialogs = dialogs;
     }
 
-    public boolean getOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
-
     public String getAvatar() {
         return avatar;
     }
@@ -143,11 +130,11 @@ public class User implements UserDetails, OAuth2User {
         return authorities;
     }
 
-    public List<Course> getCourses() {
+    public Set<Course> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(Set<Course> courses) {
         this.courses = courses;
     }
 
@@ -236,14 +223,6 @@ public class User implements UserDetails, OAuth2User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
     }
 
     public Role getRole() {
