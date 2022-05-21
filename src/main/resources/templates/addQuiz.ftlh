@@ -1,7 +1,7 @@
 <#import "parts/commonWithoutAside.ftlh" as c>
 <#include "parts/security.ftlh">
 <@c.page>
-    <title>Добавить викторину</title>
+    <title>Добавить тест</title>
 
 
 <#--
@@ -16,55 +16,33 @@
     <aside class="sidebar bg-light">
         <div class="container h-100">
             <#--            <div class="flex-wrap mt-5">-->
-            <nav id="navbar-example3" class="navbar navbar-light bg-light px-3" aria-label="...">
-                <ul class="justify-content-center pagination nav nav-pills" style="flex-wrap: wrap">
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="feather feather-sliders">
-                                <line x1="4" y1="21" x2="4" y2="14"></line>
-                                <line x1="4" y1="10" x2="4" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12" y2="3"></line>
-                                <line x1="20" y1="21" x2="20" y2="16"></line>
-                                <line x1="20" y1="12" x2="20" y2="3"></line>
-                                <line x1="1" y1="14" x2="7" y2="14"></line>
-                                <line x1="9" y1="8" x2="15" y2="8"></line>
-                                <line x1="17" y1="16" x2="23" y2="16"></line>
-                            </svg>
-                        </a>
-                    </li>
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">1
-                        </a>
-                    </li>
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">2
-                        </a>
-                    </li>
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">3
-                        </a>
-                    </li>
-                    <li aria-disabled="true" disabled style="width: 60px"
-                        class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a disabled="true" aria-disabled="true" style="color: #5376fc" id="nav1"
-                           class="card-body page-link nav-link text-center"
-                           href="#list-item-1">4
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">1. Укажите общую информацию и ограничения на тестирование</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">2. Создайте тестовые задания</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">3. Подтвердите создание теста кнопкой "создать тест"</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <#--            </div>-->
         </div>
     </aside>
@@ -164,7 +142,7 @@
                                 </a>
                             </div>
 
-                            <div class="mt-2 col">Время начала
+                            <div class="mt-2 col">Дата и время начала доступа
 
                                 <div class="form-check ml-4">
                                     <input onclick="document.getElementById('startDate').hidden=true"
@@ -187,7 +165,7 @@
                                 </div>
 
                             </div>
-                            <div class="mt-2 col">Время конца
+                            <div class="mt-2 col">Дата и время окончания доступа
 
                                 <div class="form-check ml-4">
                                     <input onclick="document.getElementById('endDate').hidden=true"
@@ -243,7 +221,7 @@
                                     ?
                                 </a>
                             </div>
-                            <div class="mt-2 col">Отображать ответы пользователям
+                            <div class="mt-2 col">Отображать ответы пользователям по окончании тестирования
                                 <div class="form-check ml-4">
                                     <input class="form-check-input" type="radio" name="flexRadioDefault5"
                                            id="flexRadioDefault9"
@@ -293,10 +271,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="exampleFormControlInput1 validationDefault01">Вопрос</label>
+                                <label for="exampleFormControlInput1 validationDefault01">формулировка</label>
                                 <textarea rows="1" required type="text" class="form-control"
                                           id="questionID validationDefault01"
-                                          placeholder="Напишите здесь ваш вопрос" name="question"></textarea>
+                                          placeholder="Напишите здесь формулировку вашего задания" name="question"></textarea>
                             </div>
 
 
@@ -313,7 +291,7 @@
                             </div>
 
                             <div id="chooseType1">
-                                <label for="exampleFormControlInput1 validationDefault01">Выберите тип вопроса</label>
+                                <label for="exampleFormControlInput1 validationDefault01">Выберите тип задания</label>
                                 <div class="card-body row">
                                     <div class="col-auto mt-8">
                                         <a class="btn btn-sm btn-icon btn-primary rounded-circle">
@@ -695,7 +673,7 @@
 
                 <div class="row mb-5">
                     <div id="addQuiz" class="col">
-                        <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
+                        <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить задание</button>
                     </div>
 
                     <div class="col text-end">
@@ -708,7 +686,7 @@
             <#else >
 
                 <div id="addQuiz">
-                    <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
+                    <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить задание</button>
                 </div>
 
                 <div>

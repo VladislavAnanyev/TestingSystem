@@ -7,7 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
+//S в конце
 @Entity(name = "USER_QUIZ_STRING_ANSWERS")
 public class StringUserAnswerQuiz extends UserQuizAnswer {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

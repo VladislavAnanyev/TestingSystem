@@ -27,6 +27,28 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">Добавить курс</h4>
+                        </div>
+                        <div class="col-auto">
+                            <a data-bs-toggle="modal"
+                               data-bs-target="#modal-invite"
+                               class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-plus">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </aside>
@@ -39,9 +61,9 @@
             </div>
 
             <div class="row">
+                <#if courses?size!=0>
                 <#list courses as course>
 
-                    <#if course??>
 
                         <div class="col-sm-6 mb-10">
 
@@ -62,8 +84,7 @@
                                         </div>
                                     </div>
                                     <#if course.ownerUserId = nameId>
-                                    <div class="row text-center">
-
+                                        <div class="row text-center">
 
 
                                             <div class="col">
@@ -81,40 +102,39 @@
                                             </div>
 
 
+                                            <div class="col">
+                                                <a href="/course/${course.courseId?c}/tests"
+                                                   class="btn btn-icon btn-primary rounded-circle">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                         stroke-width="2"
+                                                         stroke-linecap="round" stroke-linejoin="round"
+                                                         class="feather feather-chevron-right">
+                                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                                    </svg>
+                                                </a>
+                                            </div>
 
-                                        <div class="col">
-                                            <a href="/course/${course.courseId?c}/tests"
-                                               class="btn btn-icon btn-primary rounded-circle">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2"
-                                                     stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-chevron-right">
-                                                    <polyline points="9 18 15 12 9 6"></polyline>
-                                                </svg>
-                                            </a>
                                         </div>
 
-                                    </div>
+                                    <#else >
+                                        <div class="row ">
 
-                                        <#else >
-                                            <div class="row ">
+                                            <div class="col text-center">
 
-                                                <div class="col text-center">
-
-                                                    <a href="/course/${course.courseId?c}/tests"
-                                                       class="btn btn-icon btn-primary rounded-circle">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                             stroke-width="2"
-                                                             stroke-linecap="round" stroke-linejoin="round"
-                                                             class="feather feather-chevron-right">
-                                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                                        </svg>
-                                                    </a>
-                                                </div>
-
+                                                <a href="/course/${course.courseId?c}/tests"
+                                                   class="btn btn-icon btn-primary rounded-circle">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                         stroke-width="2"
+                                                         stroke-linecap="round" stroke-linejoin="round"
+                                                         class="feather feather-chevron-right">
+                                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                                    </svg>
+                                                </a>
                                             </div>
+
+                                        </div>
 
                                     </#if>
 
@@ -125,11 +145,15 @@
 
                         </div>
 
-                    <#else>
+
+                </#list>
+                <#else>
                         <div class="d-flex flex-column h-100 justify-content-center">
                             <div class="text-center mb-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round"
                                      class="feather feather-monitor">
                                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                                     <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -139,8 +163,7 @@
 
                             <p class="text-center text-muted">Курсов пока нет<br> создайте из меню слева</p>
                         </div>
-                    </#if>
-                </#list>
+                </#if>
             </div>
         </div>
     </main>
@@ -183,16 +206,19 @@
                         <div class="profile-body">
                             <div class="avatar avatar-lg">
                                     <span class="avatar-text bg-primary">
+
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+
                                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                              stroke-linecap="round" stroke-linejoin="round"
                                              class="feather feather-user-plus"><path
-                                                    d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle
-                                                    cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20"
-                                                                                         y2="14"></line><line x1="23"
-                                                                                                              y1="11"
-                                                                                                              x2="17"
-                                                                                                              y2="11"></line></svg>
+                                                d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle
+                                                cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20"
+                                                                                     y2="14"></line><line x1="23"
+                                                                                                          y1="11"
+                                                                                                          x2="17"
+                                                                                                          y2="11"></line>
+                                        </svg>
                                     </span>
                             </div>
 

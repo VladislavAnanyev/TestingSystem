@@ -16,7 +16,7 @@ public class UserTestAnswer {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long userAnswerId;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -24,7 +24,7 @@ public class UserTestAnswer {
     @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "test_id")
     private Test test;
 

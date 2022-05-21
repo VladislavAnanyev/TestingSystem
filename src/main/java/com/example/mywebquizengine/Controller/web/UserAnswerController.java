@@ -166,13 +166,23 @@ public class UserAnswerController {
                 }
             }
 
+
+            model.addAttribute("minQuiz", test.getQuizzes().get(minQuestionIndex));
+            model.addAttribute("maxQuiz", test.getQuizzes().get(maxQuestionIndex));
+
             model.addAttribute("min", minQuestionIndex + 1);
             model.addAttribute("max", maxQuestionIndex + 1);
+
+            model.addAttribute("chart", answerStats);
+            model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, groupId));
+            model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id, groupId));
+            model.addAttribute("timeChart", timeAnswerStats);
+            if (timeAnswerStats != null) {
+                List<Double> timeValues = new ArrayList<>(timeAnswerStats.values());
+                model.addAttribute("timeMin", timeValues.get(minQuestionIndex));
+                model.addAttribute("timeMax", timeValues.get(maxQuestionIndex));
+            }
         }
-        model.addAttribute("chart", answerStats);
-        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, groupId));
-        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id, groupId));
-        model.addAttribute("timeChart", timeAnswerStats);
         if (groupId != null) {
             for (GroupView groupView : groupsInCourse) {
                 if (groupView.getGroupId().equals(groupId)) {

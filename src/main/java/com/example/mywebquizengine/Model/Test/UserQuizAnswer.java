@@ -11,12 +11,12 @@ public class UserQuizAnswer {
 
     private Boolean status;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "quiz_id")
     //@OnDelete(action = OnDeleteAction.CASCADE)
     private Quiz quiz;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "user_answer_id")
     private UserTestAnswer userAnswer;
 

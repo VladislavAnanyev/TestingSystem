@@ -32,6 +32,8 @@
                                     <li><a class="dropdown-item"
                                            href="?groupId=${group.groupId?c}">Группа №: ${group.groupName}</a></li>
                                 </#list>
+                                <li><a class="dropdown-item"
+                                       href="#">по всем группам</a></li>
                             </ul>
                         </div>
                     </div>
@@ -42,7 +44,9 @@
                 <div class="card-body">
                     <div class="row align-items-center gx-0">
                         <div class="col">
-                            <h4 class="mb-1">Самый трудный вопрос: №<#if min??>${min}</#if></h4>
+                            <h4 class="mb-1">Больше всего ошибок в задании: №<#if min??>${min}</#if></h4>
+                            <h5 class="mb-1">Его тема: <#if max??>${minQuiz.title}</#if></h5>
+                            <h4 class="mb-1">Решалось в среднем за: <#if timeMin??>${timeMin} сек.</#if></h4>
                         </div>
                         <div class="col-auto">
                             <a class="btn btn-sm btn-icon btn-primary rounded-circle">
@@ -62,7 +66,9 @@
                 <div class="card-body">
                     <div class="row align-items-center gx-0">
                         <div class="col">
-                            <h4 class="mb-1">Самый лёгкий вопрос: №<#if max??>${max}</#if></h4>
+                            <h4 class="mb-1">Меньше всего ошибок в задании: №<#if max??>${max}</#if></h4>
+                            <h4 class="mb-1">Его тема: <#if max??>${maxQuiz.title}</#if></h4>
+                            <h4 class="mb-1">Решалось в среднем за: <#if timeMax??>${timeMax} сек.</#if></h4>
                         </div>
                         <div class="col-auto">
                             <a class="btn btn-sm btn-icon btn-primary rounded-circle">
@@ -194,7 +200,7 @@
                         width: 300,
                         legend: {position: 'none'},
                         chart: {
-                            title: 'Среднее время прохождения ',
+                            title: 'Среднее время прохождения (сек)',
                             subtitle: 'По каждому из вопросов'
                         },
                         axes: {
@@ -245,7 +251,7 @@
                                             <th scope="col">Логин</th>
                                             <th scope="col">Завершён в</th>
                                             <th scope="col">Процент</th>
-                                            <th scope="col">Действие</th>
+<#--                                            <th scope="col">Действие</th>-->
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -282,7 +288,7 @@
                                                     </#if>
                                                 </td>
 
-                                                <td>
+                                                <#--<td>
                                                     <a onclick="writeMsg('${answer.userId?c}')"
                                                        class="btn btn-sm btn-icon btn-primary rounded-circle">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -294,7 +300,7 @@
                                                             <polyline points="22,6 12,13 2,6"></polyline>
                                                         </svg>
                                                     </a>
-                                                </td>
+                                                </td>-->
 
 
                                             </tr>
@@ -338,7 +344,7 @@
                                             <th scope="col">${quiz_index + 1}</th>
                                         </#list>
                                         <th scope="col">Процент</th>
-                                        <th scope="col">Действие</th>
+<#--                                        <th scope="col">Действие</th>-->
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -395,7 +401,7 @@
                                             </td>
 
 
-                                            <td>
+                                           <#-- <td>
                                                 <a onclick="writeMsg('${answer.userId?c}')"
                                                    class="btn btn-sm btn-icon btn-primary rounded-circle">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -407,7 +413,7 @@
                                                         <polyline points="22,6 12,13 2,6"></polyline>
                                                     </svg>
                                                 </a>
-                                            </td>
+                                            </td>-->
 
 
                                         </tr>
@@ -448,7 +454,7 @@
                                             <th scope="col">${quiz_index + 1}</th>
                                         </#list>
                                         <th scope="col">Процент</th>
-                                        <th scope="col">Действие</th>
+<#--                                        <th scope="col">Действие</th>-->
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -481,7 +487,7 @@
                                             </td>
 
 
-                                            <td>
+                                            <#--<td>
                                                 <a onclick="writeMsg('${answer.userId?c}')"
                                                    class="btn btn-sm btn-icon btn-primary rounded-circle">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -493,7 +499,7 @@
                                                         <polyline points="22,6 12,13 2,6"></polyline>
                                                     </svg>
                                                 </a>
-                                            </td>
+                                            </td>-->
 
 
                                         </tr>

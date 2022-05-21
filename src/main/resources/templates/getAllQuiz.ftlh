@@ -71,6 +71,13 @@
                                         <#else>
                                             <p class="card-text">Ограничение по времени: отсутствует</p>
                                         </#if>
+
+                                        <#if test.startTime??>
+                                            <p class="card-text">Тест доступен с: ${test.startTime?datetime}</p>
+
+                                        <#else>
+                                            <p class="card-text">Тест доступен в любое время</p>
+                                        </#if>
                                     </div>
 
 

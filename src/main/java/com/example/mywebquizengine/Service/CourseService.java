@@ -1,8 +1,5 @@
 package com.example.mywebquizengine.Service;
 
-import com.example.mywebquizengine.Model.Chat.Dialog;
-import com.example.mywebquizengine.Model.Chat.Message;
-import com.example.mywebquizengine.Model.Chat.MessageStatus;
 import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.Group;
 import com.example.mywebquizengine.Model.Projection.CourseView;
@@ -14,7 +11,6 @@ import com.example.mywebquizengine.Repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,15 +26,11 @@ public class CourseService {
     @Autowired
     private UserRepository userRepository;
 
-
-
     @Autowired
     private MailSender mailSender;
 
     @Value("${hostname}")
     private String hostname;
-    @Autowired
-    private MessageService messageService;
 
     @Autowired
     private UserService userService;
@@ -54,30 +46,10 @@ public class CourseService {
         course.setOwner(user);
         course.addMember(user);
 
-        // другая бизнес-логика
-        // в данном случае по созданию групповой конференции
-
         courseRepository.save(course);
         return course.getCourseId();
     }
 
-        /*Dialog dialog = new Dialog();
-        dialog.addUser(user);
-        dialog.setName(name);
-        dialog.setImage("https://localhost/img/default.jpg");
-
-        course.setDialog(dialog);
-
-        Message message = new Message();
-        message.setSender(user);
-        message.setTimestamp(new Date());
-        message.setDialog(dialog);
-        message.setStatus(MessageStatus.DELIVERED);
-        message.setContent(user.getFirstName() + " " + user.getLastName() + " " + "создал группу \"Базы данных \"");
-
-        dialog.setMessages(Collections.singletonList(message));
-        courseRepository.save(course);
-    }*/
 
     public List<CourseView> getAllCourses() {
         return courseRepository.findAllCourses();
@@ -102,8 +74,6 @@ public class CourseService {
                 user.setEmail(email);
                 user.setActivationCode(uuid);
                 user.setEnabled(false);
-                user.setFirstName(email);
-                user.setLastName(email);
                 userRepository.save(user);
 
                 mailSender.send(
@@ -123,7 +93,6 @@ public class CourseService {
             }
 
             course.addMember(user);
-            messageService.addUsersToDialog(course.getDialog().getDialogId(), Collections.singletonList(user));
 
         } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вы не создатель этого курса");
     }
@@ -142,7 +111,6 @@ public class CourseService {
         if (optionalCourse.isPresent()) {
             Course course = optionalCourse.get();
             course.getMembers().forEach(course::removeMember);
-            course.getDialog().getUsers().forEach(user -> course.getDialog().removeUser(user));
             courseRepository.deleteById(id);
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }

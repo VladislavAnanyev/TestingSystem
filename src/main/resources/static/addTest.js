@@ -159,7 +159,7 @@ async function addTest() {
 
         console.log(json)
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', '/test/create', true);
+        xhr.open('POST', '/course/' + courseId.value + '/test/create', true);
         xhr.setRequestHeader('Content-type','application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

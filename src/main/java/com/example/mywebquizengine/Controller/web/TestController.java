@@ -40,14 +40,14 @@ public class TestController {
         return "addQuiz";
     }
 
-    @PostMapping(path = "/test/create", consumes = {"application/json"})
+    @PostMapping(path = "/course/{courseId}/test/create", consumes = {"application/json"})
     @ResponseBody
     public void addTest(
-            @RequestBody CreateTestRequest request,
+            @RequestBody CreateTestRequest request, @PathVariable Long courseId,
             @AuthenticationPrincipal User authUser) throws ResponseStatusException {
 
         testService.add(
-                request.getCourseId(),
+                courseId,
                 request.getDuration(),
                 request.getQuizzes(),
                 request.getDescription(),

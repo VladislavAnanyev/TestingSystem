@@ -17,15 +17,13 @@ public class Test {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long testId;
 
-    //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<@Valid Quiz> quizzes;
 
-    //@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<UserTestAnswer> userTestAnswers;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @NotNull
     @JoinColumn(name = "COURSE_ID")
     private Course course;
@@ -38,13 +36,12 @@ public class Test {
 
     private String description;
 
-    private String fileUrl;
-
     private LocalTime duration;
 
     private Integer passingScore;
 
     @ColumnDefault("true")
+    @NotNull
     private boolean displayAnswers;
 
     public Test() {}
@@ -55,14 +52,6 @@ public class Test {
 
     public void setPassingScore(Integer percent) {
         this.passingScore = percent;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
     }
 
     public Calendar getEndTime() {

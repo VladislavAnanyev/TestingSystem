@@ -1,7 +1,7 @@
 function checkAnswerSession(id) {
 
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', '/checklastanswer/' + id,true);
+    xhr.open('GET', '/test/' + id + '/answer/check',true);
     xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
     xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

@@ -1,6 +1,5 @@
 package com.example.mywebquizengine.Model;
 
-import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.MywebquizengineApplication;
 import com.example.mywebquizengine.Service.UserService;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,21 +30,14 @@ public class User implements UserDetails, OAuth2User {
     private String activationCode;
     private String changePasswordCode;
     @NotBlank
-    @NotNull
+    @Column(nullable = false)
     private String firstName;
     @NotBlank
-    @NotNull
     private String lastName;
     @Size(min = 5)
     private String password;
+    @NotNull
     private String avatar;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "users_dialogs",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "dialog_id")
-    )
-    private List<Dialog> dialogs = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "courses_members",
@@ -105,14 +97,6 @@ public class User implements UserDetails, OAuth2User {
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public List<Dialog> getDialogs() {
-        return dialogs;
-    }
-
-    public void setDialogs(List<Dialog> dialogs) {
-        this.dialogs = dialogs;
     }
 
     public String getAvatar() {

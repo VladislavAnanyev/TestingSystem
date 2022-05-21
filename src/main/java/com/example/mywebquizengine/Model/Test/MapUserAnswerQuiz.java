@@ -9,8 +9,8 @@ public class MapUserAnswerQuiz extends UserQuizAnswer {
 
     @ElementCollection
     @CollectionTable(name = "USER_QUIZ_MAP_ANSWERS", joinColumns=@JoinColumn(name = "QUIZ_ID"))
-    @MapKeyColumn(name = "answer_id")
-    @Column(name = "answers")
+    @MapKeyColumn(name = "answer_key")
+    @Column(name = "answer_value")
     private Map<String, String> answer;
 
     public Map<String, String> getAnswer() {

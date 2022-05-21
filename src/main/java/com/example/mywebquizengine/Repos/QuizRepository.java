@@ -55,11 +55,6 @@ public interface QuizRepository extends CrudRepository<Quiz, Long>, PagingAndSor
     @Transactional
     void insertOptions(@Param("QUIZZES_ID") int QUIZZES_ID, @Param("OPTIONS") String OPTIONS);
 
-    @Modifying
-    @Transactional
-    @Query(value = "CASCADE DELETE FROM QUIZZES WHERE QUIZZES_ID = :id", nativeQuery = true)
-    void CustomDeleteById(int id);
-
     @Query(nativeQuery = true, value = "SELECT *, 0 AS clazz_ FROM QUIZZES WHERE QUIZ_ID = :quizId")
     Quiz find(Long quizId);
 

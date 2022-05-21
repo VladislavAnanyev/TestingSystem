@@ -43,13 +43,13 @@ public interface UserTestAnswerRepository extends CrudRepository<UserTestAnswer,
     @Query(value = "SELECT USER_ANSWER_ID FROM USER_TEST_ANSWERS u WHERE TEST_ID = :id", nativeQuery = true)
     List<Long> getUserAnswersById(Long id);
 
-    @Query(value = "SELECT TOP 1 * FROM USER_TEST_ANSWERS WHERE USER_ID = :userId ORDER BY START_AT DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM USER_TEST_ANSWERS WHERE USER_ID = :userId ORDER BY START_AT DESC limit 1", nativeQuery = true)
     Optional<UserTestAnswer> findLastUserAnswer(Long userId);
 
-    @Query(value = "SELECT TOP 1 * FROM USER_TEST_ANSWERS WHERE USER_ID = :userId ORDER BY START_AT DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM USER_TEST_ANSWERS WHERE USER_ID = :userId ORDER BY START_AT DESC limit 1", nativeQuery = true)
     Optional<UserTestAnswer> findLastUserAnswerEager(Long userId);
 
-    @Query(value = "SELECT TOP 1 * FROM USER_TEST_ANSWERS WHERE user_id = :userId AND TEST_ID = :test_id ORDER BY START_AT DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM USER_TEST_ANSWERS WHERE user_id = :userId AND TEST_ID = :test_id ORDER BY START_AT DESC limit 1", nativeQuery = true)
     Optional<UserTestAnswer> findLastUserTestAnswer(Long userId, Long test_id);
 
     Optional<UserTestAnswer> findByUserAnswerId(Long userAnswerId);

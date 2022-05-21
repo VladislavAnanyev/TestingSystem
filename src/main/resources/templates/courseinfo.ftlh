@@ -44,7 +44,7 @@
                             <th scope="col">Фамилия</th>
                             <th scope="col">Почта</th>
                             <th scope="col">Процент</th>
-                            <th scope="col">Действие</th>
+<#--                            <th scope="col">Действие</th>-->
                         </tr>
                         </thead>
                         <tbody>
@@ -73,7 +73,7 @@
 
                                 </td>
 
-                                <td>
+                                <#--<td>
                                     <a onclick="writeMsg('${answer.userId?c}')"
                                        class="btn btn-sm btn-icon btn-primary rounded-circle ">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -84,7 +84,7 @@
                                             <polyline points="22,6 12,13 2,6"></polyline>
                                         </svg>
                                     </a>
-                                </td>
+                                </td>-->
 
 
                             </tr>

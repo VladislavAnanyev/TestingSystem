@@ -6,42 +6,20 @@ public class AnswerChecker {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public Quiz quiz;
     private boolean success;
-    private String feedback;
 
     public AnswerChecker() {}
 
     public void checkAnswer(UserQuizAnswer answer){
 
-        if (quiz instanceof MultipleAnswerQuiz) {
+        if (quiz instanceof MultipleAnswerQuiz multipleAnswerQuiz) {
             MultipleUserAnswerQuiz multipleUserAnswerQuiz = (MultipleUserAnswerQuiz) answer;
-            MultipleAnswerQuiz multipleAnswerQuiz = (MultipleAnswerQuiz) quiz;
-            if (multipleUserAnswerQuiz.getAnswer().toString().equals(multipleAnswerQuiz.getAnswer().toString())) {
-                this.feedback = "Congratulations, you're right!";
-                this.success = true;
-            } else {
-                this.feedback = "Wrong answer! Please, try again.";
-                this.success = false;
-            }
-        } else if (quiz instanceof StringAnswerQuiz) {
+            this.success = multipleUserAnswerQuiz.getAnswer().toString().equals(multipleAnswerQuiz.getAnswer().toString());
+        } else if (quiz instanceof StringAnswerQuiz stringAnswerQuiz) {
             StringUserAnswerQuiz stringUserAnswerQuiz = (StringUserAnswerQuiz) answer;
-            StringAnswerQuiz stringAnswerQuiz = (StringAnswerQuiz) quiz;
-            if (stringUserAnswerQuiz.getAnswer().equals(stringAnswerQuiz.getAnswer().get(0))) {
-                this.feedback = "Congratulations, you're right!";
-                this.success = true;
-            } else {
-                this.feedback = "Wrong answer! Please, try again.";
-                this.success = false;
-            }
-        } else if (quiz instanceof MapAnswerQuiz) {
+            this.success = stringUserAnswerQuiz.getAnswer().equals(stringAnswerQuiz.getAnswer().get(0));
+        } else if (quiz instanceof MapAnswerQuiz mapAnswerQuiz) {
             MapUserAnswerQuiz mapUserAnswerQuiz = (MapUserAnswerQuiz) answer;
-            MapAnswerQuiz mapAnswerQuiz = (MapAnswerQuiz) quiz;
-            if (mapUserAnswerQuiz.getAnswer().equals(mapAnswerQuiz.getAnswer())) {
-                this.feedback = "Congratulations, you're right!";
-                this.success = true;
-            } else {
-                this.feedback = "Wrong answer! Please, try again.";
-                this.success = false;
-            }
+            this.success = mapUserAnswerQuiz.getAnswer().equals(mapAnswerQuiz.getAnswer());
         }
 
     }
@@ -54,11 +32,4 @@ public class AnswerChecker {
         this.success = success;
     }
 
-    public String getFeedback() {
-        return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
-    }
 }

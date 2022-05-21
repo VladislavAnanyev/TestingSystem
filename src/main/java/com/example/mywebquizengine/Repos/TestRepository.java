@@ -20,16 +20,6 @@ import java.util.Optional;
 public interface TestRepository extends CrudRepository<Test, Long>,
         PagingAndSortingRepository<Test, Long>, JpaRepository<Test, Long> {
 
-    /*@Query(value = "SELECT TEST_ID as testId, DESCRIPTION, DURATION, COURSE_ID as courseId, USERNAME FROM TESTS u WHERE USERNAME = :name AND COURSE_ID = :courseId", nativeQuery = true)
-    List<TestView> findMyTestsInCourse(String name, Long courseId);*/
-
-    /*@Query(value = "SELECT * FROM TESTS u WHERE USER = :name", nativeQuery = true)
-    List<Test> getQuizForThisNoPaging(String name);*/
-
-    /*@Query(nativeQuery = true, value = "SELECT * FROM TESTS INNER JOIN QUIZZES ON TESTS.ID = QUIZZES.TEST_ID\n" +
-            "WHERE TESTS.ID =:id")
-    Optional<Test> getTestByIds(Integer id);*/
-
     List<TestView> findTestsByCourse_CourseId(Long courseId);
 
     List<TestView> findTestsByCourse_CourseIdAndCourse_Owner_UserId(Long courseId, Long userId);

@@ -1,15 +1,12 @@
 package com.example.mywebquizengine.Model;
 
-import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.Model.Test.Test;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 @Entity(name = "COURSES")
 public class Course {
@@ -17,25 +14,16 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long courseId;
     private String name;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User owner;
     @ManyToMany(mappedBy = "courses", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<User> members = new HashSet<>();
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
     private List<Test> tests;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "dialog_id")
-    private Dialog dialog;
+
+    @NotNull
     private String image;
-
-    public Dialog getDialog() {
-        return dialog;
-    }
-
-    public void setDialog(Dialog dialog) {
-        this.dialog = dialog;
-    }
 
     public String getImage() {
         return image;
