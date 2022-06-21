@@ -266,12 +266,12 @@
                             <div class="form-group">
                                 <label for="exampleFormControlInput1 validationDefault01">Тема</label>
                                 <textarea required type="text" class="form-control" id="titleID validationDefault01"
-                                          placeholder="Напишите здесь тему вопроса" rows="1" name="title"></textarea>
+                                          placeholder="Напишите здесь тему задания" rows="1" name="title"></textarea>
                                 <input type="hidden">
                             </div>
 
-                            <div class="form-group">
-                                <label for="exampleFormControlInput1 validationDefault01">формулировка</label>
+                            <div class="form-group mt-4">
+                                <label for="exampleFormControlInput1 validationDefault01">Формулировка</label>
                                 <textarea rows="1" required type="text" class="form-control"
                                           id="questionID validationDefault01"
                                           placeholder="Напишите здесь формулировку вашего задания" name="question"></textarea>

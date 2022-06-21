@@ -25,7 +25,7 @@ public class SimpleJob extends QuartzJobBean {
         UserTestAnswer userTestAnswer2 = userAnswerService.findByUserAnswerId(dataMap.getLong("answer"));
 
         if (userTestAnswer2.getCompletedAt() == null) {
-            userAnswerController.sendAnswer(userTestAnswer.getUserAnswerId());
+            userAnswerController.sendAnswer(userTestAnswer.getUserAnswerId(), userTestAnswer2.getUser());
         }
 
         System.out.println("Задание выполнено в: " + new GregorianCalendar().getTime());

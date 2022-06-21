@@ -16,30 +16,20 @@ public class Test {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long testId;
-
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<@Valid Quiz> quizzes;
-
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<UserTestAnswer> userTestAnswers;
-
     @ManyToOne(optional = false)
     @NotNull
     @JoinColumn(name = "COURSE_ID")
     private Course course;
-
     private Calendar startTime;
-
     private Calendar endTime;
-
     private Integer attempts;
-
     private String description;
-
     private LocalTime duration;
-
     private Integer passingScore;
-
     @ColumnDefault("true")
     @NotNull
     private boolean displayAnswers;

@@ -38,14 +38,19 @@ public interface UserQuizAnswerRepository extends CrudRepository<UserQuizAnswer,
     List<Object[]> getAnswerStat(ArrayList<Long> quizzes, Long groupId);
 
     @Query(value = """
-            SELECT QUIZ_ID,
-            ROUND(((SELECT cast(COUNT(1) as FLOAT)
-            FROM USER_QUIZ_ANSWERS AS B  WHERE STATUS = TRUE
-            AND B.QUIZ_ID = C.QUIZ_ID )/(SELECT COUNT(1) + 0.001
-            FROM USER_QUIZ_ANSWERS AS B
-            join USER_TEST_ANSWERS UTA on UTA.USER_ANSWER_ID = B.USER_ANSWER_ID
-            where B.QUIZ_ID = C.QUIZ_ID and UTA.COMPLETED_AT is not null)) * 100 , 1)
-            FROM USER_QUIZ_ANSWERS AS C WHERE QUIZ_ID IN (:quizzes)  GROUP BY QUIZ_ID
+            SELECT quiz_id,
+                    ROUND(((SELECT cast(COUNT(1) as FLOAT)
+                            FROM User_Quiz_Answers AS UQA
+                            WHERE status = TRUE
+                              AND UQA.quiz_id = UQA_EXT.quiz_id) / (SELECT COUNT(1)
+                                                            FROM User_Quiz_Answers AS B
+                                                                     JOIN User_Test_Answers UTA
+                                                                         ON UTA.user_answer_id = B.user_answer_id
+                                                            WHERE B.quiz_id = UQA_EXT.QUIZ_ID
+                                                              AND UTA.completed_at IS NOT NULL)) * 100, 1)
+             FROM User_Quiz_Answers AS UQA_EXT
+             WHERE quiz_id IN (:quizzes)
+             GROUP BY quiz_id
             """, nativeQuery = true)
     List<Object[]> getAnswerStat(ArrayList<Long> quizzes);
 

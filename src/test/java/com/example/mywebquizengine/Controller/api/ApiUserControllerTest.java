@@ -102,11 +102,7 @@ public class ApiUserControllerTest {
                 .andExpect(jsonPath("$.jwtToken").isString());
 
         User user = repository.findUserByEmail("application").get();
-        assertNull(user.getChangePasswordCode());
         assertNotNull(user.getPassword());
-
-
-
     }
 
     @Test

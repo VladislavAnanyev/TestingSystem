@@ -40,7 +40,7 @@ public class CourseService {
 
     public Long createCourse(String name, Long userId) {
         Course course = new Course();
-        course.setName(name);
+        course.setCourseName(name);
         course.setImage(hostname + "/img/default.jpg");
         User user = userService.loadUserByUserId(userId);
         course.setOwner(user);

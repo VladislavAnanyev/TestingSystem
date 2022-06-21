@@ -1,7 +1,6 @@
 package com.example.mywebquizengine.Service;
 
 import com.example.mywebquizengine.Model.Course;
-import com.example.mywebquizengine.Model.Group;
 import com.example.mywebquizengine.Model.Projection.GroupView;
 import com.example.mywebquizengine.Model.Projection.TestView;
 import com.example.mywebquizengine.Model.Test.*;
@@ -11,7 +10,6 @@ import com.example.mywebquizengine.Model.dto.input.MultipleAnswerQuizRequest;
 import com.example.mywebquizengine.Model.dto.input.StringAnswerQuizRequest;
 import com.example.mywebquizengine.Repos.GroupRepository;
 import com.example.mywebquizengine.Repos.TestRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -66,13 +64,6 @@ public class TestService {
         testRepository.deleteById(id);
     }
 
-    public void updateTest(Long id, Test test) {
-        Test oldTest = testRepository.findById(id).get();
-        oldTest.setDescription(test.getDescription());
-        oldTest.setQuizzes(test.getQuizzes());
-        testRepository.save(oldTest);
-    }
-
     public List<TestView> findTestInCourse(Long id) {
         return testRepository.findTestsByCourse_CourseId(id);
     }
@@ -121,9 +112,9 @@ public class TestService {
                         );
 
                         if (uniqueFilename.substring(uniqueFilename.lastIndexOf(".")).contains("jp")) {
-                            quiz.setFileUrl("https://" + hostname + "/img/" + uniqueFilename);
+                            quiz.setFileUrl(hostname + "/img/" + uniqueFilename);
                         } else {
-                            quiz.setFileUrl("https://" + hostname + "/download/" + uniqueFilename);
+                            quiz.setFileUrl(hostname + "/download/" + uniqueFilename);
                         }
 
                     } catch (IOException e) {

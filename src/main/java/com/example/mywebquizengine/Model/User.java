@@ -28,7 +28,6 @@ public class User implements UserDetails, OAuth2User {
     @Email
     private String email;
     private String activationCode;
-    private String changePasswordCode;
     @NotBlank
     @Column(nullable = false)
     private String firstName;
@@ -215,14 +214,6 @@ public class User implements UserDetails, OAuth2User {
 
     public void setRole(Role roles) {
         this.role = roles;
-    }
-
-    public String getChangePasswordCode() {
-        return changePasswordCode;
-    }
-
-    public void setChangePasswordCode(String changePasswordCode) {
-        this.changePasswordCode = changePasswordCode;
     }
 
     @Override

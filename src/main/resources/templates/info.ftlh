@@ -44,9 +44,9 @@
                 <div class="card-body">
                     <div class="row align-items-center gx-0">
                         <div class="col">
-                            <h4 class="mb-1">Больше всего ошибок в задании: №<#if min??>${min}</#if></h4>
+                            <h5 class="mb-1">Больше всего ошибок в задании: №<#if min??>${min}</#if></h5>
                             <h5 class="mb-1">Его тема: <#if max??>${minQuiz.title}</#if></h5>
-                            <h4 class="mb-1">Решалось в среднем за: <#if timeMin??>${timeMin} сек.</#if></h4>
+                            <h5 class="mb-1">Решалось в среднем за: <#if timeMin??>${timeMin} сек.</#if></h5>
                         </div>
                         <div class="col-auto">
                             <a class="btn btn-sm btn-icon btn-primary rounded-circle">
@@ -66,9 +66,9 @@
                 <div class="card-body">
                     <div class="row align-items-center gx-0">
                         <div class="col">
-                            <h4 class="mb-1">Меньше всего ошибок в задании: №<#if max??>${max}</#if></h4>
-                            <h4 class="mb-1">Его тема: <#if max??>${maxQuiz.title}</#if></h4>
-                            <h4 class="mb-1">Решалось в среднем за: <#if timeMax??>${timeMax} сек.</#if></h4>
+                            <h5 class="mb-1">Меньше всего ошибок в задании: №<#if max??>${max}</#if></h5>
+                            <h5 class="mb-1">Его тема: <#if max??>${maxQuiz.title}</#if></h5>
+                            <h5 class="mb-1">Решалось в среднем за: <#if timeMax??>${timeMax} сек.</#if></h5>
                         </div>
                         <div class="col-auto">
                             <a class="btn btn-sm btn-icon btn-primary rounded-circle">

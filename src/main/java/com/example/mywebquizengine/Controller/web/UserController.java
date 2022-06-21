@@ -55,12 +55,6 @@ public class UserController {
         return "singin";
     }
 
-    @PutMapping(path = "/updatepass/{changePasswordCode}", consumes = {"application/json"})
-    public String changePasswordUsingCode(@RequestBody String password, @PathVariable String changePasswordCode) {
-        userService.updatePassword(password, changePasswordCode);
-        return "changePassword";
-    }
-
     @Transactional
     @PutMapping(path = "/update/user/{userId}", consumes = {"application/json"})
 //    @PreAuthorize(value = "#principal.name.equals(#userId)")

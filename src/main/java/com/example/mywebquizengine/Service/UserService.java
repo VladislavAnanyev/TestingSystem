@@ -124,13 +124,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    @Transactional
-    public void updatePassword(String password, String changePasswordCode) {
-        User savedUser = getUserViaChangePasswordCode(changePasswordCode);
-        savedUser.setPassword(passwordEncoder.encode(password));
-        savedUser.setChangePasswordCode(UUID.randomUUID().toString());
-    }
-
     public User findUserByActivationCode(String activationCode) {
         Optional<User> optionalUser = userRepository.findByActivationCode(activationCode);
         if (optionalUser.isEmpty()) {

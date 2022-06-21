@@ -61,8 +61,8 @@ public class UserAnswerController {
     @PostMapping(path = "/test/answer/{id}/send")
     @ResponseBody
     @Transactional
-    public void sendAnswer(@PathVariable Long id) {
-        userAnswerService.checkAnswer(id);
+    public void sendAnswer(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
+        userAnswerService.checkAnswer(id, authUser.getUserId());
     }
 
     @PostMapping(path = "/test/answer/{id}/start")
@@ -91,27 +91,14 @@ public class UserAnswerController {
             model.addAttribute("lastAnswer", userTestAnswer);
             model.addAttribute("test_id", test);
             List<Quiz> quizzes = test.getQuizzes();
-            Collections.shuffle(quizzes);
+            //Collections.shuffle(quizzes);
             model.addAttribute("quizzes", quizzes);
 
             if (test.getDuration() != null) {
                 Calendar userTestAnswerStartAt = userTestAnswer.getStartAt();
                 Calendar userTestAnswerFinishAt = new GregorianCalendar();
                 userTestAnswerFinishAt.setTime(userTestAnswerStartAt.getTime());
-                userTestAnswerFinishAt.set(Calendar.SECOND, userTestAnswerFinishAt.get(Calendar.SECOND) + test.getDuration().getSecond());
-                userTestAnswerFinishAt.set(Calendar.MINUTE, userTestAnswerFinishAt.get(Calendar.MINUTE) + test.getDuration().getMinute());
-                userTestAnswerFinishAt.set(Calendar.HOUR, userTestAnswerFinishAt.get(Calendar.HOUR) + test.getDuration().getHour());
-
-                if (test.getEndTime() != null) {
-                    Calendar nowTimePlusDuration = new GregorianCalendar();
-                    nowTimePlusDuration.add(Calendar.SECOND, test.getDuration().getSecond());
-                    nowTimePlusDuration.add(Calendar.MINUTE, test.getDuration().getMinute());
-                    nowTimePlusDuration.add(Calendar.HOUR, test.getDuration().getHour());
-
-                    if (nowTimePlusDuration.after(test.getEndTime())) {
-                        userTestAnswerFinishAt = test.getEndTime();
-                    }
-                }
+                userTestAnswerFinishAt = UserAnswerService.getEndTime(test);
                 model.addAttribute("timeout", userTestAnswerFinishAt.getTime());
             }
 

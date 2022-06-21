@@ -13,7 +13,7 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long courseId;
-    private String name;
+    private String courseName;
     @ManyToOne(optional = false)
     private User owner;
     @ManyToMany(mappedBy = "courses", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -33,8 +33,8 @@ public class Course {
         this.image = image;
     }
 
-    public String getName() {
-        return name;
+    public String getCourseName() {
+        return courseName;
     }
 
     public Long getCourseId() {
@@ -53,8 +53,8 @@ public class Course {
         return owner;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCourseName(String name) {
+        this.courseName = name;
     }
 
     public void setCourseId(Long id) {

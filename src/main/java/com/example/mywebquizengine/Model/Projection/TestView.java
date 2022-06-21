@@ -2,8 +2,12 @@ package com.example.mywebquizengine.Model.Projection;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import java.sql.Date;
+
+import java.time.Instant;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public interface TestView {
@@ -15,6 +19,6 @@ public interface TestView {
     @Value("#{@userAnswerService.checkComplete(target.testId)}")
     boolean isComplete();
     Integer getAttempts();
-    Date getStartTime();
-    Date getEndTime();
+    Calendar getStartTime();
+    Calendar getEndTime();
 }
