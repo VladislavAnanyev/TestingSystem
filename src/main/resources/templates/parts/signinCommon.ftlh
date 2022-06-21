@@ -12,7 +12,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700" rel="stylesheet">
 
         <link rel="stylesheet" href="/static/template.bundle.css">
-        <link rel="stylesheet" href="/static/template.dark.bundle.css" media="(prefers-color-scheme: dark)">
     </head>
     <body>
 

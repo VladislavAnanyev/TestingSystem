@@ -18,7 +18,6 @@
 
         <!-- Template CSS -->
         <link rel="stylesheet" href="/static/template.bundle.css">
-        <link rel="stylesheet" href="/static/template.dark.bundle.css" media="(prefers-color-scheme: dark)">
     </head>
     <#--<body>-->
     <body>
