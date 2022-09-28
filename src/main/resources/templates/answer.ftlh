@@ -160,7 +160,7 @@
                                     </#if>
                                     <p>Выберите один или несколько ответов</p>
                                 </div>
-                                <#if quiz.class == "class com.example.mywebquizengine.Model.Test.MapAnswerQuiz">
+                                <#if quiz.class == "class com.example.mywebquizengine.model.test.MapAnswerQuiz">
                                     <div class="custom-control custom-checkbox mt-2">
 
                                         <div class="card border-0 mt-3">
@@ -234,7 +234,7 @@
 
                                     </div>
                                 </#if>
-                                <#if quiz.class == "class com.example.mywebquizengine.Model.Test.MultipleAnswerQuiz">
+                                <#if quiz.class == "class com.example.mywebquizengine.model.test.MultipleAnswerQuiz">
 
                                     <#list quiz.options as options>
                                         <div class="custom-control custom-checkbox mt-2">
@@ -288,7 +288,7 @@
 
                                 </#if>
 
-                                <#if quiz.class == "class com.example.mywebquizengine.Model.Test.StringAnswerQuiz">
+                                <#if quiz.class == "class com.example.mywebquizengine.model.test.StringAnswerQuiz">
                                     <div id="inputAnswer" class="custom-control mt-3">
                                         <input oninput="onInput(${quiz.quizId?c}, ${quiz_index+1})" required type="text"
                                                class="form-control" id="stringAnswer${quiz_index+1}"

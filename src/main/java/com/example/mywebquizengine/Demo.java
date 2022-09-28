@@ -1,10 +1,7 @@
 package com.example.mywebquizengine;
 
-import com.example.mywebquizengine.Model.User;
-import com.example.mywebquizengine.Repos.UserRepository;
-import com.example.mywebquizengine.Service.UserService;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.Queue;
+import com.example.mywebquizengine.repos.UserRepository;
+import com.example.mywebquizengine.service.UserService;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;

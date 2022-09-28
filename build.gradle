@@ -19,9 +19,9 @@ tasks.withType(JavaCompile).each {
     it.options.compilerArgs.add('--enable-preview')
 }
 
-/*wrapper {
+wrapper {
     gradleVersion = '7.0'
-}*/
+}
 
 sourceCompatibility='15'
 
