@@ -1,6 +1,7 @@
 package com.example.mywebquizengine.model;
 
 import com.example.mywebquizengine.MywebquizengineApplication;
+import com.example.mywebquizengine.model.chat.Dialog;
 import com.example.mywebquizengine.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,6 +29,7 @@ public class User implements UserDetails, OAuth2User {
     @Email
     private String email;
     private String activationCode;
+    private String changePasswordCode;
     @NotBlank
     @Column(nullable = false)
     private String firstName;
@@ -45,9 +47,24 @@ public class User implements UserDetails, OAuth2User {
     )
     private Set<Course> courses = new HashSet<>();
 
+    public String getChangePasswordCode() {
+        return changePasswordCode;
+    }
+
+    public void setChangePasswordCode(String changePasswordCode) {
+        this.changePasswordCode = changePasswordCode;
+    }
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "GROUP_ID")
     private Group group;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "users_dialogs",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "dialog_id")
+    )
+    private List<Dialog> dialogs = new ArrayList<>();
 
     @Transient
     private boolean accountNonExpired;
@@ -104,6 +121,14 @@ public class User implements UserDetails, OAuth2User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public List<Dialog> getDialogs() {
+        return dialogs;
+    }
+
+    public void setDialogs(List<Dialog> dialogs) {
+        this.dialogs = dialogs;
     }
 
     @Override
