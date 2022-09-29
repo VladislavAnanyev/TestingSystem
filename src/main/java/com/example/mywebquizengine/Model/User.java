@@ -21,12 +21,11 @@ import java.util.Map;
 public class User implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = -7422293274841574951L;
+
     @Id
-    @NotBlank
-    /*@Pattern(regexp = """
-            [\S]{0,}
-            """) // без пробелов*/
-    private String username;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long userId;
+
     @NotBlank
     @NotNull
     @Email
@@ -40,6 +39,8 @@ public class User implements UserDetails, OAuth2User {
     @NotNull
     private String lastName;
 
+    private String groupName;
+
     @Size(min = 5)
     private String password;
     private String avatar;
@@ -50,6 +51,13 @@ public class User implements UserDetails, OAuth2User {
             inverseJoinColumns = @JoinColumn(name = "dialog_id")
     )
     private List<Dialog> dialogs = new ArrayList<>();
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "courses_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private List<Course> courses = new ArrayList<>();
     @Transient
     private boolean accountNonExpired;
     @Transient
@@ -59,11 +67,9 @@ public class User implements UserDetails, OAuth2User {
     @Transient
     private boolean enabled;
     private boolean status;
-    @ManyToMany
-    private List<User> friends;
+
     @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    private Role role;
     private boolean online;
 
     public User() {
@@ -74,7 +80,6 @@ public class User implements UserDetails, OAuth2User {
     }
 
     public User(String username, String email, String firstName, String lastName, String password) {
-        this.username = username;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -82,11 +87,35 @@ public class User implements UserDetails, OAuth2User {
         this.status = false;
     }
 
-    public User(String username, String firstName, String lastName, String avatar) {
-        this.username = username;
+    public User(Long userId, String firstName, String lastName, String avatar, String email) {
+        this.userId = userId;
+        this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
+    }
+
+    public User(String username, String firstName, String lastName, String avatar) {
+        this.email = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.avatar = avatar;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String group) {
+        this.groupName = group;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public List<Dialog> getDialogs() {
@@ -116,8 +145,16 @@ public class User implements UserDetails, OAuth2User {
     @Override
     public List<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.toString())));
+        authorities.add(new SimpleGrantedAuthority(role.toString()));
         return authorities;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
     }
 
     public String getActivationCode() {
@@ -154,21 +191,16 @@ public class User implements UserDetails, OAuth2User {
 
     public boolean isAdmin(String name) {
         return MywebquizengineApplication.ctx.getBean(UserService.class)
-                .loadUserByUsername(name).getRoles().contains(Role.ROLE_ADMIN);
+                .loadUserByUsername(name).getRole().equals(Role.ROLE_ADMIN);
     }
 
     public void grantAuthority(Role authority) {
-        if (roles == null) roles = new ArrayList<>();
-        this.roles.add(authority);
+        this.role = authority;
     }
 
     @Override
     public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        return email;
     }
 
     @Override
@@ -212,12 +244,12 @@ public class User implements UserDetails, OAuth2User {
         this.status = status;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setRole(Role roles) {
+        this.role = roles;
     }
 
     public String getChangePasswordCode() {
@@ -228,23 +260,9 @@ public class User implements UserDetails, OAuth2User {
         this.changePasswordCode = changePasswordCode;
     }
 
-    public List<User> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<User> friends) {
-        this.friends = new ArrayList<>();
-        this.friends.addAll(friends);
-    }
-
-    public void addFriend(User user) {
-        this.friends.add(user);
-        user.getFriends().add(this);
-    }
-
     @Override
     public String getName() {
-        return username;
+        return String.valueOf(userId);
     }
 
     @Override

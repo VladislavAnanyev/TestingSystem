@@ -1,7 +1,6 @@
 package com.example.mywebquizengine.Service;
 
-import com.example.mywebquizengine.Service.JWTUtil;
-import com.google.api.client.auth.oauth2.Credential;
+import com.example.mywebquizengine.Model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,21 +25,22 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-        String username = null;
+        Long userId = null;
         String jwt = null;
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             //если подпись не совпадает с вычисленной, то SignatureException
             //если подпись некорректная (не парсится), то MalformedJwtException
             //если время подписи истекло, то ExpiredJwtException
-            username = jwtUtil.extractUsername(jwt);
+            userId = jwtUtil.extractUserId(jwt);
         }
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String commaSeparatedListOfAuthorities = jwtUtil.extractAuthorities(jwt);
             List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(commaSeparatedListOfAuthorities);
+            User user = new User();
+            user.setUserId(userId);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(
-                            username, "Bearer", authorities);
+                    new UsernamePasswordAuthenticationToken(user, "Bearer", authorities);
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
         chain.doFilter(request, response);

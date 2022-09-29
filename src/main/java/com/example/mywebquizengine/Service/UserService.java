@@ -1,6 +1,5 @@
 package com.example.mywebquizengine.Service;
 
-import com.example.mywebquizengine.Model.Projection.ProfileView;
 import com.example.mywebquizengine.Model.Projection.UserCommonView;
 import com.example.mywebquizengine.Model.Projection.UserView;
 import com.example.mywebquizengine.Model.Role;
@@ -26,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,7 +34,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.*;
 
 
@@ -46,8 +43,6 @@ public class UserService implements UserDetailsService {
     private static final HttpTransport transport = new NetHttpTransport();
     private static final JsonFactory jsonFactory = new JacksonFactory();
 
-    @Value("${androidGoogleClientId}")
-    private String CLIENT_ID;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -64,20 +59,28 @@ public class UserService implements UserDetailsService {
     private String hostname;
 
     @Override
-    public User loadUserByUsername(String username) throws ResponseStatusException {
-        Optional<User> user = userRepository.findById(username);
+    public User loadUserByUsername(String email) throws ResponseStatusException {
+        Optional<User> user = userRepository.findUserEntityByEmail(email);
 
         if (user.isPresent()) {
             return user.get();
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    public User loadUserByUsernameProxy(String username) throws UsernameNotFoundException {
-        return userRepository.getOne(username);
+    public User loadUserByUserId(Long userId) throws ResponseStatusException {
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isPresent()) {
+            return user.get();
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    public void updateUser(String lastName, String firstName, String username) {
-        userRepository.updateUserInfo(firstName, lastName, username);
+    public User loadUserByUserIdProxy(Long userId) throws UsernameNotFoundException {
+        return userRepository.getOne(userId);
+    }
+
+    public void updateUser(String lastName, String firstName, Long userId) {
+        userRepository.updateUserInfo(firstName, lastName, userId);
     }
 
     public void sendCodeForChangePasswordFromPhone(String username) {
@@ -105,9 +108,9 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void sendCodeForChangePassword(String username) {
+    public void sendCodeForChangePassword(Long userId) {
 
-        User user = loadUserByUsername(username);
+        User user = loadUserByUserId(userId);
 
         String code = UUID.randomUUID().toString();
         userRepository.setChangePasswordCode(user.getUsername(), code);
@@ -122,15 +125,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void updatePassword(User user, String changePasswordCode) {
-
+    public void updatePassword(String password, String changePasswordCode) {
         User savedUser = getUserViaChangePasswordCode(changePasswordCode);
-
-        user.setUsername(savedUser.getUsername());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setChangePasswordCode(UUID.randomUUID().toString());
-
-        userRepository.changePassword(user.getPassword(), user.getUsername(), user.getChangePasswordCode());
+        savedUser.setPassword(passwordEncoder.encode(password));
         savedUser.setChangePasswordCode(UUID.randomUUID().toString());
     }
 
@@ -143,15 +140,16 @@ public class UserService implements UserDetailsService {
 
     public User getUserViaChangePasswordCode(String changePasswordCode) {
 
-        if (userRepository.findByChangePasswordCode(changePasswordCode).isPresent()) {
-            return userRepository.findByChangePasswordCode(changePasswordCode).get();
+        Optional<User> optionalUser = userRepository.findByChangePasswordCode(changePasswordCode);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
     }
 
-    public User castToUserFromOauth(OAuth2AuthenticationToken authentication) {
+    /*public User castToUserFromOauth(OAuth2AuthenticationToken authentication) {
 
         User user = new User();
 
@@ -191,7 +189,7 @@ public class UserService implements UserDetailsService {
         //doInitialize(user);
 
         return user;
-    }
+    }*/
 
     private void rabbitInitialize(String username) {
 
@@ -209,12 +207,8 @@ public class UserService implements UserDetailsService {
         return (ArrayList<User>) userRepository.findAll();
     }
 
-    public List<UserCommonView> findMyFriends(Principal principal) {
-        return userRepository.findUsersByFriendsUsername(principal.getName());
-    }
-
     public UserCommonView getUserView(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByEmail(username);
     }
 
     public AuthResponse signInViaJwt(AuthRequest authRequest) {
@@ -291,16 +285,17 @@ public class UserService implements UserDetailsService {
         }
     }*/
 
-    public UserView getAuthUser(String username) {
-        if (userRepository.findAllByUsername(username) == null) {
+    public UserView getAuthUser(Long userId) {
+        UserView allByUserId = userRepository.findAllByUserId(userId);
+        if (allByUserId == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
-            return userRepository.findAllByUsername(username);
+            return allByUserId;
         }
     }
 
     @Transactional
-    public void uploadPhoto(MultipartFile file, String username) {
+    public void uploadPhoto(MultipartFile file, Long userId) {
         if (!file.isEmpty()) {
             try {
                 String uuid = UUID.randomUUID().toString();
@@ -313,7 +308,7 @@ public class UserService implements UserDetailsService {
 
                 String photoUrl = hostname + "/img/" + uuid + ".jpg";
 
-                User user = loadUserByUsername(username);
+                User user = loadUserByUserId(userId);
                 user.setAvatar(photoUrl);
 
             } catch (IOException e) {
@@ -322,14 +317,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public Boolean checkForExistUser(String username) {
-        return userRepository.existsById(username);
+    public Boolean checkForExistUser(Long userId) {
+        return userRepository.existsById(userId);
     }
 
-    @Transactional
+    /*@Transactional
     public ProfileView getUserProfileById(String username) {
         return userRepository.findUserByUsernameOrderByUsernameAsc(username);
-    }
+    }*/
 
     public void getUserViaChangePasswordCodePhoneApi(String username, String code) {
         Optional<User> user = userRepository.findByChangePasswordCode(code);
@@ -357,24 +352,23 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public void processCheckIn(String activationCode, String firstName, String lastName, String password) {
-        User user = findUserByActivationCode(activationCode);
+    public void processCheckIn(String activationCode, String email, String firstName, String lastName, String password) {
+
+        User user;
+        if (activationCode == null) {
+            user = new User();
+            user.setEmail(email);
+        } else {
+            user = findUserByActivationCode(activationCode);
+        }
+
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPassword(passwordEncoder.encode(password));
         user.setStatus(true);
         user.setActivationCode(UUID.randomUUID().toString());
-        String mes = user.getFirstName() + " " + user.getLastName() + ", Добро пожаловать в WebQuizzes! "
-                + "Для активации аккаунта перейдите по ссылке: " + hostname + "/activate/" + user.getActivationCode()
-                + " Если вы не регистрировались на данном ресурсе, то проигнорируйте это сообщение";
 
-        /*try {
-            mailSender.send(user.getEmail(), "Активация аккаунта в WebQuizzes", mes);
-        } catch (Exception e) {
-            System.out.println("Отключено");
-        }*/
-
-        user.setAvatar(hostname + "/img/default.jpg");
+        user.setAvatar("https://" + hostname + "/img/default.jpg");
         user.setOnline(false);
         user.setEnabled(true);
         user.grantAuthority(Role.ROLE_USER);

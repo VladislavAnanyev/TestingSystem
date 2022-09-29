@@ -8,12 +8,13 @@ import java.util.List;
 
 @Entity(name = "QUIZZES")
 @Inheritance(
-        strategy = InheritanceType.JOINED
+        strategy = InheritanceType.SINGLE_TABLE
 )
-public abstract class Quiz {
+public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "QUIZ_ID")
     private Long quizId;
 
     @NotBlank
@@ -24,14 +25,14 @@ public abstract class Quiz {
     @NotNull
     private String text;
 
+    private String fileUrl;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "test_id")
     private Test test;
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserQuizAnswer> userQuizAnswers;
-
-    private String type;
 
     public Quiz() {}
 
@@ -40,12 +41,12 @@ public abstract class Quiz {
         this.text = text;
     }
 
-    public String getType() {
-        return type;
+    public String getFileUrl() {
+        return fileUrl;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setFileUrl(String image) {
+        this.fileUrl = image;
     }
 
     public String getTitle() {

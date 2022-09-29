@@ -1,13 +1,12 @@
 package com.example.mywebquizengine.Service;
 
 
-import com.example.mywebquizengine.Controller.api.ApiChatController;
 import com.example.mywebquizengine.Model.Chat.Dialog;
 import com.example.mywebquizengine.Model.Chat.Message;
 
 //import com.example.mywebquizengine.Model.Projection.MessageForStompView;
 import com.example.mywebquizengine.Model.Chat.MessageStatus;
-import com.example.mywebquizengine.Model.Projection.Api.MessageForApiViewCustomQuery;
+import com.example.mywebquizengine.Model.Projection.Api.LastDialog;
 import com.example.mywebquizengine.Model.Projection.Api.MessageWithDialog;
 import com.example.mywebquizengine.Model.Projection.DialogWithUsersViewPaging;
 import com.example.mywebquizengine.Model.User;
@@ -28,16 +27,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -76,17 +70,17 @@ public class MessageService {
     }
 
 
-    public Long checkDialog(String username, String authUsername) {
+    public Long checkDialog(Long userId, Long authUserId) {
 
-        if (!authUsername.equals(username)) {
-            Long dialog_id = dialogRepository.findDialogByName(username,
-                    authUsername);
+        if (!authUserId.equals(userId)) {
+            Long dialog_id = dialogRepository.findDialogByName(userId,
+                    authUserId);
 
             if (dialog_id == null) {
                 Dialog dialog = new Dialog();
 
-                dialog.addUser(userService.loadUserByUsername(username));
-                dialog.addUser(userService.loadUserByUsername(authUsername));
+                dialog.addUser(userService.loadUserByUserId(userId));
+                dialog.addUser(userService.loadUserByUserId(authUserId));
 
                 dialogRepository.save(dialog);
                 return dialog.getDialogId();
@@ -104,33 +98,33 @@ public class MessageService {
         return messageRepository.getDialogs(username);
     }*/
 
-    public ArrayList<MessageForApiViewCustomQuery> getDialogsForApi(String username) {
+    public ArrayList<LastDialog> getDialogsForApi(Long userId) {
 
-        List<MessageForApiViewCustomQuery> messageViews = messageRepository.getDialogsForApi(username);
+        List<LastDialog> messageViews = messageRepository.getDialogsForApi(userId);
 
-        return (ArrayList<MessageForApiViewCustomQuery>) messageViews;
+        return (ArrayList<LastDialog>) messageViews;
     }
 
 
     @Transactional
-    public void deleteMessage(Long id, String username) throws JsonProcessingException, ParseException {
+    public void deleteMessage(Long id, Long userId) throws JsonProcessingException, ParseException {
         Optional<Message> optionalMessage = messageRepository.findById(id);
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
-            if (message.getSender().getUsername().equals(username)) {
+            if (message.getSender().getUserId().equals(userId)) {
                 message.setStatus(MessageStatus.DELETED);
 
-                MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
+                MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
                 JSONObject jsonObject = (JSONObject) JSONValue
                         .parseWithException(objectMapper.writeValueAsString(messageDto));
                 jsonObject.put("type", "DELETE-MESSAGE");
 
                 for (User user :message.getDialog().getUsers()) {
 
-                    simpMessagingTemplate.convertAndSend("/topic/" + user.getUsername(),
+                    simpMessagingTemplate.convertAndSend("/topic/" + user.getUserId(),
                             jsonObject);
 
-                    rabbitTemplate.convertAndSend(user.getUsername(),
+                    rabbitTemplate.convertAndSend(String.valueOf(user.getUserId()),
                             jsonObject);
 
                 }
@@ -150,40 +144,40 @@ public class MessageService {
                                                  Integer page,
                                                  Integer pageSize,
                                                  String sortBy,
-                                                 String username) {
+                                                 Long userId) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
         Optional<Dialog> optionalDialog = dialogRepository.findById(dialogId);
         optionalDialog.ifPresent(dialog -> dialog.setPaging(paging));
         DialogWithUsersViewPaging dialog = dialogRepository.findAllDialogByDialogId(dialogId);
 
         // If user contains in dialog
-        if (dialog.getUsers().stream().anyMatch(o -> o.getUsername()
-                .equals(username))) {
+        if (dialog.getUsers().stream().anyMatch(o -> o.getUserId()
+                .equals(userId))) {
             return dialog;
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
     }
 
     @Transactional
-    public void editMessage(Message newMessage, String username) throws JsonProcessingException, ParseException {
-        Optional<Message> optionalMessage = messageRepository.findById(newMessage.getId());
+    public void editMessage(Message newMessage, Long userId) throws JsonProcessingException, ParseException {
+        Optional<Message> optionalMessage = messageRepository.findById(newMessage.getMessageId());
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
-            if (message.getSender().getUsername().equals(username)) {
+            if (message.getSender().getUserId().equals(userId)) {
                 message.setContent(newMessage.getContent());
                 message.setStatus(MessageStatus.EDIT);
 
-                MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
+                MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
                 JSONObject jsonObject = (JSONObject) JSONValue
                         .parseWithException(objectMapper.writeValueAsString(messageDto));
                 jsonObject.put("type", "EDIT-MESSAGE");
 
                 for (User user :message.getDialog().getUsers()) {
 
-                    simpMessagingTemplate.convertAndSend("/topic/" + user.getUsername(),
+                    simpMessagingTemplate.convertAndSend("/topic/" + user.getUserId(),
                             jsonObject);
 
-                    rabbitTemplate.convertAndSend(user.getUsername(),
+                    rabbitTemplate.convertAndSend(String.valueOf(user.getUserId()),
                             jsonObject);
 
                 }
@@ -195,11 +189,28 @@ public class MessageService {
     }
 
 
+    @Transactional
+    public void addUsersToDialog(Long dialogId, List<User> userIdList) {
+
+        Optional<Dialog> optionalDialog = dialogRepository.findById(dialogId);
+        if (optionalDialog.isPresent()) {
+            Dialog dialog = optionalDialog.get();
+
+            for (User user : userIdList) {
+                if (dialog.getUsers().stream().noneMatch(userInDialog -> userInDialog.getUserId().equals(user.getUserId()))) {
+                    dialog.addUser(user);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Specified user already exist in dialog");
+                }
+            }
+        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dialog with specified id not found");
+    }
+
 
 
     public void sendMessage(Message message, String client) throws JsonProcessingException, ParseException {
 
-        User sender = userService.loadUserByUsernameProxy(message.getSender().getUsername());
+        User sender = userService.loadUserByUserIdProxy(message.getSender().getUserId());
 
         message.setSender(sender);
         message.setDialog(dialogRepository.findById(message.getDialog().getDialogId()).get());
@@ -212,7 +223,7 @@ public class MessageService {
 
         Hibernate.initialize(dialog.getUsers());
 
-        MessageWithDialog messageDto = messageRepository.findMessageById(message.getId());
+        MessageWithDialog messageDto = messageRepository.findMessageByMessageId(message.getMessageId());
 
         rabbitTemplate.setExchange("message-exchange");
 
@@ -230,10 +241,10 @@ public class MessageService {
 
         for (User user :dialog.getUsers()) {
 
-            simpMessagingTemplate.convertAndSend("/topic/" + user.getUsername(),
+            simpMessagingTemplate.convertAndSend("/topic/" + user.getUserId(),
                     jsonObject);
 
-            rabbitTemplate.convertAndSend(user.getUsername(),
+            rabbitTemplate.convertAndSend(String.valueOf(user.getUserId()),
                     jsonObject);
 
         }
@@ -241,7 +252,7 @@ public class MessageService {
     }
 
 
-    public Long createGroup(Dialog newDialog, String username) throws JsonProcessingException, ParseException {
+    /*public Long createGroup(Dialog newDialog, String username) throws JsonProcessingException, ParseException {
 
         User authUser = new User();
 
@@ -291,7 +302,7 @@ public class MessageService {
             return dialog.getDialogId();
 
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-    }
+    }*/
 
     public DialogWithUsersViewPaging getDialogWithPaging(String dialog_id, Integer page, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());

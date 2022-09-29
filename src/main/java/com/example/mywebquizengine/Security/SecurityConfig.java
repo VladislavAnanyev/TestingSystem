@@ -1,15 +1,13 @@
 package com.example.mywebquizengine.Security;
-import com.example.mywebquizengine.Model.Role;
 import com.example.mywebquizengine.Service.JWTFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -40,18 +37,12 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.session.SessionInformationExpiredStrategy;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
-import javax.servlet.ServletContextListener;
-import javax.servlet.http.HttpSessionListener;
 import javax.sql.DataSource;
 import java.util.*;
 
@@ -111,14 +102,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
 
                     .anyRequest().authenticated()
 
-                    /*.and()
-                    .formLogin()*/
-
-                    /*.loginPage("/api/jwt")*//*.successForwardUrl("/api/jwt")*/
-                    /*.and().logout().logoutUrl("/api/logout").permitAll()*/
-
-                    //.and().oauth2Login().defaultSuccessUrl("/loginSuccess")
-                    /*.permitAll()*/
                     .and()
                     .logout().logoutUrl("/api/logout").logoutSuccessHandler(new SimpleUrlLogoutSuccessHandler())
                     .permitAll()
@@ -134,8 +117,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
 
         }
     }
-
-
 
     @Order(2)
     @Configuration
@@ -191,12 +172,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
             http
 
                     .authorizeRequests()
-                    .antMatchers("/googlee45a32e3d6f7edf4.html", "/signup", "/activate/*",
+                    .antMatchers( "/googlee45a32e3d6f7edf4.html", "/signup", "/signup/admin", "/activate/*",
                             "/quizzes", "/reg",  "/androidSign", "/ws/**", "/add", "/about/**",
-                            "/", "/signin", "/checkyandex", "/h2-console/**", "/.well-known/pki-validation/**",
+                            "/signin", "/checkyandex", "/h2-console/**", "/.well-known/pki-validation/**",
                             "/update/userinfo/pswrdwithoutauth", "/updatepass/**", "/testm", "/pass/**",
                             "/updatepassword/{activationCode}", "/yandex_135f209071de02b1.html",
-                            "/start/{activationCode}").permitAll()
+                            "/start/{activationCode}", "/password/forget").permitAll()
                     .antMatchers("/swagger-ui/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
 
@@ -207,16 +188,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
                         .successHandler(myAuthenticationSuccessHandler)
 
 
-                        //.successForwardUrl("/profile")
-                        //.defaultSuccessUrl("/profile")
-                        //.failureUrl("/signin?error")
-
-
-                    .and()
+                    /*.and()
                     .oauth2Login().userInfoEndpoint()
                         .oidcUserService(this.oidcUserService()).userService(this.oAuth2UserService())
                         .userAuthoritiesMapper(this.userAuthoritiesMapper()).and()
-                        .defaultSuccessUrl("/loginSuccess").successHandler(myAuthenticationSuccessHandler).permitAll()/*.and().rememberMe().rememberMeParameter("remember-me")
+                        .defaultSuccessUrl("/loginSuccess").successHandler(myAuthenticationSuccessHandler).permitAll()*//*.and().rememberMe().rememberMeParameter("remember-me")
                     //.and().key("secretkey").alwaysRemember(true).rememberMeServices(rememberMeServices())*/
 
                     .and()
@@ -238,8 +214,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
                     .frameOptions()
                     .sameOrigin().and()
                     .requiresChannel()
-                    .anyRequest()
-                    .requiresSecure().and()
+                    /*.anyRequest()
+                    .requiresSecure()*/.and()
 
                     .sessionManagement().maximumSessions(100).sessionRegistry(sessionRegistry())
                     .and().sessionCreationPolicy(SessionCreationPolicy.NEVER).sessionFixation().none();
@@ -290,11 +266,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter  {
         private GrantedAuthoritiesMapper userAuthoritiesMapper() {
             return (authorities) -> {
                 Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
-
-
-
-
                 authorities.forEach(authority -> {
                     if (authority instanceof OidcUserAuthority) {
                         OidcUserAuthority oidcUserAuthority = (OidcUserAuthority)authority;

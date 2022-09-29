@@ -1,10 +1,11 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.example.mywebquizengine.Model.User;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -13,15 +14,15 @@ public class UserTestAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int userAnswerId;
+    private Long userAnswerId;
 
     @ManyToOne
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    //@Fetch(FetchMode.SUBSELECT)
-    private List<UserQuizAnswer> userQuizAnswers;
+    @OrderBy(value = "quiz.quizId")
+    @OneToMany(mappedBy = "userAnswer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "test_id")
@@ -57,11 +58,11 @@ public class UserTestAnswer {
         this.user = user;
     }
 
-    public int getUserAnswerId() {
+    public Long getUserAnswerId() {
         return userAnswerId;
     }
 
-    public void setUserAnswerId(int userAnswerId) {
+    public void setUserAnswerId(Long userAnswerId) {
         this.userAnswerId = userAnswerId;
     }
 
@@ -86,6 +87,16 @@ public class UserTestAnswer {
             this.userQuizAnswers.forEach((userQuizAnswer) -> userQuizAnswer.setUserAnswer(this));
         }
 
+    }
+
+    public void addUserQuizAnswer(UserQuizAnswer userQuizAnswer) {
+        this.userQuizAnswers.add(userQuizAnswer);
+        userQuizAnswer.setUserAnswer(this);
+    }
+
+    public void removeUserQuizAnswer(UserQuizAnswer userQuizAnswer) {
+        this.userQuizAnswers.remove(userQuizAnswer);
+        userQuizAnswer.setUserAnswer(this);
     }
 
     public void setTest(Test test) {

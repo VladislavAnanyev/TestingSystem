@@ -1,9 +1,6 @@
 package com.example.mywebquizengine.Model.Test;
 
-import com.example.mywebquizengine.Model.dto.MultipleAnswerQuizRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
 
 public class AnswerChecker {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -15,12 +12,7 @@ public class AnswerChecker {
 
     public void checkAnswer(UserQuizAnswer answer){
 
-        /*List<Integer> list1 = new ArrayList<>();
-        list1 = answer;
-
-        List<Integer> list2 = new ArrayList<>();
-        list2 = quiz.getAnswer();*/
-        if (quiz.getType().equals("MULTIPLE")) {
+        if (quiz instanceof MultipleAnswerQuiz) {
             MultipleUserAnswerQuiz multipleUserAnswerQuiz = (MultipleUserAnswerQuiz) answer;
             MultipleAnswerQuiz multipleAnswerQuiz = (MultipleAnswerQuiz) quiz;
             if (multipleUserAnswerQuiz.getAnswer().toString().equals(multipleAnswerQuiz.getAnswer().toString())) {
@@ -30,10 +22,20 @@ public class AnswerChecker {
                 this.feedback = "Wrong answer! Please, try again.";
                 this.success = false;
             }
-        } else if (quiz.getType().equals("STRING")) {
+        } else if (quiz instanceof StringAnswerQuiz) {
             StringUserAnswerQuiz stringUserAnswerQuiz = (StringUserAnswerQuiz) answer;
             StringAnswerQuiz stringAnswerQuiz = (StringAnswerQuiz) quiz;
-            if (stringUserAnswerQuiz.getAnswer().equals(stringAnswerQuiz.getAnswer())) {
+            if (stringUserAnswerQuiz.getAnswer().equals(stringAnswerQuiz.getAnswer().get(0))) {
+                this.feedback = "Congratulations, you're right!";
+                this.success = true;
+            } else {
+                this.feedback = "Wrong answer! Please, try again.";
+                this.success = false;
+            }
+        } else if (quiz instanceof MapAnswerQuiz) {
+            MapUserAnswerQuiz mapUserAnswerQuiz = (MapUserAnswerQuiz) answer;
+            MapAnswerQuiz mapAnswerQuiz = (MapAnswerQuiz) quiz;
+            if (mapUserAnswerQuiz.getAnswer().equals(mapAnswerQuiz.getAnswer())) {
                 this.feedback = "Congratulations, you're right!";
                 this.success = true;
             } else {

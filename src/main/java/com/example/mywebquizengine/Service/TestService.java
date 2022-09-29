@@ -1,18 +1,16 @@
 package com.example.mywebquizengine.Service;
 
+import com.example.mywebquizengine.Model.Course;
 import com.example.mywebquizengine.Model.Projection.TestView;
-import com.example.mywebquizengine.Model.Test.MultipleAnswerQuiz;
-import com.example.mywebquizengine.Model.Test.Quiz;
-import com.example.mywebquizengine.Model.Test.StringAnswerQuiz;
-import com.example.mywebquizengine.Model.Test.Test;
-import com.example.mywebquizengine.Model.User;
-import com.example.mywebquizengine.Model.dto.AddQuizRequest;
-import com.example.mywebquizengine.Model.dto.MultipleAnswerQuizRequest;
-import com.example.mywebquizengine.Model.dto.StringAnswerQuizRequest;
-import com.example.mywebquizengine.Repos.QuizRepository;
+import com.example.mywebquizengine.Model.Test.*;
+import com.example.mywebquizengine.Model.dto.input.AddQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.MapAnswerQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.MultipleAnswerQuizRequest;
+import com.example.mywebquizengine.Model.dto.input.StringAnswerQuizRequest;
 import com.example.mywebquizengine.Repos.TestRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-//@Transactional
 @Service
 public class TestService {
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private CourseService courseService;
@@ -39,15 +34,13 @@ public class TestService {
     private TestRepository testRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private FileSystemStorageService fileStorageService;
 
-    public Page<TestView> findTestsInCourseByName(String name, Long courseId, Integer page, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
-        return testRepository.findMyTestsInCourse(name, courseId, paging);
-    }
+    @Value("${hostname}")
+    private String hostname;
 
-    public List<Test> getMyQuizNoPaging (String name) {
-        return testRepository.getQuizForThisNoPaging(name);
+    public List<TestView> findTestsInCourseByName(Long courseId, Long userId) {
+        return testRepository.findTestsByCourse_CourseIdAndCourse_Owner_UserId(courseId, userId);
     }
 
     public Page<Test> getAllQuizzes(Integer page, Integer pageSize, String sortBy) {
@@ -55,32 +48,19 @@ public class TestService {
         return testRepository.findAll(paging);
     }
 
-    public void saveTest(Test test) {
-        testRepository.save(test);
-    }
-
-    public Test findTest(Integer id) {
-        if (testRepository.findById(id).isPresent()){
+    public Test findTest(Long id) {
+        if (testRepository.findById(id).isPresent()) {
             return testRepository.findById(id).get();
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
-    public Test findTestProxy(Integer id) {
-        return testRepository.getOne(id);
+    public void deleteTest(Long id) {
+        testRepository.deleteById(id);
     }
 
-    public void deleteTest(int id) {
-        if (testRepository.findById(id).isPresent()) {
-            testRepository.deleteById(id);
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    public void updateTest(Integer id, Test test) {
+    public void updateTest(Long id, Test test) {
         Test oldTest = testRepository.findById(id).get();
         oldTest.setDescription(test.getDescription());
         oldTest.setQuizzes(test.getQuizzes());
@@ -91,49 +71,69 @@ public class TestService {
         return testRepository.findTestsByCourse_CourseId(id);
     }
 
-    public void add(Long courseId, LocalTime duration, List<Object> addQuizRequests,
-                    String description, String name) {
-        //try {
+    public void add(Long courseId, LocalTime duration, List<AddQuizRequest> addQuizRequests,
+                    String description, Long userId, Calendar startAt, Calendar finishAt,
+                    boolean displayAnswers, Integer attempts, Integer percent) {
+
+        Course course = courseService.findCourseById(courseId);
+        if (userId.equals(course.getOwner().getUserId())) {
             Test test = new Test();
-            test.setCourse(courseService.findCourseById(courseId));
-            User user = userService.loadUserByUsernameProxy(name);
+            test.setStartTime(startAt);
+            test.setEndTime(finishAt);
+            test.setCourse(course);
             test.setDuration(duration);
             test.setDescription(description);
+            test.setDisplayAnswers(displayAnswers);
+            test.setAttempts(attempts);
+            test.setPassingScore(percent);
 
             List<Quiz> quizzes = new ArrayList<>();
-            for (Object objectRequest : addQuizRequests) {
-                AddQuizRequest addQuizRequest =  objectMapper.convertValue(objectRequest, AddQuizRequest.class);
-                if (addQuizRequest.getType().equals("MULTIPLE")) {
-                    MultipleAnswerQuizRequest addQuizReq = objectMapper.convertValue(objectRequest, MultipleAnswerQuizRequest.class);
-                    MultipleAnswerQuiz quiz = new MultipleAnswerQuiz();
-                    quiz.setAnswer(addQuizReq.getAnswer());
-                    quiz.setOptions(addQuizReq.getOptions());
-                    quiz.setText(addQuizReq.getText());
-                    quiz.setTitle(addQuizReq.getTitle());
-                    quiz.setType("MULTIPLE");
-                    quizzes.add(quiz);
-                } else if (addQuizRequest.getType().equals("STRING")) {
-                    StringAnswerQuizRequest stringAnswerQuizRequest = objectMapper.convertValue(objectRequest, StringAnswerQuizRequest.class);
-                    StringAnswerQuiz quiz = new StringAnswerQuiz();
-                    quiz.setAnswer(stringAnswerQuizRequest.getAnswer());
-                    quiz.setText(stringAnswerQuizRequest.getText());
-                    quiz.setTitle(stringAnswerQuizRequest.getTitle());
-                    quiz.setType("STRING");
-                    quizzes.add(quiz);
-                } else if (addQuizRequest.getType().equals("MAP")) {}
 
+            for (AddQuizRequest addQuizRequest : addQuizRequests) {
+
+                Quiz quiz;
+                if (addQuizRequest instanceof MultipleAnswerQuizRequest quizRequest) {
+                    quiz = new MultipleAnswerQuiz();
+                    ((MultipleAnswerQuiz) quiz).setAnswer(quizRequest.getAnswer());
+                    ((MultipleAnswerQuiz) quiz).setOptions(quizRequest.getOptions());
+                } else if (addQuizRequest instanceof StringAnswerQuizRequest quizRequest) {
+                    quiz = new StringAnswerQuiz();
+                    ((StringAnswerQuiz) quiz).setAnswer(Collections.singletonList(quizRequest.getAnswer()));
+                } else if (addQuizRequest instanceof MapAnswerQuizRequest quizRequest) {
+                    quiz = new MapAnswerQuiz();
+                    ((MapAnswerQuiz) quiz).setAnswer(quizRequest.getAnswer());
+                } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+
+                String uniqueFilename;
+                if (addQuizRequest.getFile() != null) {
+                    byte[] decodedBytes = Base64.getMimeDecoder().decode(addQuizRequest.getFile().getBytes());
+                    try {
+                        uniqueFilename = fileStorageService.store(
+                                new ByteArrayInputStream(decodedBytes),
+                                addQuizRequest.getFile().getFilename()
+                        );
+
+                        if (uniqueFilename.substring(uniqueFilename.lastIndexOf(".")).contains("jp")) {
+                            quiz.setFileUrl("https://" + hostname + "/img/" + uniqueFilename);
+                        } else {
+                            quiz.setFileUrl("https://" + hostname + "/download/" + uniqueFilename);
+                        }
+
+                    } catch (IOException e) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                    }
+                }
+
+                quiz.setText(addQuizRequest.getText());
+                quiz.setTitle(addQuizRequest.getTitle());
+                quiz.setTest(test);
+
+                quizzes.add(quiz);
             }
 
             test.setQuizzes(quizzes);
-            test.setUser(user);
-
-            for (int i = 0; i < addQuizRequests.size(); i++) {
-                test.getQuizzes().get(i).setTest(test);
-            }
-            saveTest(test);
-
-        /*} catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }*/
+            testRepository.save(test);
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 }

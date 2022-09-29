@@ -54,10 +54,6 @@ function createGroup() {
         xhr.onreadystatechange = function () {
             if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 
-
-
-
-
                 console.log(xhr.responseText)
 
                 if (document.getElementById(xhr.responseText) === null) {

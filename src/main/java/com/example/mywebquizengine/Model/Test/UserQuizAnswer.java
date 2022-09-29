@@ -3,32 +3,40 @@ package com.example.mywebquizengine.Model.Test;
 import javax.persistence.*;
 
 @Entity(name = "USER_QUIZ_ANSWERS")
-@Inheritance(
-        strategy = InheritanceType.JOINED
-)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class UserQuizAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int quizAnswerId;
+    private Long quizAnswerId;
 
     private Boolean status;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "quiz_id")
-    //@Cascade(org.hibernate.annotations.CascadeType.DELETE)
     //@OnDelete(action = OnDeleteAction.CASCADE)
     private Quiz quiz;
-    //private Test test;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "user_answer_id")
     private UserTestAnswer userAnswer;
 
-    public UserQuizAnswer() {
+    private Double duration;
+
+    public UserQuizAnswer() {}
+
+    public Double getDuration() {
+        return duration;
     }
 
-    public Boolean getStatus() {
-        return status;
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+
+    public void addDuration(Double duration) {
+        if (this.duration == null) {
+            this.duration = 0.0;
+        }
+        this.duration += duration;
     }
 
     public Quiz getQuiz() {
@@ -39,24 +47,24 @@ public class UserQuizAnswer {
         this.quiz = id;
     }
 
-    public int getQuizAnswerId() {
+    public Long getQuizAnswerId() {
         return quizAnswerId;
     }
 
-    public void setQuizAnswerId(int id) {
+    public void setQuizAnswerId(Long id) {
         this.quizAnswerId = id;
     }
 
-    public boolean isStatus() {
+    public Boolean getStatus() {
         return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
     }
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public Boolean isStatus() {
+        return status;
     }
 
     public UserTestAnswer getUserAnswer() {

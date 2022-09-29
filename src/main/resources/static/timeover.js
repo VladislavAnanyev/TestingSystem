@@ -17,26 +17,13 @@ var colors = [
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
 ];
 
-function connect(/*event*/) {
-
-
-    //if(username) {
-    //usernamePage.classList.add('hidden');
-    //chatPage.classList.remove('hidden');
+function connect() {
 
     console.log("Go")
     var socket = new SockJS('/ws');
     stompClient2 = Stomp.over(socket);
 
-
-
     stompClient2.connect({}, onConnected, onError);
-
-
-
-
-    //}
-    //event.preventDefault();
 }
 
 
@@ -59,6 +46,8 @@ function onConnected() {
     console.log('/topic/' + username2);
     stompClient2.subscribe('/topic/' + username2 + id, onMessageReceived);
 
+    console.log("uuu")
+
 
     // Tell your username to the server
     /*stompClient.send("/app/testchat",
@@ -75,7 +64,7 @@ function onError(error) {
     connectingElement.style.color = 'red';*/
     console.log("fail")
 
-    //connect()
+    connect()
     console.log("try")
 }
 
@@ -83,29 +72,30 @@ function onError(error) {
 
 
 function onMessageReceived(payload) {
-    let id = document.getElementById("testid").value
-    //console.log(payload.body.replaceAll("\"", ""))
-    let result = payload.body.replaceAll("\"", "")
-    //f(id)
-    /**/
-    console.log(result)
-
+    let answer = JSON.parse(payload.body);
     let size = document.getElementsByClassName("quiz");
-
-    for (let i = 0; i < size.length; i++) {
-        let style = document.getElementById("test" + i).style;
-        style.padding = '20px';
-        style.borderRadius = '10px';
-        style.opacity = '0.9';
+    let result
+    if (answer.result != null) {
+        result = answer.result.replaceAll("\"", "")
 
 
-        if (result[i] == "1") {
-            style.background = 'MediumSpringGreen';
-        } else {
-            style.background = 'Salmon';
+
+
+        for (let i = 0; i < size.length; i++) {
+            let style = document.getElementById("test" + i).style;
+            style.padding = '20px';
+            style.borderRadius = '10px';
+            style.opacity = '0.9';
+
+
+            if (result[i] == "1") {
+                style.background = 'MediumSpringGreen';
+            } else {
+                style.background = 'Salmon';
+            }
+
+
         }
-
-
     }
 
 
@@ -115,7 +105,7 @@ function onMessageReceived(payload) {
 
     for (let i = 0; i < size.length; i++) {
         let answer = document.getElementsByName("" + name + i);
-
+        console.log(answer)
         for (let j = 0; j < answer.length; j++) {
             if (answer[j].checked) {
                 //console.log(answer[j].value)
@@ -123,9 +113,6 @@ function onMessageReceived(payload) {
             }
             answer[j].disabled = true;
         }
-        // let test = {answer: answer_values}
-        //answers.push(test)
-        // answer_values = []
 
     }
 
@@ -134,8 +121,10 @@ function onMessageReceived(payload) {
     var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
         keyboard: false
     })
-    myModal.show()
-    chartpie(result)
+    myModal.toggle()
+    console.log("1234567890")
+
+    chartpie(answer.percent)
 
 
     let clock = document.getElementById("clock")

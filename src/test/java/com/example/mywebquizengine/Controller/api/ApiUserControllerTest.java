@@ -1,34 +1,21 @@
 package com.example.mywebquizengine.Controller.api;
 
-import com.example.mywebquizengine.Controller.UserController;
 import com.example.mywebquizengine.Model.Role;
 import com.example.mywebquizengine.Model.User;
 import com.example.mywebquizengine.Repos.UserRepository;
-import com.example.mywebquizengine.Security.BCryptEncoderConfig;
 import com.example.mywebquizengine.Service.JWTUtil;
-import com.example.mywebquizengine.Service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
 import org.junit.After;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import javax.sql.DataSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +46,6 @@ public class ApiUserControllerTest {
 
     @Autowired
     private JWTUtil jwtUtil;
-
 
     @After
     public void resetDb() {
@@ -102,7 +88,7 @@ public class ApiUserControllerTest {
     public void testSignUp() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.v@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -115,10 +101,9 @@ public class ApiUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.jwtToken").isString());
 
-        User user = repository.findById("application").get();
+        User user = repository.findUserByEmail("application").get();
         assertNull(user.getChangePasswordCode());
         assertNotNull(user.getPassword());
-        assertEquals("0", String.valueOf(user.getBalance()));
 
 
 
@@ -129,7 +114,7 @@ public class ApiUserControllerTest {
 
         createTestPerson("application");
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -145,7 +130,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBadPassword() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -161,7 +146,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBadUsername() throws Exception {
 
         String json = """
-                {"username": "    ",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -193,7 +178,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithoutEmail() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
                     "password": "12345"}
@@ -208,7 +193,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBadEmail() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -224,7 +209,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithBlankEmail() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "",
                     "firstName": "Владислав",
                     "lastName": "Ананьев",
@@ -240,7 +225,7 @@ public class ApiUserControllerTest {
     public void testSignUpWithoutFirstName() throws Exception {
 
         String json = """
-                {"username": "application",
+                {
                     "email": "a.vlad.c@ya.ru",
                     "firstName": "",
                     "lastName": "Ананьев",
@@ -259,7 +244,7 @@ public class ApiUserControllerTest {
         createTestPerson("application");
 
         String json = """
-                {"username": "application",
+                {"username": "a.vlad.c@ya.ru",
                  "password": "12345"}
                       """;
 
@@ -277,7 +262,7 @@ public class ApiUserControllerTest {
         createTestPerson("application");
 
         String json = """
-                {"username": "application",
+                {"username": "a.vlad.c@ya.ru",
                  "password": "12346"}
                       """;
 
@@ -292,8 +277,8 @@ public class ApiUserControllerTest {
         User person = new User(name, "a.vlad.v@ya.ru", "Vladislav", "Ananyev",
                 passwordEncoder.encode("12345"));
         person.grantAuthority(Role.ROLE_USER);
-        person.setRoles(new ArrayList<>(Collections.singleton(Role.ROLE_USER)));
-        person.setPhotos(Collections.singletonList("https://localhost/img/default.jpg"));
+        person.setRole(Role.ROLE_USER);
+        person.setAvatar("https://localhost/img/default.jpg");
         return repository.save(person);
     }
 

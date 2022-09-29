@@ -1,13 +1,13 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.example.mywebquizengine.Model.Course;
-import com.example.mywebquizengine.Model.User;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.List;
 
 @Entity(name = "TESTS")
@@ -15,20 +15,14 @@ public class Test {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int testId;
+    private Long testId;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(FetchMode.SUBSELECT)
-    //@Fetch(value = FetchMode)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<@Valid Quiz> quizzes;
 
-    @ManyToOne/*(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)*/
-    @JoinColumn(name = "username")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private User user;
-
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@Fetch(FetchMode.SUBSELECT)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<UserTestAnswer> userTestAnswers;
 
     @ManyToOne
@@ -36,11 +30,56 @@ public class Test {
     @JoinColumn(name = "COURSE_ID")
     private Course course;
 
+    private Calendar startTime;
+
+    private Calendar endTime;
+
+    private Integer attempts;
+
     private String description;
+
+    private String fileUrl;
 
     private LocalTime duration;
 
+    private Integer passingScore;
+
+    @ColumnDefault("true")
+    private boolean displayAnswers;
+
     public Test() {}
+
+    public Integer getPassingScore() {
+        return passingScore;
+    }
+
+    public void setPassingScore(Integer percent) {
+        this.passingScore = percent;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public Calendar getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Calendar endTime) {
+        this.endTime = endTime;
+    }
+
+    public Calendar getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Calendar startTime) {
+        this.startTime = startTime;
+    }
 
     public List<Quiz> getQuizzes() {
         return quizzes;
@@ -65,20 +104,20 @@ public class Test {
         //this.quizzes = quizzes;
     }
 
-    public int getTestId() {
+    public Integer getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(Integer attempts) {
+        this.attempts = attempts;
+    }
+
+    public Long getTestId() {
         return testId;
     }
 
-    public void setTestId(int id) {
+    public void setTestId(Long id) {
         this.testId = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public void setUserTestAnswers(List<UserTestAnswer> answers) {
@@ -126,5 +165,13 @@ public class Test {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public boolean isDisplayAnswers() {
+        return displayAnswers;
+    }
+
+    public void setDisplayAnswers(boolean displayAnswers) {
+        this.displayAnswers = displayAnswers;
     }
 }

@@ -1,11 +1,13 @@
 package com.example.mywebquizengine.Controller;
 
 import com.example.mywebquizengine.Model.Test.Test;
-import com.example.mywebquizengine.Model.dto.CreateTestRequest;
+import com.example.mywebquizengine.Model.User;
+import com.example.mywebquizengine.Model.dto.input.CreateTestRequest;
 import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,7 +21,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.Principal;
+import java.util.*;
 
 @Validated
 @Controller
@@ -27,77 +32,65 @@ import java.security.Principal;
 public class TestController {
 
     @Autowired
-    private UserAnswerService userAnswerService;
-
-    @Autowired
     private TestService testService;
 
-    @GetMapping(path = "/course/{id}/test/add")
-    public String addTest(Model model, @PathVariable Long id) {
-        model.addAttribute("courseId", id);
+    @GetMapping(path = "/course/{courseId}/test/create")
+    public String addTest(@PathVariable Long courseId, Model model) {
+        model.addAttribute("courseId", courseId);
         return "addQuiz";
     }
 
-    @PostMapping(path = "/quizzes", consumes = {"application/json"})
-    public String addTest(@RequestBody @Valid CreateTestRequest request, @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
+    @PostMapping(path = "/test/create", consumes = {"application/json"})
+    @ResponseBody
+    public void addTest(
+            @RequestBody CreateTestRequest request,
+            @AuthenticationPrincipal User authUser) throws ResponseStatusException {
+
         testService.add(
                 request.getCourseId(),
                 request.getDuration(),
                 request.getQuizzes(),
                 request.getDescription(),
-                principal.getName()
+                authUser.getUserId(),
+                request.getStartAt(),
+                request.getFinishAt(),
+                request.isDisplayAnswers(),
+                request.getAttempts(),
+                request.getPercent()
         );
-        return "redirect:/";
     }
 
     @GetMapping(path = "/quizzes")
     public String getQuizzes(Model model, @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
                              @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(10) Integer pageSize,
-                             @RequestParam(defaultValue = "id") String sortBy) throws IOException {
-
-        Page<Test> page1 = testService.getAllQuizzes(page, pageSize, sortBy);
-
-
-        model.addAttribute("test", page1.getContent());
+                             @RequestParam(defaultValue = "id") String sortBy) {
+        Page<Test> quizzes = testService.getAllQuizzes(page, pageSize, sortBy);
+        model.addAttribute("test", quizzes.getContent());
         return "getAllQuiz";
     }
 
     @DeleteMapping(path = "/quizzes/{id}")
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public void deleteTest(@PathVariable Integer id, @AuthenticationPrincipal Principal principal) {
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
+    public void deleteTest(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
         testService.deleteTest(id);
+        throw new ResponseStatusException(HttpStatus.OK);
     }
 
 
     @PutMapping(path = "/update/{id}", consumes = {"application/json"})
     @ResponseBody
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public void changeTest(@PathVariable Integer id, @Valid @RequestBody Test test,
-                           @AuthenticationPrincipal Principal principal) throws ResponseStatusException {
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
+    public void changeTest(@PathVariable Long id, @Valid @RequestBody Test test,
+                           @AuthenticationPrincipal User authUser) throws ResponseStatusException {
         testService.updateTest(id, test);
     }
 
     @GetMapping(path = "/update/{id}")
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public String update(@PathVariable Integer id, Model model, @AuthenticationPrincipal Principal principal) {
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
+    public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal User authUser) {
         Test tempTest = testService.findTest(id);
         model.addAttribute("oldTest", tempTest);
         return "updateQuiz";
-    }
-
-    @GetMapping(path = "/quizzes/{id}/info/")
-    @PreAuthorize(value = "@testService.findTest(#id).user.username.equals(#principal.name)")
-    public String getInfo(@PathVariable Integer id, Model model,
-                          @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
-                          @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
-                          @RequestParam(defaultValue = "completed_at") String sortBy, @AuthenticationPrincipal Principal principal) {
-
-        Test test = testService.findTest(id);
-        model.addAttribute("quizzes", test.getQuizzes());
-        model.addAttribute("chart", userAnswerService.getAnswerStats(id));
-        System.out.println(userAnswerService.getAnswerStats(id));
-        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, page, pageSize, sortBy).getContent());
-        return "info";
     }
 
 

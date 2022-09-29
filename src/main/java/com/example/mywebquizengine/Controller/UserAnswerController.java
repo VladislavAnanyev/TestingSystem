@@ -1,31 +1,35 @@
 package com.example.mywebquizengine.Controller;
 
-import com.example.mywebquizengine.Model.Test.*;
+import com.example.mywebquizengine.Model.Test.Test;
+import com.example.mywebquizengine.Model.Test.UserTestAnswer;
 import com.example.mywebquizengine.Model.User;
-import com.example.mywebquizengine.Model.dto.UserTestAnswerRequest;
-import com.example.mywebquizengine.Service.QuizService;
+import com.example.mywebquizengine.Model.dto.input.AnswerDuration;
+import com.example.mywebquizengine.Model.dto.input.UserTestAnswerRequest;
+import com.example.mywebquizengine.Model.dto.output.SendAnswerResponse;
 import com.example.mywebquizengine.Service.TestService;
 import com.example.mywebquizengine.Service.UserAnswerService;
 import com.example.mywebquizengine.Service.UserService;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.math.BigInteger;
 import java.security.Principal;
-import java.util.Calendar;
 import java.util.*;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
-
 @Controller
+@Validated
 public class UserAnswerController {
 
     @Autowired
@@ -35,180 +39,134 @@ public class UserAnswerController {
     private UserAnswerService userAnswerService;
 
     @Autowired
-    private QuizService quizService;
-
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-
-    @Autowired
     private UserService userService;
 
-    // Проверка наличия неотправленных ответов
     @GetMapping(path = "/checklastanswer/{id}")
     @ResponseBody
-    public Boolean checkLastAnswer(@PathVariable String id, @AuthenticationPrincipal Principal principal) {
-        if (userAnswerService.checkLastComplete(userService.loadUserByUsernameProxy(principal.getName()), id) != null) {
-            return userAnswerService.checkLastComplete(userService.loadUserByUsernameProxy(principal.getName()), id).getCompletedAt() == null;
+    public Boolean checkLastAnswer(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
+        UserTestAnswer userTestAnswer = userAnswerService.checkLastComplete(
+                userService.loadUserByUserIdProxy(authUser.getUserId()),
+                id
+        );
+
+        if (userTestAnswer != null) {
+            return userTestAnswer.getCompletedAt() == null;
         } else {
             return false;
         }
     }
 
-    @PostMapping(path = "/quizzes/{id}/solve")
+    @PostMapping(path = "/test/answer/{userTestAnswerId}/send")
     @ResponseBody
     @Transactional
-    public void getAnswerOnTest(@PathVariable String id,
-                                @RequestBody UserTestAnswer userAnswerId) {
-
-        UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userAnswerId.getUserAnswerId());
-        StringBuilder result = new StringBuilder();
-        List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
-        int trueAnswers = 0;
-
-        for (int i = 0; i < userTestAnswer.getTest().getQuizzes().size(); i++) {
-            UserQuizAnswer quizAnswer = new UserQuizAnswer();
-            AnswerChecker answerChecker = new AnswerChecker();
-
-            Quiz quiz = quizService.findQuiz(userTestAnswer.getTest().getQuizzes().get(i).getQuizId());
-            answerChecker.quiz = quiz;
-
-            if (quiz.getType().equals("MULTIPLE")) {
-                quizAnswer = new MultipleUserAnswerQuiz();
-                MultipleUserAnswerQuiz userQuizAnswer = (MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i);
-                answerChecker.checkAnswer(userQuizAnswer);
-                ((MultipleUserAnswerQuiz) quizAnswer).setAnswer(((MultipleUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
-            } else if (quiz.getType().equals("STRING")) {
-                quizAnswer = new StringUserAnswerQuiz();
-                answerChecker.checkAnswer(userTestAnswer.getUserQuizAnswers().get(i));
-                ((StringUserAnswerQuiz) quizAnswer).setAnswer(((StringUserAnswerQuiz) userTestAnswer.getUserQuizAnswers().get(i)).getAnswer());
-            }
-            quizAnswer.setQuiz(quiz);
-            quizAnswer.setStatus(answerChecker.isSuccess());
-            userQuizAnswers.add(quizAnswer);
-
-            if (quizAnswer.getStatus().toString().equals("true")) {
-                result.append("1");
-                trueAnswers++;
-            } else {
-                result.append("0");
-            }
-        }
-
-        userTestAnswer.setUserQuizAnswers(userQuizAnswers);
-
-        userTestAnswer.setPercent(((double) trueAnswers / (double) result.length()) * 100.0);
-
-        TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
-        Calendar nowDate = new GregorianCalendar();
-        nowDate.setTimeZone(timeZone);
-
-        userTestAnswer.setCompletedAt(nowDate);
-
-        userAnswerService.saveAnswer(userTestAnswer);
-
-        simpMessagingTemplate.convertAndSend("/topic/" +
-                userTestAnswer.getUser().getUsername() + userTestAnswer.getUserAnswerId(), result.toString().toCharArray());
+    public void sendAnswer(@PathVariable Long userTestAnswerId) {
+        userAnswerService.checkAnswer(userTestAnswerId);
     }
 
-    @GetMapping(path = "/quizzes/{id}/solve")
-    public String passTest(Model model, @PathVariable String id,
+    @PostMapping(path = "/test/answer/{testId}/start")
+    @ResponseBody
+    public Long passTest(@PathVariable Long testId,
                            @RequestParam(required = false, defaultValue = "false") String restore,
-                           @AuthenticationPrincipal Principal principal) throws SchedulerException {
-
-        Test test = testService.findTest(Integer.parseInt(id));
-        UserTestAnswer userTestAnswer;
-
-        UserTestAnswer lastUserTestAnswer = userAnswerService.checkLastComplete(userService.loadUserByUsernameProxy(principal.getName()), id);
-
-        if (Boolean.parseBoolean(restore) && lastUserTestAnswer != null && lastUserTestAnswer.getCompletedAt() == null) {
-
-            model.addAttribute("lastAnswer", lastUserTestAnswer);
-
-            if (test.getDuration() != null) {
-                Calendar calendar2 = lastUserTestAnswer.getStartAt();
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(calendar2.getTime());
-                calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) + test.getDuration().getSecond());
-                calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
-                calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + test.getDuration().getHour());
-
-                model.addAttribute("timeout", calendar.getTime());
-            }
-
-        } else {
-            userTestAnswer = new UserTestAnswer();
-            Calendar calendar = new GregorianCalendar();
-            userTestAnswer.setStartAt(calendar);
-            userTestAnswer.setTest(testService.findTest(Integer.parseInt(id)));
-            userTestAnswer.setUser(userService.loadUserByUsernameProxy(principal.getName()));
-            userAnswerService.saveStartAnswer(userTestAnswer);
-
-            model.addAttribute("lastAnswer", userTestAnswer);
-
-
-            if (test.getDuration() != null) {
-                Calendar jobCalendar = new GregorianCalendar();
-                jobCalendar.set(Calendar.SECOND, jobCalendar.get(Calendar.SECOND) + test.getDuration().getSecond());
-                jobCalendar.set(Calendar.MINUTE, jobCalendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
-                jobCalendar.set(Calendar.HOUR, jobCalendar.get(Calendar.HOUR) + test.getDuration().getHour());
-
-
-                SchedulerFactory sf = new StdSchedulerFactory();
-                Scheduler scheduler = sf.getScheduler();
-
-                JobDetail job = newJob(SimpleJob.class)
-                        .withIdentity(UUID.randomUUID().toString(), "group1")
-                        .usingJobData("username", userService.loadUserByUsernameProxy(principal.getName()).getUsername())
-                        .usingJobData("test", test.getTestId())
-                        .usingJobData("answer", userTestAnswer.getUserAnswerId())
-                        .build();
-
-
-                CronTrigger trigger = newTrigger()
-                        .withIdentity(UUID.randomUUID().toString(), "group1")
-                        .withSchedule(cronSchedule(jobCalendar.get(Calendar.SECOND) + " " +
-                                jobCalendar.get(Calendar.MINUTE) + " " +
-                                jobCalendar.get(Calendar.HOUR_OF_DAY) + " " +
-                                jobCalendar.get(Calendar.DAY_OF_MONTH) + " " +
-                                (jobCalendar.get(Calendar.MONTH) + 1) + " ? " +
-                                jobCalendar.get(Calendar.YEAR)))
-                        .build();
-
-                scheduler.scheduleJob(job, trigger);
-
-                System.out.println("Задание выполнится в: " + jobCalendar.getTime());
-
-                model.addAttribute("timeout", jobCalendar.getTime());
-
-                scheduler.start();
-
-            }
-        }
-
-        model.addAttribute("test_id", test);
-        return "answer";
+                           @AuthenticationPrincipal User authUser) throws SchedulerException {
+        return userAnswerService.startAnswer(testId, restore, authUser.getUserId());
     }
 
-    @PostMapping(value = "/answersession/{id}")
-    public void getAnswerSession(@AuthenticationPrincipal Principal principal, @RequestBody UserTestAnswerRequest request, @PathVariable String id) {
-        User user = userService.loadUserByUsernameProxy(principal.getName());
-        UserTestAnswer userTestAnswer = new UserTestAnswer();
+    @GetMapping(value = "/test/{testId}/{userTestAnswerId}/solve")
+    public String startAnswer(@PathVariable Long testId, @PathVariable Long userTestAnswerId, Model model) {
+        UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userTestAnswerId);
+        Test test = testService.findTest(testId);
 
-        Quiz quiz = quizService.findQuiz(request.getQuizId());
-        if (quiz.getType().equals("MULTIPLE")) {
-            MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
-            multipleUserAnswerQuiz.setQuiz(quiz);
-            multipleUserAnswerQuiz.setAnswer((List<Integer>) request.getAnswer());
-            userTestAnswer.setUserQuizAnswers(Collections.singletonList(multipleUserAnswerQuiz));
-        } else if (quiz.getType().equals("STRING")) {
-            StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
-            stringUserAnswerQuiz.setAnswer((String) request.getAnswer());
-            stringUserAnswerQuiz.setQuiz(quiz);
-            userTestAnswer.setUserQuizAnswers(Collections.singletonList(stringUserAnswerQuiz));
+        if (userTestAnswer.getCompletedAt() != null) {
+            SendAnswerResponse sendAnswerResponse = new SendAnswerResponse();
+            sendAnswerResponse.setPercent(userTestAnswer.getPercent());
+            if (test.isDisplayAnswers()) {
+                model.addAttribute("quizAnswers", userTestAnswer.getUserQuizAnswers());
+            }
+            model.addAttribute("sendAnswerResponse", sendAnswerResponse);
+            model.addAttribute("testId", test.getTestId());
+            return "result";
+        } else {
+            model.addAttribute("lastAnswer", userTestAnswer);
+            model.addAttribute("test_id", test);
+
+            if (test.getDuration() != null) {
+                Calendar userTestAnswerStartAt = userTestAnswer.getStartAt();
+                Calendar userTestAnswerFinishAt = new GregorianCalendar();
+                userTestAnswerFinishAt.setTime(userTestAnswerStartAt.getTime());
+                userTestAnswerFinishAt.set(Calendar.SECOND, userTestAnswerFinishAt.get(Calendar.SECOND) + test.getDuration().getSecond());
+                userTestAnswerFinishAt.set(Calendar.MINUTE, userTestAnswerFinishAt.get(Calendar.MINUTE) + test.getDuration().getMinute());
+                userTestAnswerFinishAt.set(Calendar.HOUR, userTestAnswerFinishAt.get(Calendar.HOUR) + test.getDuration().getHour());
+
+                if (test.getEndTime() != null) {
+                    Calendar nowTimePlusDuration = new GregorianCalendar();
+                    nowTimePlusDuration.add(Calendar.SECOND, test.getDuration().getSecond());
+                    nowTimePlusDuration.add(Calendar.MINUTE, test.getDuration().getMinute());
+                    nowTimePlusDuration.add(Calendar.HOUR, test.getDuration().getHour());
+
+                    if (nowTimePlusDuration.after(test.getEndTime())) {
+                        userTestAnswerFinishAt = test.getEndTime();
+                    }
+                }
+                model.addAttribute("timeout", userTestAnswerFinishAt.getTime());
+            }
+
+            return "answer";
         }
-        userTestAnswer.setUser(user);
-        userTestAnswer.setTest(testService.findTest(Integer.parseInt(id)));
-        userAnswerService.saveTempAnswer(userTestAnswer);
+    }
+
+    @PostMapping(value = "/test/answer/update")
+    public void getAnswerSession(@AuthenticationPrincipal User authUser, @Valid @RequestBody UserTestAnswerRequest request) {
+        userAnswerService.updateAnswer(request.getQuizId(), request.getAnswer(), authUser.getUserId());
+        throw new ResponseStatusException(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/test/answer/duration")
+    public void updateDuration(@RequestBody AnswerDuration answerDuration) {
+        userAnswerService.updateDuration(
+                answerDuration.getAnswerSessionId(),
+                answerDuration.getQuizId(),
+                answerDuration.getDuration()
+        );
+        throw new ResponseStatusException(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/quizzes/{id}/info")
+    @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
+    public String getInfo(@PathVariable Long id, Model model,
+                          @RequestParam(required = false, defaultValue = "0") @Min(0) Integer page,
+                          @RequestParam(required = false, defaultValue = "2000") @Min(1) @Max(2000) Integer pageSize,
+                          @RequestParam(defaultValue = "completed_at") String sortBy,
+                          @AuthenticationPrincipal User authUser) {
+
+        Test test = testService.findTest(id);
+        model.addAttribute("test_id", test);
+        model.addAttribute("quizzes", test.getQuizzes());
+        Map<BigInteger, Double> answerStats = userAnswerService.getAnswerStats(id);
+        if (answerStats != null) {
+            double min = answerStats.values().stream().min(Double::compareTo).get();
+            double max = answerStats.values().stream().max(Double::compareTo).get();
+
+            int minQuestionIndex = 0;
+            int maxQuestionIndex = 0;
+
+            List<Double> values = new ArrayList<>(answerStats.values());
+            for (int i = 0; i < values.size(); i++) {
+                Double aDouble = values.get(i);
+                if (aDouble.intValue() == min) {
+                    minQuestionIndex = i;
+                }
+                if (aDouble.intValue() == max) {
+                    maxQuestionIndex = i;
+                }
+            }
+
+            model.addAttribute("min", minQuestionIndex + 1);
+            model.addAttribute("max", maxQuestionIndex + 1);
+        }
+        model.addAttribute("chart", userAnswerService.getAnswerStats(id));
+        model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id));
+        model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id));
+        return "info";
     }
 
 }

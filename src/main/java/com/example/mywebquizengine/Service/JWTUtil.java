@@ -28,8 +28,8 @@ public class JWTUtil {
     }
 
     //извлечение имени пользователя из токена (внутри валидация токена)
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public Long extractUserId(String token) {
+        return Long.parseLong(extractClaim(token, Claims::getSubject));
     }
     //извлечение authorities (внутри валидация токена)
     public String extractAuthorities(String token) {

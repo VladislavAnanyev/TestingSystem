@@ -71,5 +71,15 @@ public class QuizService   {
         return quizRepository.getQuizForThis(name, paging);
     }
 
+    public Quiz findQuizManually(Long quizId) {
+        return quizRepository.find(quizId);
+    }
 
+    public Quiz findQuizProxy(Long quizId) {
+        return quizRepository.getOne(quizId);
+    }
+
+    public String getTypeOfQuiz(Long quizId) {
+        return quizRepository.findType(quizId);
+    }
 }

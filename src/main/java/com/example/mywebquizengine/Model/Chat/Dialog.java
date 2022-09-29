@@ -22,7 +22,6 @@ public class Dialog {
 
     private String image;
 
-    @Size(min = 2)
     @ManyToMany(mappedBy = "dialogs", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<User> users = new HashSet<>();
 

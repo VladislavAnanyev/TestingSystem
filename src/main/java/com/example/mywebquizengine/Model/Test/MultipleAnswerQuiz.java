@@ -1,35 +1,41 @@
 package com.example.mywebquizengine.Model.Test;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-@Entity
+@Entity(name = "QUIZZES_MULTIPLE_TRUE_ANSWER")
+//@OnDelete(action = OnDeleteAction.CASCADE)
 public class MultipleAnswerQuiz extends Quiz {
 
     @ElementCollection
-    @CollectionTable
+    @CollectionTable(name = "QUIZZES_MULTIPLE_OPTIONS", joinColumns=@JoinColumn(name = "QUIZ_ID"))
     @NotNull
     @NotEmpty
     @Size(min = 2)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "QUIZ_ID")
     private List<@NotEmpty String> options;
 
     @ElementCollection
-    @CollectionTable
+    @CollectionTable(name = "QUIZZES_MULTIPLE_TRUE_ANSWERS", joinColumns=@JoinColumn(name = "QUIZ_ID"))
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Long> answer;
+    //@OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "QUIZ_ID")
+    private List<Integer> answer;
 
     public List<String> getOptions() {
         return options;
     }
 
-    public List<Long> getAnswer() {
+    public List<Integer> getAnswer() {
         return answer;
     }
 
@@ -37,7 +43,7 @@ public class MultipleAnswerQuiz extends Quiz {
         this.options = options;
     }
 
-    public void setAnswer(List<Long> answer) {
+    public void setAnswer(List<Integer> answer) {
         this.answer = answer;
     }
 }

@@ -26,18 +26,11 @@ public class ApiUserController {
     @Autowired
     private UserService userService;
 
-
-    @GetMapping(path = "/friends")
-    public List<UserCommonView> getFriends(@AuthenticationPrincipal Principal principal) {
-        return userService.findMyFriends(principal);
-    }
-
     @GetMapping(path = "/findbyid")
     public UserCommonView getUserById(@RequestParam String username) {
         return userService.getUserView(username);
 
     }
-
 
     @PostMapping(path = "/signin")
     public AuthResponse jwtSignIn(@RequestBody AuthRequest authRequest) {
@@ -59,26 +52,26 @@ public class ApiUserController {
 
 
     @GetMapping(path = "/authuser")
-    public UserView getApiAuthUser(@AuthenticationPrincipal Principal principal)  {
-            return userService.getAuthUser(principal.getName());
+    public UserView getApiAuthUser(@AuthenticationPrincipal User authUser)  {
+            return userService.getAuthUser(authUser.getUserId());
     }
 
-    @GetMapping(path = "/user/{username}/profile")
+    /*@GetMapping(path = "/user/{username}/profile")
     public ProfileView getProfile(@PathVariable String username) {
         return userService.getUserProfileById(username);
-    }
+    }*/
 
 
-    @PostMapping(path = "/upload")
-    public void uploadPhoto(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal Principal principal) {
-        userService.uploadPhoto(file, principal.getName());
-    }
+    /*@PostMapping(path = "/upload")
+    public void uploadPhoto(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal User authUser) {
+        userService.uploadPhoto(file, authUser.getUserId());
+    }*/
 
 
     @PutMapping(path = "/user", consumes={"application/json"})
     public void changeUser(@RequestBody User user,
-                           @AuthenticationPrincipal Principal principal) {
-        userService.updateUser(user.getLastName(), user.getFirstName(), principal.getName());
+                           @AuthenticationPrincipal User authUser) {
+        userService.updateUser(user.getLastName(), user.getFirstName(), authUser.getUserId());
     }
 
     @PostMapping(path = "/user/send-change-password-code")
@@ -87,13 +80,13 @@ public class ApiUserController {
     }
 
     /*@PostMapping(path = "/user/send-change-password-code")
-    public void sendChangePasswordCodeWithAuth(@AuthenticationPrincipal Principal principal) {
-        userService.sendCodeForChangePasswordFromPhone(principal.getName());
+    public void sendChangePasswordCodeWithAuth(@AuthenticationPrincipal User authUser) {
+        userService.sendCodeForChangePasswordFromPhone(authUser.getUserId());
     }*/
 
     @PutMapping(path = "/user/password")
     public void changePassword(@RequestBody User user) {
-        userService.updatePassword(user, user.getChangePasswordCode());
+        userService.updatePassword(user.getPassword(), user.getChangePasswordCode());
     }
 
     @GetMapping(path = "/user/verify-password-code")
@@ -101,9 +94,11 @@ public class ApiUserController {
         userService.getUserViaChangePasswordCodePhoneApi(user.getUsername(), user.getChangePasswordCode());
     }
 
+/*
     @GetMapping(path = "/user/check-username")
     public Boolean checkExistUser(@RequestParam String username) {
         return userService.checkForExistUser(username);
     }
+*/
 
 }

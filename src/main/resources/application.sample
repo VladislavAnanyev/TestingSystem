@@ -34,9 +34,6 @@ spring.session.store-type=jdbc
 #spring.redis.ssl = true
 spring.session.timeout = 72h
 
-
-
-
 spring.security.oauth2.client.registration.google.client-id=INPUT
 spring.security.oauth2.client.registration.google.client-secret=INPUT
 
