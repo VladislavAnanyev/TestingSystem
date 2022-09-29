@@ -1,71 +1,48 @@
 <#import "parts/commonWithoutAside.ftlh" as c>
 <#include "parts/security.ftlh">
 <@c.page>
-    <title>Добавить викторину</title>
-    <script src="/static/addTest.js"></script>
-    <script src="/static/addOptions.js"></script>
-    <script src="/static/addQuiz.js"></script>
-    <script src="/static/deletereq.js"></script>
+    <title>Добавить тест</title>
 
+
+<#--
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
+-->
 
 
 
     <aside class="sidebar bg-light">
         <div class="container h-100">
             <#--            <div class="flex-wrap mt-5">-->
-            <nav id="navbar-example3" class="navbar navbar-light bg-light px-3" aria-label="...">
-                <ul class="justify-content-center pagination nav nav-pills" style="flex-wrap: wrap">
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="feather feather-sliders">
-                                <line x1="4" y1="21" x2="4" y2="14"></line>
-                                <line x1="4" y1="10" x2="4" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12" y2="3"></line>
-                                <line x1="20" y1="21" x2="20" y2="16"></line>
-                                <line x1="20" y1="12" x2="20" y2="3"></line>
-                                <line x1="1" y1="14" x2="7" y2="14"></line>
-                                <line x1="9" y1="8" x2="15" y2="8"></line>
-                                <line x1="17" y1="16" x2="23" y2="16"></line>
-                            </svg>
-                        </a>
-                    </li>
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">1
-                        </a>
-                    </li>
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">2
-                        </a>
-                    </li>
-                    <li style="width: 60px" class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a style="color: #5376fc" id="nav1" class="card-body page-link nav-link text-center"
-                           href="#list-item-1">3
-                        </a>
-                    </li>
-                    <li aria-disabled="true" disabled style="width: 60px"
-                        class="ml-5 mt-2 card page-item  nav-item mx-1 <#--active-->"
-                        aria-current="page">
-                        <a disabled="true" aria-disabled="true" style="color: #5376fc" id="nav1"
-                           class="card-body page-link nav-link text-center"
-                           href="#list-item-1">4
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">1. Укажите общую информацию и ограничения на тестирование</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">2. Создайте тестовые задания</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-4 mt-3">
+                <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                        <div class="col">
+                            <h4 class="mb-1">3. Подтвердите создание теста кнопкой "создать тест"</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <#--            </div>-->
         </div>
     </aside>
@@ -92,73 +69,45 @@
                         <input type="hidden" id="courseId" value="${courseId?c}">
 
 
-                        <div class="mt-2">Время на выполнение
-                            <div class="form-check ml-4">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                       id="flexRadioDefault1"
-                                       checked>
-                                <label class="form-check-label" for="flexRadioDefault1">
-                                    Неограничено
-                                </label>
+                        <div class="row card-body">
+                            <div class="col-auto mt-8">
+                                <a class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" class="feather feather-clock">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                </a>
                             </div>
-                            <div class="form-check ml-4">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                       id="flexRadioDefault2">
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Ограничено
-                                </label>
-                                <label for="time"> (чч:мм)</label>
-                                <input class="input-text" type="time" value="01:00" id="time">
-                            </div>
-                            <div>
-
-                            </div>
-                        </div>
-
-                        <div class="mt-2">Время начала
-
-                            <div class="form-check ml-4">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault2"
-                                       id="flexRadioDefault3"
-                                       checked>
-                                <label class="form-check-label" for="flexRadioDefault3">
-                                    Любое
-                                </label>
-                            </div>
-                            <div class="form-check ml-4">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault2"
-                                       id="flexRadioDefault4">
-                                <label class="form-check-label" for="flexRadioDefault4">
-                                    Заданное
-                                </label>
-                                <label for="time"> (чч:мм)</label>
-                                <input class="time" type="datetime-local" id="startDate">
-                            </div>
-
-                        </div>
-                        <div class="mt-2">Время конца
-
-                            <div class="form-check ml-4">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault3"
-                                       id="flexRadioDefault5"
-                                       checked>
-                                <label class="form-check-label" for="flexRadioDefault5">
-                                    Любое
-                                </label>
-                            </div>
-                            <div class="form-check ml-4">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault3"
-                                       id="flexRadioDefault6">
-                                <label class="form-check-label" for="flexRadioDefault6">
-                                    Заданное
-                                </label>
-                                <label for="time"> (чч:мм)</label>
-                                <input type="datetime-local" id="endDate">
-                            </div>
-
-                            <div class="mt-2">Количество попыток
+                            <div class="mt-2 col">Время на выполнение
                                 <div class="form-check ml-4">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault4"
+                                    <input onclick="document.getElementById('time').hidden=true"
+                                           class="form-check-input" type="radio" name="flexRadioDefault"
+                                           id="flexRadioDefault1"
+                                           checked>
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Неограничено
+                                    </label>
+                                </div>
+                                <div class="form-check ml-4">
+                                    <input onclick="document.getElementById('time').hidden=false"
+                                           class="form-check-input" type="radio" name="flexRadioDefault"
+                                           id="flexRadioDefault2">
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Ограничено
+                                    </label>
+                                    <label for="time"> (чч:мм)</label>
+                                    <input hidden class="form-control" type="time" value="01:00" id="time">
+                                </div>
+                                <div>
+
+                                </div>
+                            </div>
+                            <div class="mt-2 col">Количество попыток
+                                <div class="form-check ml-4">
+                                    <input onclick="document.getElementById('attempts').hidden=true"
+                                           class="form-check-input" type="radio" name="flexRadioDefault4"
                                            id="flexRadioDefault7"
                                            checked>
                                     <label class="form-check-label" for="flexRadioDefault7">
@@ -166,39 +115,113 @@
                                     </label>
                                 </div>
                                 <div class="form-check ml-4">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault4"
+                                    <input onclick="document.getElementById('attempts').hidden=false"
+                                           class="form-check-input" type="radio" name="flexRadioDefault4"
                                            id="flexRadioDefault8">
                                     <label class="form-check-label" for="flexRadioDefault8">
                                         Ограничено
                                     </label>
-                                    <input type="number" id="attempts">
-                                </div>
-                                <div>
-
+                                    <input hidden placeholder="Введите число доступных попыток" class="form-control"
+                                           type="number" id="attempts">
                                 </div>
                             </div>
 
-                            <#--<section class="w-100 p-4 pb-4">
-                                <label class="form-label" for="customRange1">Example range</label>
-                                <div class="range">
-                                    <input type="range" class="form-range" id="customRange1">
-                                    <span class="thumb" style="left: calc(50% + 0.5px);"><span class="thumb-value">50</span></span></div>
-                            </section>-->
+                        </div>
 
-                            <#--                            <div class="container">-->
+                        <div class="row card-body">
+                            <div class="col-auto mt-8">
+                                <a class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" class="feather feather-calendar">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                </a>
+                            </div>
 
-                            <div class="form-group mt-2">
+                            <div class="mt-2 col">Дата и время начала доступа
+
+                                <div class="form-check ml-4">
+                                    <input onclick="document.getElementById('startDate').hidden=true"
+                                           class="form-check-input" type="radio" name="flexRadioDefault2"
+                                           id="flexRadioDefault3"
+                                           checked>
+                                    <label class="form-check-label" for="flexRadioDefault3">
+                                        Любое
+                                    </label>
+                                </div>
+                                <div class="form-check ml-4">
+                                    <input onclick="document.getElementById('startDate').hidden=false"
+                                           class="form-check-input" type="radio" name="flexRadioDefault2"
+                                           id="flexRadioDefault4">
+                                    <label class="form-check-label" for="flexRadioDefault4">
+                                        Заданное
+                                    </label>
+                                    <label for="time"> (чч:мм)</label>
+                                    <input hidden class="form-control" type="datetime-local" id="startDate">
+                                </div>
+
+                            </div>
+                            <div class="mt-2 col">Дата и время окончания доступа
+
+                                <div class="form-check ml-4">
+                                    <input onclick="document.getElementById('endDate').hidden=true"
+                                           class="form-check-input"
+                                           type="radio" name="flexRadioDefault3"
+                                           id="flexRadioDefault5"
+                                           checked>
+                                    <label class="form-check-label" for="flexRadioDefault5">
+                                        Любое
+                                    </label>
+                                </div>
+                                <div class="form-check ml-4">
+                                    <input onclick="document.getElementById('endDate').hidden=false"
+                                           class="form-check-input" type="radio" name="flexRadioDefault3"
+                                           id="flexRadioDefault6">
+                                    <label class="form-check-label" for="flexRadioDefault6">
+                                        Заданное
+                                    </label>
+                                    <label for="time"> (чч:мм)</label>
+                                    <input hidden class="form-control" type="datetime-local" id="endDate">
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="row card-body">
+                            <div class="col-auto mt-6">
+                                <a class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" class="feather feather-trending-up">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                        <polyline points="17 6 23 6 23 12"></polyline>
+                                    </svg>
+
+                                </a>
+                            </div>
+                            <div class="form-group mt-2 col">
                                 <label for="formControlRange">Проходной балл:
-                                    <span id="rangeval">50<!-- Default value --></span>
+                                    <span id="rangeval">50</span>
                                 </label>
                                 <input type="range" class="form-range" id="formControlRange"
                                        onInput="$('#rangeval').html($(this).val())">
 
                             </div>
+                        </div>
 
-                            <#--                            </div>-->
 
-                            <div class="mt-2">Отображать ответы пользователям
+                        <div class="row card-body">
+                            <div class="col-auto mt-8">
+                                <a class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                    ?
+                                </a>
+                            </div>
+                            <div class="mt-2 col">Отображать ответы пользователям по окончании тестирования
                                 <div class="form-check ml-4">
                                     <input class="form-check-input" type="radio" name="flexRadioDefault5"
                                            id="flexRadioDefault9"
@@ -218,15 +241,15 @@
 
                                 </div>
                             </div>
-
                         </div>
 
-                        <#--    <form method="get" action="/" >-->
-
-                        <#--    </form>-->
-
-
                     </div>
+
+                    <#--    <form method="get" action="/" >-->
+
+                    <#--    </form>-->
+
+
                 </div>
             </div>
 
@@ -243,58 +266,78 @@
                             <div class="form-group">
                                 <label for="exampleFormControlInput1 validationDefault01">Тема</label>
                                 <textarea required type="text" class="form-control" id="titleID validationDefault01"
-                                          placeholder="Напишите здесь тему вопроса" rows="1" name="title"></textarea>
+                                          placeholder="Напишите здесь тему задания" rows="1" name="title"></textarea>
                                 <input type="hidden">
                             </div>
 
-                            <div class="form-group">
-                                <label for="exampleFormControlInput1 validationDefault01">Вопрос</label>
+                            <div class="form-group mt-4">
+                                <label for="exampleFormControlInput1 validationDefault01">Формулировка</label>
                                 <textarea rows="1" required type="text" class="form-control"
                                           id="questionID validationDefault01"
-                                          placeholder="Напишите здесь ваш вопрос" name="question"></textarea>
+                                          placeholder="Напишите здесь формулировку вашего задания" name="question"></textarea>
                             </div>
 
-                            <div class="form-group">
+
+                            <div class="form-switch mt-4 mb-4">
+                                <input class="form-check-input" onchange="document.getElementById('file1').hidden=false"
+                                       type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                                <label class="form-check-label" for="flexSwitchCheckDefault">Прикрепить файл</label>
+                            </div>
+
+
+                            <div hidden id="file1" class="form-group">
                                 <label for="exampleFormControlInput1 validationDefault01">Файл</label>
                                 <input class="form-control" type="file" name="file1">
-
                             </div>
 
                             <div id="chooseType1">
-                                <label for="exampleFormControlInput1 validationDefault01">Выберите тип вопроса</label>
-                                <div class="custom-control custom-checkbox">
-                                    <input onclick="document.getElementById('1optionstest').hidden = false; document.getElementById('chooseType1').hidden = true"
-                                           type="checkbox"
-                                           class="custom-control-input" id="choose1" name="1choose" value="0">
-                                    <label class="custom-control-label 1opt validationDefault01" id="1label1"
-                                           for="choose1">
-                                        <input disabled value="Один или несколько ответов" required type="text"
-                                               class="form-control"
-                                               placeholder="1)" name="1choose">
-                                    </label>
-                                </div>
+                                <label for="exampleFormControlInput1 validationDefault01">Выберите тип задания</label>
+                                <div class="card-body row">
+                                    <div class="col-auto mt-8">
+                                        <a class="btn btn-sm btn-icon btn-primary rounded-circle">
+                                            ?
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <div class="custom-control custom-checkbox row">
 
-                                <div class="custom-control custom-checkbox mt-2">
-                                    <input onclick="document.getElementById('1inputAnswer').hidden = false; document.getElementById('chooseType1').hidden = true"
-                                           type="checkbox"
-                                           class="custom-control-input " id="choose2" name="1choose" value="1">
-                                    <label class="custom-control-label 1opt " id="1label2" for="choose2">
-                                        <input disabled value="Ответ в виде строки" required type="text"
-                                               class="form-control"
-                                               placeholder="2)" name="1choose">
-                                    </label>
-                                </div>
+                                            <div class="col-auto">
+                                                <input onclick="document.getElementById('1optionstest').hidden = false; document.getElementById('chooseType1').hidden = true"
+                                                       type="checkbox"
+                                                       class="form-check-input" id="choose1" name="1choose" value="0">
+                                            </div>
 
-                                <div class="custom-control custom-checkbox mt-2">
-                                    <input onclick="document.getElementById('1mapAnswer').hidden = false; document.getElementById('chooseType1').hidden = true"
-                                           type="checkbox"
-                                           class="custom-control-input" id="choose3" name="1choose"
-                                           value="2">
-                                    <label class="custom-control-label 1opt" id="1label3" for="choose3">
-                                        <input disabled value="Соответствие" required type="text" class="form-control"
-                                               placeholder="3)"
-                                               name="1choose">
-                                    </label>
+                                            <label class="col custom-control-label 1opt validationDefault01"
+                                                   id="1label1" for="choose1">
+                                                Один или несколько ответов
+                                            </label>
+
+                                        </div>
+
+                                        <div class="custom-control custom-checkbox mt-2 row">
+                                            <div class="col-auto">
+                                                <input onclick="document.getElementById('1inputAnswer').hidden = false; document.getElementById('chooseType1').hidden = true"
+                                                       type="checkbox"
+                                                       class="form-check-input" id="choose2" name="1choose" value="1">
+                                            </div>
+                                            <label class="col custom-control-label 1opt " id="1label2" for="choose2">
+                                                Ответ в виде строки
+                                            </label>
+                                        </div>
+
+                                        <div class="custom-control custom-checkbox mt-2 row">
+                                            <div class="col-auto">
+                                                <input onclick="document.getElementById('1mapAnswer').hidden = false; document.getElementById('chooseType1').hidden = true"
+                                                       type="checkbox"
+                                                       class="form-check-input" id="choose3" name="1choose"
+                                                       value="2">
+                                            </div>
+
+                                            <label class="col custom-control-label 1opt" id="1label3" for="choose3">
+                                                Соответствие
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -501,8 +544,8 @@
                                     </div>
 
                                     <div>
-                                        <button onclick="addOptions(1)" class="btn btn-primary mt-2">Добавить
-                                            вариант
+                                        <button onclick="addOptions(1)" class="btn btn-primary mt-2">
+                                            Добавить вариант
                                         </button>
                                     </div>
 
@@ -628,27 +671,70 @@
 
             <#if nowUser??>
 
-                <div id="addQuiz">
-                    <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
-                </div>
+                <div class="row mb-5">
+                    <div id="addQuiz" class="col">
+                        <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить задание</button>
+                    </div>
 
-                <button onclick="addTest()" type="submit" id="createTestBtn" class="btn btn-primary mb-2 mt-2">Создать
-                    тест
-                </button>
+                    <div class="col text-end">
+                        <button onclick="addTest()" type="submit" id="createTestBtn"
+                                class="btn btn-primary mb-2 mt-2">
+                            Создать тест
+                        </button>
+                    </div>
+                </div>
             <#else >
 
                 <div id="addQuiz">
-                    <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить вопрос</button>
+                    <button onclick="addQuiz()" class="btn btn-primary mt-2">Добавить задание</button>
                 </div>
 
-                <button onclick="location.href='/signin'" id="createTestBtn" type="submit"
-                        class="btn btn-primary mb-2 mt-2">
-                    Создать
-                    тест
-                </button>
+                <div>
+                    <button onclick="location.href='/signin'" id="createTestBtn" type="submit"
+                            class="btn btn-primary mb-2 mt-2">
+                        Создать тест
+                    </button>
+                </div>
 
             </#if>
         </div>
+
+        <div class="modal fade" id="staticBackdropAdd" data-backdrop="static"
+                <#--data-keyboard="false"--> <#--tabindex="-1"--> aria-labelledby="staticBackdropLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Уведомление</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            Тест успешно создан
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit"
+                                onclick="location.href='/course/${courseId?c}/test/create'" <#--onclick="restoreSession(false, ${testList.id?c})"-->
+                                class="btn btn-secondary" <#--data-dismiss="modal"-->>Создать новый
+                        </button>
+                        <button type="submit"
+                                onclick="location.href='/course/${courseId?c}/tests'" <#--onclick="restoreSession(true, ${testList.id?c})"-->
+                                class="btn btn-primary">К списку тестов
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/addTest.js"></script>
+        <script src="/static/addOptions.js"></script>
+        <script src="/static/addQuiz.js"></script>
+        <script src="/static/deletereq.js"></script>
+        <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
 
     </main>
 

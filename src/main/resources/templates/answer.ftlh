@@ -4,6 +4,7 @@
 <@e.page>
     <link type="text/html" rel="stylesheet" href="/static/chart.css">
     <link href="/static/timer.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/atom-one-light.min.css">
 <#--    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>-->
 
     <title>Ответить</title>
@@ -121,15 +122,15 @@
              tabindex="0" data-bs-spy="scroll" data-bs-target="#navbar-example3">
             <div>
 
-                <#list test_id.quizzes as quiz>
+                <#list quizzes as quiz>
                     <div id="list-item-${quiz_index + 1}"
-                         class="card quiz mt-2 card mb-3 shadow p-3 mb-5 <#--bg-white--> rounded">
+                         class="card quiz mt-2 card mb-3 shadow p-3 mb-6 <#--bg-white--> rounded">
                         <b class="mr-4">${quiz_index + 1}.</b>
                         <div class="card-body">
                             <div id="test${quiz_index}">
                                 <#--                        <div><h6>${quiz.title}</h6></div>-->
                                 <div>
-                                    <h5 class="user-select-none">${quiz.text}</h5>
+                                    <h5 class="user-select-none">${quiz.text?replace("<sql>", "<pre><code>")?replace("</sql>", "</code></pre>")?no_esc}</h5>
                                     <#if quiz.fileUrl??>
 
                                         <#if quiz.fileUrl?contains("download")>
@@ -159,7 +160,7 @@
                                     </#if>
                                     <p>Выберите один или несколько ответов</p>
                                 </div>
-                                <#if quiz.class == "class com.example.mywebquizengine.Model.Test.MapAnswerQuiz">
+                                <#if quiz.class == "class com.example.mywebquizengine.model.test.MapAnswerQuiz">
                                     <div class="custom-control custom-checkbox mt-2">
 
                                         <div class="card border-0 mt-3">
@@ -233,7 +234,7 @@
 
                                     </div>
                                 </#if>
-                                <#if quiz.class == "class com.example.mywebquizengine.Model.Test.MultipleAnswerQuiz">
+                                <#if quiz.class == "class com.example.mywebquizengine.model.test.MultipleAnswerQuiz">
 
                                     <#list quiz.options as options>
                                         <div class="custom-control custom-checkbox mt-2">
@@ -287,13 +288,13 @@
 
                                 </#if>
 
-                                <#if quiz.class == "class com.example.mywebquizengine.Model.Test.StringAnswerQuiz">
+                                <#if quiz.class == "class com.example.mywebquizengine.model.test.StringAnswerQuiz">
                                     <div id="inputAnswer" class="custom-control mt-3">
                                         <input oninput="onInput(${quiz.quizId?c}, ${quiz_index+1})" required type="text"
                                                class="form-control" id="stringAnswer${quiz_index+1}"
-                                                <#if lastAnswer??>
+                                                <#--<#if lastAnswer??>
                                                     value="<#if lastAnswer.userQuizAnswers[quiz_index]??><#if lastAnswer.userQuizAnswers[quiz_index].answer??>${lastAnswer.userQuizAnswers[quiz_index].answer}</#if></#if>"
-                                                </#if>
+                                                </#if>-->
                                                placeholder="Введите ответ">
                                     </div>
                                 </#if>
@@ -306,11 +307,12 @@
                 </#list>
 
 
-                <button <#--onmouseenter="scrollListener()"--> type="submit"
+                <button type="submit"
                                                                data-toggle="modal" <#--data-target="#staticBackdrop"-->
-                                                               class="btn btn-primary ml-2 mb-2" id="btnAns"
+                                                               class="btn btn-primary ml-2 mb-6" id="btnAns"
                                                                onclick="f(${test_id.testId?c})">Ответить
                 </button>
+                <div class="card mt-15"></div>
 
 
                 <div <#--onload="chartpie(${test_id.id?c})"--> class="modal fade" id="staticBackdrop"
@@ -442,7 +444,11 @@
         </script>
 
 
+
     </main>
+
+    <script src="/static/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
 
 
 </@e.page>

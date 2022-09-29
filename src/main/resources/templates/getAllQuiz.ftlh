@@ -71,6 +71,28 @@
                                         <#else>
                                             <p class="card-text">Ограничение по времени: отсутствует</p>
                                         </#if>
+
+
+                                        <#if !test.startTime?? && !test.endTime??>
+                                            <p class="card-text">Тест доступен в любой момент</p>
+
+                                            <#else >
+                                                <p class="card-text">Тест доступен с:
+                                                    <#if test.startTime??>
+                                                        ${test.startTime.timeInMillis?number_to_date?string("dd.MM.yyyy, HH:mm")}
+                                                    <#else>
+                                                        "ограничений нет"
+                                                    </#if>
+                                                    до: <#if test.endTime??>
+                                                        ${test.endTime.timeInMillis?number_to_date?string("dd.MM.yyyy, HH:mm")}
+                                                    <#else>
+                                                        "ограничений нет"
+                                                    </#if>
+                                                </p>
+
+                                        </#if>
+
+
                                     </div>
 
 
