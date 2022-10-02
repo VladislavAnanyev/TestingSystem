@@ -79,9 +79,9 @@
             </a>
         </li>-->
 
-        <#--<li class="nav-item &lt;#&ndash;d-none&ndash;&gt; d-xl-block flex-xl-grow-1">
+        <li class="nav-item <#--d-none--> d-xl-block flex-xl-grow-1">
             <a class="nav-link py-0 py-lg-8" id="tab-chats" href="#"
-               onclick="location.href= '/chat'" &lt;#&ndash;href="#tab-content-chats"&ndash;&gt; title="Chats"
+               onclick="location.href= '/chat'" <#--href="#tab-content-chats"--> title="Chats"
                data-bs-toggle="tab" role="tab">
                 <div class="icon icon-xl icon-badged">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </a>
-        </li>-->
+        </li>
 
         <#--<li class="nav-item">
             <a class="nav-link py-0 py-lg-8" id="tab-notifications" href="#tab-content-notifications"

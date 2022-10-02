@@ -142,10 +142,10 @@ public class UserAnswerController {
             List<Double> values = new ArrayList<>(answerStats.values());
             for (int i = 0; i < values.size(); i++) {
                 Double aDouble = values.get(i);
-                if (aDouble.intValue() == min) {
+                if (aDouble == min) {
                     minQuestionIndex = i;
                 }
-                if (aDouble.intValue() == max) {
+                if (aDouble == max) {
                     maxQuestionIndex = i;
                 }
             }
