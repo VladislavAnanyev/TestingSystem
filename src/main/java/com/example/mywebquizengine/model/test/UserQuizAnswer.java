@@ -13,7 +13,6 @@ public class UserQuizAnswer {
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "quiz_id")
-    //@OnDelete(action = OnDeleteAction.CASCADE)
     private Quiz quiz;
 
     @ManyToOne(optional = false)
@@ -23,6 +22,14 @@ public class UserQuizAnswer {
     private Double duration;
 
     public UserQuizAnswer() {}
+
+    public void updateAnswer(Object object) {
+        throw new UnsupportedOperationException("Поддерживается только в классах наследниках");
+    }
+
+    public void check() {
+        throw new UnsupportedOperationException("Поддерживается только в классах наследниках");
+    }
 
     public Double getDuration() {
         return duration;

@@ -1,11 +1,11 @@
 package com.example.mywebquizengine.service;
 
 
+import com.example.mywebquizengine.model.User;
+import com.example.mywebquizengine.model.dto.output.SendAnswerResponse;
 import com.example.mywebquizengine.model.projection.AnswerViewForInfo;
 import com.example.mywebquizengine.model.projection.UserTestAnswerView;
 import com.example.mywebquizengine.model.test.*;
-import com.example.mywebquizengine.model.User;
-import com.example.mywebquizengine.model.dto.output.SendAnswerResponse;
 import com.example.mywebquizengine.repos.UserQuizAnswerRepository;
 import com.example.mywebquizengine.repos.UserTestAnswerRepository;
 import org.quartz.*;
@@ -34,9 +34,6 @@ public class UserAnswerService {
     private UserQuizAnswerRepository userQuizAnswerRepository;
 
     @Autowired
-    private QuizService quizService;
-
-    @Autowired
     private UserTestAnswerRepository userTestAnswerRepository;
 
     @Autowired
@@ -47,23 +44,34 @@ public class UserAnswerService {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private CourseService courseService;
 
-    public UserTestAnswer findByUserAnswerId(Long userAnswerId) {
+    public static Calendar getEndTime(Test test) {
+        Calendar jobCalendar = new GregorianCalendar();
+        jobCalendar.set(Calendar.SECOND, jobCalendar.get(Calendar.SECOND) + test.getDuration().getSecond());
+        jobCalendar.set(Calendar.MINUTE, jobCalendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
+        jobCalendar.set(Calendar.HOUR, jobCalendar.get(Calendar.HOUR) + test.getDuration().getHour());
 
+        if (test.getEndTime() != null) {
+            Calendar nowTimePlusDuration = new GregorianCalendar();
+            nowTimePlusDuration.add(Calendar.SECOND, test.getDuration().getSecond());
+            nowTimePlusDuration.add(Calendar.MINUTE, test.getDuration().getMinute());
+            nowTimePlusDuration.add(Calendar.HOUR, test.getDuration().getHour());
+
+            if (nowTimePlusDuration.after(test.getEndTime())) {
+                jobCalendar = test.getEndTime();
+            }
+        }
+        return jobCalendar;
+    }
+
+    public UserTestAnswer findByUserAnswerId(Long userAnswerId) {
         Optional<UserTestAnswer> userTestAnswer = userTestAnswerRepository.findByUserAnswerId(userAnswerId);
         if (userTestAnswer.isPresent()) {
             return userTestAnswer.get();
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-    }
-
-    private void saveAnswer(UserTestAnswer userTestAnswer) {
-        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findById(userTestAnswer.getUserAnswerId()).get();
-        lastUserAnswer.setCompletedAt(userTestAnswer.getCompletedAt());
-        lastUserAnswer.setPercent(userTestAnswer.getPercent());
     }
 
     public List<AnswerViewForInfo> getPageAnswersById(Long id, Long groupId) {
@@ -72,12 +80,6 @@ public class UserAnswerService {
         } else {
             return userTestAnswerRepository.getAnswersOnMyQuiz(id, groupId);
         }
-    }
-
-    @Transactional
-    public UserTestAnswer getUserTestAnswerById(Long id) {
-
-        return userTestAnswerRepository.findById(id).get();
     }
 
     @Transactional
@@ -194,82 +196,49 @@ public class UserAnswerService {
 
     public void checkAnswer(Long userTestAnswerId, Long authUserId) {
         UserTestAnswer userTestAnswer = findByUserAnswerId(userTestAnswerId);
-        if (authUserId.equals(userTestAnswer.getUser().getUserId())) {
-            Test test = userTestAnswer.getTest();
-            StringBuilder result = new StringBuilder();
-            List<UserQuizAnswer> userQuizAnswers = new ArrayList<>();
-            int trueAnswers = 0;
+        if (!authUserId.equals(userTestAnswer.getUser().getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
-            for (int i = 0; i < test.getQuizzes().size(); i++) {
+        StringBuilder result = new StringBuilder();
 
-                UserQuizAnswer quizAnswer = null;
-                for (UserQuizAnswer userQuizAnswer : userTestAnswer.getUserQuizAnswers()) {
-                    if (userQuizAnswer.getQuiz().getQuizId().equals(test.getQuizzes().get(i).getQuizId())) {
-                        quizAnswer = userQuizAnswer;
-                    }
-                }
+        int trueAnswers = 0;
+        for (UserQuizAnswer userQuizAnswer : userTestAnswer.getUserQuizAnswers()) {
+            userQuizAnswer.check();
 
-                AnswerChecker answerChecker = new AnswerChecker();
-                Quiz quiz = quizService.findQuiz(test.getQuizzes().get(i).getQuizId());
-                answerChecker.quiz = quiz;
-                answerChecker.checkAnswer(userTestAnswer.getUserQuizAnswers().get(i));
-
-                quizAnswer.setQuiz(quiz);
-                quizAnswer.setStatus(answerChecker.isSuccess());
-
-                userQuizAnswers.add(quizAnswer);
-
-                if (quizAnswer.getStatus()) {
-                    result.append("1");
-                    trueAnswers++;
-                } else {
-                    result.append("0");
-                }
-            }
-
-            double percent = ((double) trueAnswers / (double) test.getQuizzes().size()) * 100.0;
-
-            TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
-            Calendar nowDate = new GregorianCalendar();
-            nowDate.setTimeZone(timeZone);
-
-            userTestAnswer.setUserQuizAnswers(userQuizAnswers);
-            userTestAnswer.setPercent(percent);
-            userTestAnswer.setCompletedAt(nowDate);
-            saveAnswer(userTestAnswer);
-
-            String destination = "/topic/" + userTestAnswer.getUser().getUserId() + userTestAnswer.getUserAnswerId();
-
-            char[] charsResult = result.toString().toCharArray();
-            SendAnswerResponse sendAnswerResponse = new SendAnswerResponse();
-            sendAnswerResponse.setPercent(percent);
-            if (test.isDisplayAnswers()) {
-                sendAnswerResponse.setResult(charsResult);
-            }
-
-            simpMessagingTemplate.convertAndSend(destination, sendAnswerResponse);
-        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-    }
-
-    public void updateAnswer(Long quizId, Object answer, Long userId) {
-        Quiz quiz = quizService.findQuiz(quizId);
-        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(userId).get();
-
-        Long userQuizAnswerId = null;
-        for (UserQuizAnswer quizAnswer : lastUserAnswer.getUserQuizAnswers()) {
-            if (quizAnswer.getQuiz().getQuizId().equals(quizId)) {
-                userQuizAnswerId = quizAnswer.getQuizAnswerId();
+            if (userQuizAnswer.getStatus()) {
+                result.append("1");
+                trueAnswers++;
+            } else {
+                result.append("0");
             }
         }
 
-        UserQuizAnswer userQuizAnswer = userQuizAnswerRepository.findById(userQuizAnswerId).get();
-            if (quiz instanceof MultipleAnswerQuiz) {
-                ((MultipleUserAnswerQuiz) userQuizAnswer).setAnswer((List<Integer>) answer);
-            } else if (quiz instanceof StringAnswerQuiz) {
-                ((StringUserAnswerQuiz) userQuizAnswer).setAnswer((String) answer);
-            } else if (quiz instanceof MapAnswerQuiz) {
-                ((MapUserAnswerQuiz) userQuizAnswer).setAnswer((HashMap<String, String>) answer);
+        double percent = ((double) trueAnswers / (double) userTestAnswer.getTest().getQuizzes().size()) * 100.0;
+
+        userTestAnswer.setPercent(percent);
+        userTestAnswer.setCompletedAt(new GregorianCalendar());
+        userTestAnswerRepository.save(userTestAnswer);
+
+        SendAnswerResponse sendAnswerResponse = new SendAnswerResponse();
+        sendAnswerResponse.setPercent(percent);
+        if (userTestAnswer.getTest().isDisplayAnswers()) {
+            sendAnswerResponse.setResult(result.toString().toCharArray());
+        }
+
+        String destination = "/topic/" + userTestAnswer.getUser().getUserId() + userTestAnswer.getUserAnswerId();
+        simpMessagingTemplate.convertAndSend(destination, sendAnswerResponse);
+    }
+
+    public void updateAnswer(Long quizId, Object answer, Long userId) {
+        UserTestAnswer lastUserAnswer = userTestAnswerRepository.findLastUserAnswer(userId).get();
+
+        for (UserQuizAnswer quizAnswer : lastUserAnswer.getUserQuizAnswers()) {
+            if (quizAnswer.getQuiz().getQuizId().equals(quizId)) {
+                quizAnswer.updateAnswer(answer);
+                break;
             }
+        }
 
         userTestAnswerRepository.save(lastUserAnswer);
     }
@@ -277,93 +246,76 @@ public class UserAnswerService {
     public Long startAnswer(Long testId, String restore, Long userId) throws SchedulerException {
         Test test = testService.findTest(testId);
         UserTestAnswer userTestAnswer;
-        if (isAvailable(test, userId)) {
-            UserTestAnswer lastUserTestAnswer = checkLastComplete(userService.loadUserByUserIdProxy(userId), testId);
+        if (!isAvailable(test, userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        UserTestAnswer lastUserTestAnswer = checkLastComplete(userService.loadUserByUserIdProxy(userId), testId);
 
-            if (Boolean.parseBoolean(restore) && lastUserTestAnswer != null && lastUserTestAnswer.getCompletedAt() == null) {
-                userTestAnswer = lastUserTestAnswer;
-            } else {
-                userTestAnswer = new UserTestAnswer();
-                Calendar calendar = new GregorianCalendar();
-                userTestAnswer.setStartAt(calendar);
-                userTestAnswer.setTest(testService.findTest(testId));
-                userTestAnswer.setUser(userService.loadUserByUserIdProxy(userId));
-                for (Quiz quiz : userTestAnswer.getTest().getQuizzes()) {
-                    UserQuizAnswer userQuizAnswer = new UserQuizAnswer();
+        if (Boolean.parseBoolean(restore) && lastUserTestAnswer != null && lastUserTestAnswer.getCompletedAt() == null) {
+            userTestAnswer = lastUserTestAnswer;
+        } else {
+            userTestAnswer = new UserTestAnswer();
+            Calendar calendar = new GregorianCalendar();
+            userTestAnswer.setStartAt(calendar);
+            userTestAnswer.setTest(testService.findTest(testId));
+            userTestAnswer.setUser(userService.loadUserByUserIdProxy(userId));
+            for (Quiz quiz : userTestAnswer.getTest().getQuizzes()) {
+                UserQuizAnswer userQuizAnswer = new UserQuizAnswer();
 
-                    if (quiz instanceof MultipleAnswerQuiz) {
-                        MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
-                        multipleUserAnswerQuiz.setQuiz(quiz);
-                        userQuizAnswer = multipleUserAnswerQuiz;
-                    } else if (quiz instanceof StringAnswerQuiz) {
-                        StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
-                        stringUserAnswerQuiz.setQuiz(quiz);
-                        stringUserAnswerQuiz.setAnswer("");
-                        userQuizAnswer = stringUserAnswerQuiz;
-                    } else if (quiz instanceof MapAnswerQuiz) {
-                        MapUserAnswerQuiz mapUserAnswerQuiz = new MapUserAnswerQuiz();
-                        mapUserAnswerQuiz.setQuiz(quiz);
-                        userQuizAnswer = mapUserAnswerQuiz;
-                    }
-                    userQuizAnswer.setDuration(0.0);
-                    userTestAnswer.addUserQuizAnswer(userQuizAnswer);
+                if (quiz instanceof MultipleAnswerQuiz) {
+                    MultipleUserAnswerQuiz multipleUserAnswerQuiz = new MultipleUserAnswerQuiz();
+                    multipleUserAnswerQuiz.setQuiz(quiz);
+                    userQuizAnswer = multipleUserAnswerQuiz;
+                } else if (quiz instanceof StringAnswerQuiz) {
+                    StringUserAnswerQuiz stringUserAnswerQuiz = new StringUserAnswerQuiz();
+                    stringUserAnswerQuiz.setQuiz(quiz);
+                    stringUserAnswerQuiz.setAnswer("");
+                    userQuizAnswer = stringUserAnswerQuiz;
+                } else if (quiz instanceof MapAnswerQuiz) {
+                    MapUserAnswerQuiz mapUserAnswerQuiz = new MapUserAnswerQuiz();
+                    mapUserAnswerQuiz.setQuiz(quiz);
+                    userQuizAnswer = mapUserAnswerQuiz;
                 }
-                saveStartAnswer(userTestAnswer);
-
-                if (test.getDuration() != null) {
-
-                    Calendar jobCalendar = getEndTime(test);
-
-                    SchedulerFactory sf = new StdSchedulerFactory();
-                    Scheduler scheduler = sf.getScheduler();
-
-                    JobDetail job = newJob(SimpleJob.class)
-                            .withIdentity(UUID.randomUUID().toString(), "group1")
-                            .usingJobData("username", userService.loadUserByUserIdProxy(userId).getUsername())
-                            .usingJobData("test", test.getTestId())
-                            .usingJobData("answer", userTestAnswer.getUserAnswerId())
-                            .build();
-
-
-                    CronTrigger trigger = newTrigger()
-                            .withIdentity(UUID.randomUUID().toString(), "group1")
-                            .withSchedule(cronSchedule(jobCalendar.get(Calendar.SECOND) + " " +
-                                    jobCalendar.get(Calendar.MINUTE) + " " +
-                                    jobCalendar.get(Calendar.HOUR_OF_DAY) + " " +
-                                    jobCalendar.get(Calendar.DAY_OF_MONTH) + " " +
-                                    (jobCalendar.get(Calendar.MONTH) + 1) + " ? " +
-                                    jobCalendar.get(Calendar.YEAR)))
-                            .build();
-
-                    scheduler.scheduleJob(job, trigger);
-
-                    System.out.println("Задание выполнится в: " + jobCalendar.getTime());
-
-                    scheduler.start();
-                }
+                userQuizAnswer.setDuration(0.0);
+                userTestAnswer.addUserQuizAnswer(userQuizAnswer);
             }
-        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            saveStartAnswer(userTestAnswer);
 
-        return userTestAnswer.getUserAnswerId();
-    }
+            if (test.getDuration() != null) {
 
-    public static Calendar getEndTime(Test test) {
-        Calendar jobCalendar = new GregorianCalendar();
-        jobCalendar.set(Calendar.SECOND, jobCalendar.get(Calendar.SECOND) + test.getDuration().getSecond());
-        jobCalendar.set(Calendar.MINUTE, jobCalendar.get(Calendar.MINUTE) + test.getDuration().getMinute());
-        jobCalendar.set(Calendar.HOUR, jobCalendar.get(Calendar.HOUR) + test.getDuration().getHour());
+                Calendar jobCalendar = getEndTime(test);
 
-        if (test.getEndTime() != null) {
-            Calendar nowTimePlusDuration = new GregorianCalendar();
-            nowTimePlusDuration.add(Calendar.SECOND, test.getDuration().getSecond());
-            nowTimePlusDuration.add(Calendar.MINUTE, test.getDuration().getMinute());
-            nowTimePlusDuration.add(Calendar.HOUR, test.getDuration().getHour());
+                SchedulerFactory sf = new StdSchedulerFactory();
+                Scheduler scheduler = sf.getScheduler();
 
-            if (nowTimePlusDuration.after(test.getEndTime())) {
-                jobCalendar = test.getEndTime();
+                JobDetail job = newJob(SimpleJob.class)
+                        .withIdentity(UUID.randomUUID().toString(), "group1")
+                        .usingJobData("username", userService.loadUserByUserIdProxy(userId).getUsername())
+                        .usingJobData("test", test.getTestId())
+                        .usingJobData("answer", userTestAnswer.getUserAnswerId())
+                        .build();
+
+
+                CronTrigger trigger = newTrigger()
+                        .withIdentity(UUID.randomUUID().toString(), "group1")
+                        .withSchedule(cronSchedule(jobCalendar.get(Calendar.SECOND) + " " +
+                                jobCalendar.get(Calendar.MINUTE) + " " +
+                                jobCalendar.get(Calendar.HOUR_OF_DAY) + " " +
+                                jobCalendar.get(Calendar.DAY_OF_MONTH) + " " +
+                                (jobCalendar.get(Calendar.MONTH) + 1) + " ? " +
+                                jobCalendar.get(Calendar.YEAR)))
+                        .build();
+
+                scheduler.scheduleJob(job, trigger);
+
+                System.out.println("Задание выполнится в: " + jobCalendar.getTime());
+
+                scheduler.start();
             }
         }
-        return jobCalendar;
+
+
+        return userTestAnswer.getUserAnswerId();
     }
 
     @Transactional
