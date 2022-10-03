@@ -21,4 +21,5 @@ public class StringAnswerQuiz extends Quiz {
     public void setAnswer(List<String> answer) {
         this.answer = answer;
     }
+
 }

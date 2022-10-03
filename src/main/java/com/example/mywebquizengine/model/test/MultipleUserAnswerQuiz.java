@@ -29,4 +29,14 @@ public class MultipleUserAnswerQuiz extends UserQuizAnswer {
             answer.remove(integer);
         }
     }
+
+    @Override
+    public void check() {
+        setStatus(this.answer.toString().equals(((MultipleAnswerQuiz) getQuiz()).getAnswer().toString()));
+    }
+
+    @Override
+    public void updateAnswer(Object object) {
+        answer = (List<Integer>) object;
+    }
 }
