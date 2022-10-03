@@ -36,7 +36,7 @@ public class ApiUserAnswerController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(path = "/quizzes/{id}/info")
+   /* @GetMapping(path = "/quizzes/{id}/info")
     @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public String getInfo(@PathVariable Long id, Model model,
                           @RequestParam(required = false) Long groupId,
@@ -71,21 +71,15 @@ public class ApiUserAnswerController {
         model.addAttribute("answersOnQuiz", userAnswerService.getPageAnswersById(id, groupId));
         model.addAttribute("moreAnswers", userAnswerService.getAnswerStat(id, groupId));
         return "info";
-    }
+    }*/
 
     @GetMapping(path = "/checklastanswer/{id}")
     @ResponseBody
     public Boolean checkLastAnswer(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
-        UserTestAnswer userTestAnswer = userAnswerService.checkLastComplete(
+        return userAnswerService.checkLastComplete(
                 userService.loadUserByUserIdProxy(authUser.getUserId()),
                 id
-        );
-
-        if (userTestAnswer != null) {
-            return userTestAnswer.getCompletedAt() == null;
-        } else {
-            return false;
-        }
+        ) != null;
     }
 
     @PostMapping(path = "/test/answer/{userTestAnswerId}/send")
@@ -102,7 +96,7 @@ public class ApiUserAnswerController {
         return userAnswerService.startAnswer(testId, restore, authUser.getUserId());
     }
 
-    @GetMapping(value = "/test/{testId}/{userTestAnswerId}/solve")
+    /*@GetMapping(value = "/test/{testId}/{userTestAnswerId}/solve")
     public String startAnswer(@PathVariable Long testId, @PathVariable Long userTestAnswerId, Model model) {
         UserTestAnswer userTestAnswer = userAnswerService.findByUserAnswerId(userTestAnswerId);
         Test test = testService.findTest(testId);
@@ -143,7 +137,7 @@ public class ApiUserAnswerController {
 
             return "answer";
         }
-    }
+    }*/
 
     @PostMapping(value = "/test/answer/update")
     public void getAnswerSession(@AuthenticationPrincipal User authUser, @Valid @RequestBody UserTestAnswerRequest request) {

@@ -1,6 +1,7 @@
 package com.example.mywebquizengine.model.test;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,6 +20,16 @@ public class MapUserAnswerQuiz extends UserQuizAnswer {
 
     public void setAnswer(Map<String, String> answer) {
         this.answer = answer;
+    }
+
+    @Override
+    public void check() {
+        setStatus(this.getAnswer().equals(((MapAnswerQuiz) getQuiz()).getAnswer()));
+    }
+
+    @Override
+    public void updateAnswer(Object object) {
+        answer = (HashMap<String, String>) object;
     }
 
     @Override

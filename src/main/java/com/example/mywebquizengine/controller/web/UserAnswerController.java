@@ -43,16 +43,10 @@ public class UserAnswerController {
     @GetMapping(path = "/test/{id}/answer/check")
     @ResponseBody
     public Boolean checkLastAnswer(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
-        UserTestAnswer userTestAnswer = userAnswerService.checkLastComplete(
+        return userAnswerService.checkLastComplete(
                 userService.loadUserByUserIdProxy(authUser.getUserId()),
                 id
-        );
-
-        if (userTestAnswer != null) {
-            return userTestAnswer.getCompletedAt() == null;
-        } else {
-            return false;
-        }
+        ) != null;
     }
 
     @PostMapping(path = "/test/answer/{id}/send")
@@ -88,7 +82,6 @@ public class UserAnswerController {
             model.addAttribute("lastAnswer", userTestAnswer);
             model.addAttribute("test_id", test);
             List<Quiz> quizzes = test.getQuizzes();
-            //Collections.shuffle(quizzes);
             model.addAttribute("quizzes", quizzes);
 
             if (test.getDuration() != null) {

@@ -18,4 +18,13 @@ public class StringUserAnswerQuiz extends UserQuizAnswer {
         this.answer = answer;
     }
 
+    @Override
+    public void check() {
+        setStatus(this.answer.equals(((StringAnswerQuiz) getQuiz()).getAnswer().get(0)));
+    }
+
+    @Override
+    public void updateAnswer(Object object) {
+        answer = (String) object;
+    }
 }

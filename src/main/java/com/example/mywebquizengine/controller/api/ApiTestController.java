@@ -54,14 +54,13 @@ public class ApiTestController {
     @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public void deleteTest(@PathVariable Long id, @AuthenticationPrincipal User authUser) {
         testService.deleteTest(id);
-        throw new ResponseStatusException(HttpStatus.OK);
     }
 
-    @GetMapping(path = "/update/{id}")
+    /*@GetMapping(path = "/update/{id}")
     @PreAuthorize(value = "@testService.findTest(#id).course.owner.userId.equals(#authUser.userId)")
     public String update(@PathVariable Long id, Model model, @AuthenticationPrincipal User authUser) {
         Test tempTest = testService.findTest(id);
         model.addAttribute("oldTest", tempTest);
         return "updateQuiz";
-    }
+    }*/
 }
